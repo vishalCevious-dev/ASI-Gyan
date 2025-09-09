@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ASI Gyan - AI School of Entrepreneur Design System
+Futuristic, premium, intelligent, clean design focused on AI learning
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Core Brand Colors */
+    --space-blue: 218 60% 8%; /* Deep Space Blue #0A0F1F */
+    --electric-cyan: 180 100% 50%; /* Electric Cyan #00FFFF */
+    --ai-green: 153 100% 50%; /* AI Neon Green #00FF9D */
+    --digital-purple: 271 76% 53%; /* Digital Purple #8A2BE2 */
+
+    /* Semantic Design System */
+    --background: 218 60% 8%; /* Deep Space Blue */
+    --foreground: 180 100% 95%; /* Light cyan text */
+
+    --card: 218 50% 12%; /* Slightly lighter space blue */
+    --card-foreground: 180 100% 95%;
+
+    --popover: 218 50% 12%;
+    --popover-foreground: 180 100% 95%;
+
+    --primary: 153 100% 50%; /* AI Neon Green */
+    --primary-foreground: 218 60% 8%;
+
+    --secondary: 180 100% 50%; /* Electric Cyan */
+    --secondary-foreground: 218 60% 8%;
+
+    --muted: 218 50% 15%;
+    --muted-foreground: 180 50% 70%;
+
+    --accent: 271 76% 53%; /* Digital Purple */
+    --accent-foreground: 180 100% 95%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 180 100% 95%;
+
+    --border: 218 40% 20%;
+    --input: 218 40% 20%;
+    --ring: 153 100% 50%;
+
+    --radius: 1rem;
+
+    /* Gradients */
+    --cyber-sheen: linear-gradient(45deg, hsl(180 100% 50%), hsl(271 76% 53%));
+    --neon-core: radial-gradient(
+      circle,
+      hsl(153 100% 50% / 0.8) 0%,
+      hsl(153 100% 50% / 0.2) 60%,
+      transparent 100%
+    );
+    --space-depth: linear-gradient(
+      135deg,
+      hsl(218 60% 8%) 0%,
+      hsl(218 50% 12%) 50%,
+      hsl(218 40% 16%) 100%
+    );
+
+    /* Effects */
+    --glow-cyan: 0 0 20px hsl(180 100% 50% / 0.5);
+    --glow-green: 0 0 20px hsl(153 100% 50% / 0.5);
+    --glow-purple: 0 0 20px hsl(271 76% 53% / 0.5);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  .dark {
+    /* Dark mode uses same colors for this futuristic theme */
+    --background: 218 60% 8%;
+    --foreground: 180 100% 95%;
+    --card: 218 50% 12%;
+    --card-foreground: 180 100% 95%;
+    --popover: 218 50% 12%;
+    --popover-foreground: 180 100% 95%;
+    --primary: 153 100% 50%;
+    --primary-foreground: 218 60% 8%;
+    --secondary: 180 100% 50%;
+    --secondary-foreground: 218 60% 8%;
+    --muted: 218 50% 15%;
+    --muted-foreground: 180 50% 70%;
+    --accent: 271 76% 53%;
+    --accent-foreground: 180 100% 95%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 180 100% 95%;
+    --border: 218 40% 20%;
+    --input: 218 40% 20%;
+    --ring: 153 100% 50%;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}

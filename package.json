@@ -1,0 +1,20 @@
+{
+    "name": "asi-gyan-monorepo",
+    "private": true,
+    "workspaces": [
+        "apps/*"
+    ],
+  "scripts": {
+    "preinstall": "node -e \"const ua=process.env.npm_config_user_agent||''; if(!ua.includes('pnpm')){console.error('This repo uses pnpm. Install via Corepack: https://pnpm.io/installation'); process.exit(1)}\"",
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "start": "turbo run start --parallel",
+    "check": "pnpm -r run check",
+    "fix": "pnpm -r run lint:fix && pnpm -r run format"
+  },
+    "devDependencies": {
+        "turbo": "^2.1.1",
+        "prettier": "^3.6.2"
+    },
+    "packageManager": "pnpm@9.15.9"
+}

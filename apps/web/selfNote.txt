@@ -1,0 +1,5 @@
+sudo rm -rf /var/www/asi-gyan/*
+sudo cp -r dist/* /var/www/asi-gyan/
+
+
+ pnpm install --strict-peer-dependencies=false

@@ -1,0 +1,9 @@
+node_modules
+build
+dist
+.next
+.turbo
+
+# Ignore dist and scripts folders everywhere in the monorepo
+**/dist/**
+**/scripts/**
