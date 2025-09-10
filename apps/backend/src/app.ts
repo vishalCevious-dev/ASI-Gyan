@@ -17,6 +17,13 @@ const corsOptions: CorsOptions = {
   credentials: true,
 };
 
+
+// Serve uploads directory correctly in both local and production
+const uploadsDir =
+  process.env.NODE_ENV === "production"
+    ? "/home/ubuntu/uploads"
+    : path.join(__dirname, "..", "public", "uploads");
+
 // Use middleware
 app.use(helmet());
 app.use(cors(corsOptions));
@@ -24,10 +31,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static("public"));
-app.use(
-  "/uploads",
-  express.static(path.join(__dirname, "..", "public", "uploads")),
-);
+app.use("/uploads", express.static(uploadsDir));
 
 // Routes
 app.use("/api/v1", apiRoutes);

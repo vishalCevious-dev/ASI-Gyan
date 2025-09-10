@@ -22,8 +22,11 @@ export function makeImageUploader(opts: UploaderOptions = {}) {
   const fileSizeMB = opts.fileSizeMB ?? 5; // 5MB default
   const allowed = opts.allowedMimeTypes ?? defaultAllowed;
 
-  // Resolve relative to compiled dist folder -> ../../public/<folder>
-  const destinationRoot = path.resolve(__dirname, "..", "..", "public", folder);
+  // ✅ Use /home/ubuntu/uploads in production, public/<folder> in dev
+  const destinationRoot =
+    process.env.NODE_ENV === "production"
+      ? path.resolve("/home/ubuntu", folder)
+      : path.resolve(__dirname, "..", "..", "public", folder);
 
   const storage = multer.diskStorage({
     destination: (_req, _file, cb) => {
@@ -41,9 +44,7 @@ export function makeImageUploader(opts: UploaderOptions = {}) {
 
   const fileFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
     if (!allowed.includes(file.mimetype)) {
-      return cb(
-        new multer.MulterError("LIMIT_UNEXPECTED_FILE", file.fieldname),
-      );
+      return cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE", file.fieldname));
     }
     cb(null, true);
   };
