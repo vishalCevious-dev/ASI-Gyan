@@ -19,7 +19,9 @@
     "pm2:delete": "pm2 delete asi-gyan-backend",
     "pm2:status": "pm2 status",
     "pm2:save": "pm2 save",
-    "pm2:startup": "pm2 startup"
+    "pm2:startup": "pm2 startup",
+    "pm2:start": "pm2 start ecosystem.config.js --env production",
+    "pm2:logs": "pm2 logs asi-gyan-backend --lines 100"
   },
     "devDependencies": {
         "turbo": "^2.1.1",
