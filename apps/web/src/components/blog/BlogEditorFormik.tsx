@@ -1,0 +1,431 @@
+import { useState } from "react";
+import { useFormik } from "formik";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ArrowLeft, Save, Send } from "lucide-react";
+import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
+import QuillEditor from "@/components/editor/QuillEditor";
+import { slugify } from "@/lib/slug";
+import {
+  blogCreateSchema,
+  parseTagsString,
+  isRichTextEmpty,
+} from "@/validation/blog";
+import { validateImageFile } from "@/validation/file";
+import { useToast } from "@/components/ui/use-toast";
+import { useBlogMutation } from "@/hooks/useBlogMutations";
+
+type PostPreview = {
+  id: number;
+  title: string;
+  excerpt: string;
+  author: string;
+  status: string;
+  category: string;
+} | null;
+
+export default function BlogEditorFormik({
+  post,
+  onClose,
+}: {
+  post: PostPreview;
+  onClose: () => void;
+}) {
+  const { toast } = useToast();
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState("");
+  const [tagsInput, setTagsInput] = useState("");
+  const { mutate, isPending } = useBlogMutation(() => onClose());
+
+  const {
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleBlur,
+    setFieldValue,
+    setFieldTouched,
+    handleSubmit,
+    submitCount,
+  } = useFormik({
+    initialValues: {
+      title: post?.title || "",
+      slug: slugify(post?.title || ""),
+      excerpt: post?.excerpt || "",
+      content: "",
+      status: "DRAFT" as "DRAFT" | "PUBLISHED",
+      category: post?.category || "",
+      tags: [] as string[],
+    },
+    validateOnChange: true,
+    validate: (v) => {
+      const e: Record<string, string> = {};
+      const title = (v.title || "").trim();
+      if (!title || title.length < 2)
+        e.title = "Title must be at least 2 characters";
+
+      const slug = (v.slug || "").trim();
+      if (!slug) e.slug = "Slug is required";
+      else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug))
+        e.slug = "Slug may contain lowercase letters, numbers and hyphens only";
+
+      if ((v.excerpt || "").length > 512)
+        e.excerpt = "Excerpt must be at most 512 characters";
+
+      if (isRichTextEmpty(v.content)) e.content = "Content is required";
+
+      return e;
+    },
+    enableReinitialize: true,
+    onSubmit: (v) => {
+      // Basic validations similar to your pattern
+      if (!v.title.trim()) {
+        toast({ title: "Title is required", variant: "destructive" });
+        return;
+      }
+      if (!v.slug.trim()) {
+        toast({ title: "Slug is required", variant: "destructive" });
+        return;
+      }
+      if (isRichTextEmpty(v.content)) {
+        toast({ title: "Content is required", variant: "destructive" });
+        return;
+      }
+      if (imageFile) {
+        const r = validateImageFile(imageFile);
+        if (!r.ok) {
+          toast({
+            title: "Invalid image",
+            description: r.error,
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+      const parsed = blogCreateSchema.safeParse(v);
+      if (!parsed.success) {
+        console.error(parsed.error);
+        const m = parsed.error.issues[0]?.message || "Invalid form input";
+        toast({
+          title: "Validation failed 1",
+          description: m,
+          variant: "destructive",
+        });
+        return;
+      }
+      mutate({ path: "create", ...parsed.data, image: imageFile || undefined });
+    },
+  });
+
+  const addTag = () => {
+    const arr = parseTagsString(tagsInput);
+    if (arr && arr.length) {
+      setFieldValue("tags", [...values.tags, ...arr]);
+      setTagsInput("");
+    }
+  };
+  const removeTag = (i: number) =>
+    setFieldValue(
+      "tags",
+      values.tags.filter((_, idx) => idx !== i),
+    );
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Posts
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-foreground bg-clip-text text-transparent">
+              {post ? "Edit Post" : "Create New Post"}
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Write and publish educational content for your community.
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setFieldValue("status", "DRAFT")}
+            className="border-accent-foreground/30 text-accent-foreground hover:bg-accent-foreground/10"
+            disabled={isPending}
+          >
+            <Save className="w-4 h-4 mr-2" />
+            Save Draft
+          </Button>
+          <Button
+            type="button"
+            onClick={() => setFieldValue("status", "PUBLISHED")}
+            className="gradient-primary text-black font-medium hover:scale-105 transition-transform"
+            disabled={isPending}
+          >
+            <Send className="w-4 h-4 mr-2" />
+            Publish
+          </Button>
+        </div>
+      </div>
+
+      <form
+        onSubmit={handleSubmit}
+        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+      >
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Post Details */}
+          <Card className="glassmorphism border-primary/20">
+            <CardHeader>
+              <CardTitle className="text-xl">Post Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="title">Title</Label>
+                <Input
+                  id="title"
+                  name="title"
+                  value={values.title}
+                  onChange={(e) => {
+                    handleChange(e);
+                    setFieldValue("slug", slugify(e.target.value));
+                  }}
+                  onBlur={handleBlur}
+                  placeholder="Enter your post title..."
+                  className="bg-input border-primary/20 text-lg"
+                />
+                {touched.title && errors.title ? (
+                  <p className="text-sm text-destructive">{errors.title}</p>
+                ) : null}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="slug">Slug</Label>
+                <Input
+                  id="slug"
+                  name="slug"
+                  value={values.slug}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder={slugify(values.title || "your-title")}
+                  className="bg-input border-primary/20"
+                />
+                {touched.slug && errors.slug ? (
+                  <p className="text-sm text-destructive">{errors.slug}</p>
+                ) : null}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="excerpt">Excerpt</Label>
+                <Textarea
+                  id="excerpt"
+                  name="excerpt"
+                  value={values.excerpt}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="Brief description of your post..."
+                  className="bg-input border-primary/20 min-h-20"
+                />
+                {touched.excerpt && errors.excerpt ? (
+                  <p className="text-sm text-destructive">{errors.excerpt}</p>
+                ) : null}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="featured-image">Featured Image</Label>
+                <Input
+                  id="featured-image"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0] || null;
+                    setImageFile(f);
+                    setImagePreview(f ? URL.createObjectURL(f) : "");
+                  }}
+                  className="bg-input border-primary/20"
+                />
+                {imagePreview && (
+                  <div className="mt-4">
+                    <ImageWithFallback
+                      src={imagePreview}
+                      alt="Featured image preview"
+                      className="w-full h-48 object-cover rounded-lg border border-primary/20"
+                    />
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Content Editor */}
+          <Card className="glassmorphism border-primary/20">
+            <CardHeader>
+              <CardTitle className="text-xl">Content</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <QuillEditor
+                value={values.content}
+                onChange={(html) => {
+                  setFieldValue("content", html);
+                  // Mark as touched on first interaction with the editor
+                  setFieldTouched("content", true, false);
+                }}
+                minHeight="28rem"
+                className="bg-input border border-primary/20 rounded-md"
+              />
+              {(touched.content || submitCount > 0) && errors.content ? (
+                <p className="text-sm text-destructive">{errors.content}</p>
+              ) : null}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Organization */}
+          <Card className="glassmorphism border-primary/20">
+            <CardHeader>
+              <CardTitle className="text-lg">Organization</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <Select
+                  value={values.category}
+                  onValueChange={(v) => setFieldValue("category", v)}
+                >
+                  <SelectTrigger className="bg-input border-primary/20">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent className="glassmorphism border-primary/20">
+                    <SelectItem value="ai-research">AI Research</SelectItem>
+                    <SelectItem value="community">Community</SelectItem>
+                    <SelectItem value="education">Education</SelectItem>
+                    <SelectItem value="deep-learning">Deep Learning</SelectItem>
+                    <SelectItem value="nlp">NLP</SelectItem>
+                    <SelectItem value="tutorials">Tutorials</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Publishing */}
+          <Card className="glassmorphism border-primary/20">
+            <CardHeader>
+              <CardTitle className="text-lg">Publishing</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <label className="inline-flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="status"
+                    value="PUBLISHED"
+                    checked={values.status === "PUBLISHED"}
+                    onChange={() => setFieldValue("status", "PUBLISHED")}
+                  />
+                  Publish
+                </label>
+                <label className="inline-flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="status"
+                    value="DRAFT"
+                    checked={values.status === "DRAFT"}
+                    onChange={() => setFieldValue("status", "DRAFT")}
+                  />
+                  Draft
+                </label>
+              </div>
+
+              <div className="pt-2">
+                <Badge
+                  variant={
+                    values.status === "PUBLISHED" ? "default" : "secondary"
+                  }
+                  className={
+                    values.status === "PUBLISHED"
+                      ? "bg-accent-foreground/20 text-accent-foreground border-accent-foreground/30"
+                      : "bg-chart-4/20 text-chart-4 border-chart-4/30"
+                  }
+                >
+                  {values.status === "PUBLISHED" ? "Published" : "Draft"}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Tags */}
+          <Card className="glassmorphism border-primary/20">
+            <CardHeader>
+              <CardTitle className="text-lg">Tags</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex gap-2">
+                <Input
+                  value={tagsInput}
+                  onChange={(e) => setTagsInput(e.target.value)}
+                  placeholder="Add tags, comma separated"
+                  className="bg-input border-primary/20"
+                />
+                <Button type="button" onClick={addTag} variant="outline">
+                  Add
+                </Button>
+              </div>
+              {values.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {values.tags.map((t, idx) => (
+                    <Badge
+                      key={idx}
+                      variant="outline"
+                      className="border-primary/30 text-primary cursor-pointer"
+                      onClick={() => removeTag(idx)}
+                    >
+                      {t}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="bg-primary text-primary-foreground"
+            >
+              {isPending
+                ? "Please wait…"
+                : values.status === "PUBLISHED"
+                  ? "Publish"
+                  : "Save Draft"}
+            </Button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+}

@@ -8,6 +8,13 @@
       "when": 1756963838552,
       "tag": "0000_rainy_blur",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1757410792268,
+      "tag": "0001_previous_squadron_supreme",
+      "breakpoints": true
     }
   ]
 }

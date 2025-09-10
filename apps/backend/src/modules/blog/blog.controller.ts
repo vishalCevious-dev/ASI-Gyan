@@ -41,6 +41,8 @@ export const listPosts = async (req: Request, res: Response) => {
         excerpt: Blog.excerpt,
         coverImageUrl: Blog.coverImageUrl,
         videoUrl: Blog.videoUrl,
+        category: Blog.category,
+        tags: Blog.tags,
         status: Blog.status,
         createdAt: Blog.createdAt,
         updatedAt: Blog.updatedAt,
@@ -112,15 +114,27 @@ export const getPostBySlug = async (req: Request, res: Response) => {
 export const createPost = async (req: Request, res: Response) => {
   const file = (req as MulterRequest).file; // capture early for cleanup
   try {
-    const { title, slug, excerpt, content, coverImageUrl, status } =
-      req.body as {
-        title: string;
-        slug?: string;
-        excerpt?: string;
-        content: string;
-        coverImageUrl?: string;
-        status?: "DRAFT" | "PUBLISHED";
-      };
+    const {
+      title,
+      slug,
+      excerpt,
+      content,
+      coverImageUrl,
+      status,
+      category,
+      tags,
+      metaDescription,
+    } = req.body as {
+      title: string;
+      slug?: string;
+      excerpt?: string;
+      content: string;
+      coverImageUrl?: string;
+      status?: "DRAFT" | "PUBLISHED";
+      category?: string;
+      tags?: string[];
+      metaDescription?: string;
+    };
 
     const finalSlug = (slug && slugify(slug)) || slugify(title);
 
@@ -165,6 +179,9 @@ export const createPost = async (req: Request, res: Response) => {
         excerpt,
         content,
         coverImageUrl: coverUrl,
+        category: category || undefined,
+        tags: Array.isArray(tags) ? tags : undefined,
+        metaDescription: metaDescription || undefined,
         status: status || "DRAFT",
         authorId: authorId || undefined,
         createdAt: new Date(),
@@ -191,26 +208,44 @@ export const updatePost = async (req: Request, res: Response) => {
   const file = (req as MulterRequest).file; // capture early for cleanup
   try {
     const { id } = req.params;
-    const { title, slug, excerpt, content, status } = req.body as {
+    const {
+      title,
+      slug,
+      excerpt,
+      content,
+      status,
+      category,
+      tags,
+      metaDescription,
+      removeImage,
+    } = req.body as {
       title?: string;
       slug?: string;
       excerpt?: string;
       content?: string;
-      coverImageUrl?: string;
       status?: "DRAFT" | "PUBLISHED";
+      category?: string;
+      tags?: string[];
+      metaDescription?: string;
+      removeImage?: boolean | "true" | "false";
     };
 
     const updates: any = { title, excerpt, content, updatedAt: new Date() };
 
     if (slug !== undefined) updates.slug = slugify(slug);
 
+    const shouldRemoveImage = removeImage === true || removeImage === "true";
     if (file) {
       updates.coverImageUrl = buildFileUrl(`/uploads/blog/${file.filename}`);
+    } else if (shouldRemoveImage) {
+      updates.coverImageUrl = null;
     }
-    // else if (coverImageUrl !== undefined) {
-    //   updates.coverImageUrl = buildFileUrl(coverImageUrl);
-    // }
     if (status !== undefined) updates.status = status;
+    if (category !== undefined) updates.category = category;
+    if (tags !== undefined)
+      updates.tags = Array.isArray(tags) ? tags : undefined;
+    if (metaDescription !== undefined)
+      updates.metaDescription = metaDescription;
 
     if (updates.slug) {
       // check for slug collision
@@ -230,8 +265,8 @@ export const updatePost = async (req: Request, res: Response) => {
       .where(eq(Blog.id, id))
       .limit(1);
 
-    // Only delete previous file if uploading a new one
-    if (file && currentPost?.coverImageUrl) {
+    // Only delete previous file if uploading a new one or removing
+    if ((file || shouldRemoveImage) && currentPost?.coverImageUrl) {
       const abs = resolvePublicFilePath(currentPost.coverImageUrl);
       if (abs) deleteFile(abs);
     }

@@ -17,6 +17,23 @@ export const blogCreateSchema = z.object({
   content: z.string().min(1, { message: "Content is required" }),
   coverImageUrl: z.union([z.url(), relativePath]).optional(),
   videoUrl: z.union([z.url(), relativePath]).optional(),
+  category: z.string().min(1, { message: "Category is required" }).optional(),
+  tags: z.preprocess(
+    (v) => {
+      if (typeof v === "string") {
+        try {
+          const p = JSON.parse(v);
+          if (Array.isArray(p)) return p;
+          return [v];
+        } catch {
+          return [v];
+        }
+      }
+      return v;
+    },
+    z.array(z.string().min(1)).optional(),
+  ),
+  metaDescription: z.string().max(160).optional(),
   status: z.enum(["DRAFT", "PUBLISHED"]).optional(),
 });
 
@@ -29,7 +46,24 @@ export const blogUpdateSchema = z.object({
     .optional(),
   excerpt: z.string().max(512).optional(),
   content: z.string().min(1).optional(),
-  coverImageUrl: z.union([z.url(), relativePath]).optional(),
   videoUrl: z.union([z.url(), relativePath]).optional(),
+  category: z.string().min(1).optional(),
+  tags: z.preprocess(
+    (v) => {
+      if (typeof v === "string") {
+        try {
+          const p = JSON.parse(v);
+          if (Array.isArray(p)) return p;
+          return [v];
+        } catch {
+          return [v];
+        }
+      }
+      return v;
+    },
+    z.array(z.string().min(1)).optional(),
+  ),
+  metaDescription: z.string().max(160).optional(),
+  removeImage: z.union([z.boolean(), z.enum(["true", "false"])]).optional(),
   status: z.enum(["DRAFT", "PUBLISHED"]).optional(),
 });

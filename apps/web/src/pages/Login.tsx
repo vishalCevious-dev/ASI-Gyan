@@ -48,13 +48,18 @@ const Login = () => {
   async function onSubmit(values: LoginValues) {
     setIsLoading(true);
     try {
-      await authApi.login(values.email, values.password);
+      const resp = await authApi.login(values.email, values.password);
       toast({
         title: "Signed in",
         description: `Welcome back, ${values.email}`,
       });
-      // Cookie is set by server; navigate to home
-      navigate("/");
+      // Cookie is set by server; navigate based on role
+      const role = resp?.data?.role;
+      if (role === "ADMIN") {
+        navigate("/dashboard");
+      } else {
+        navigate("/");
+      }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       toast({
