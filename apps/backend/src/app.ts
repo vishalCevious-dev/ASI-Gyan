@@ -14,10 +14,10 @@ const corsOptions: CorsOptions = {
   credentials: true,
 };
 
-// Serve uploads directory correctly in both local and production
+// Use production uploads folder when serving files
 const uploadsDir =
   process.env.NODE_ENV === "production"
-    ? "/home/ubuntu/uploads"
+    ? "/home/ubuntu/asigyan-uploads"
     : path.join(__dirname, "..", "public", "uploads");
 
 // Use middleware

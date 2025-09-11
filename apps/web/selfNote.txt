@@ -3,3 +3,12 @@ sudo cp -r dist/* /var/www/asi-gyan/
 
 
  pnpm install --strict-peer-dependencies=false
+
+
+ chmod +x scripts/deploy_static.sh scripts/pm2_backend.sh && \
+./scripts/deploy_static.sh && \
+./scripts/pm2_backend.sh
+
+
+sudo nginx -t
+sudo systemctl reload nginx

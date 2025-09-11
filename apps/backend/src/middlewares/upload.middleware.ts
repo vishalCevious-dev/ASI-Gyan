@@ -22,11 +22,12 @@ export function makeImageUploader(opts: UploaderOptions = {}) {
   const fileSizeMB = opts.fileSizeMB ?? 5; // 5MB default
   const allowed = opts.allowedMimeTypes ?? defaultAllowed;
 
-  // ✅ Use /home/ubuntu/uploads in production, public/<folder> in dev
+  // ✅ Production: /home/ubuntu/asigyan-uploads/<folder>
+  // ✅ Dev: public/uploads/<folder>
   const destinationRoot =
     process.env.NODE_ENV === "production"
-      ? path.resolve("/home/ubuntu", folder)
-      : path.resolve(__dirname, "..", "..", "public", folder);
+      ? path.resolve("/home/ubuntu/asigyan-uploads", folder)
+      : path.resolve(__dirname, "..", "..", "public", "uploads", folder);
 
   const storage = multer.diskStorage({
     destination: (_req, _file, cb) => {
@@ -44,9 +45,7 @@ export function makeImageUploader(opts: UploaderOptions = {}) {
 
   const fileFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
     if (!allowed.includes(file.mimetype)) {
-      return cb(
-        new multer.MulterError("LIMIT_UNEXPECTED_FILE", file.fieldname),
-      );
+      return cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE", file.fieldname));
     }
     cb(null, true);
   };
@@ -60,9 +59,9 @@ export function makeImageUploader(opts: UploaderOptions = {}) {
   return upload;
 }
 
-// Pre-configured helpers
+// Pre-configured helper for blog images
 export const uploadBlogImage = makeImageUploader({
-  folder: path.join("uploads", "blog"),
+  folder: "blog",
 });
 
 export type MulterRequest = Express.Request & { file?: Express.Multer.File };
@@ -76,27 +75,24 @@ export function deleteFile(filePath: string) {
   }
 }
 
-// Convert a public URL or "/uploads/..." path to an absolute filesystem path under the compiled public dir
+// Convert a public URL or "/uploads/..." path to an absolute filesystem path in dev
 export function resolvePublicFilePath(urlOrPath: string): string | null {
   try {
     const publicRoot = path.resolve(__dirname, "..", "..", "public");
     let pathname = urlOrPath;
 
-    // If a full URL, extract pathname
     if (/^https?:\/\//i.test(urlOrPath)) {
       try {
         const u = new URL(urlOrPath);
         pathname = u.pathname;
       } catch {
-        // fall back to raw string
+        // ignore invalid URL
       }
     }
 
-    // Ensure leading slash removed for joining
     const rel = pathname.startsWith("/") ? pathname.slice(1) : pathname;
     const abs = path.resolve(publicRoot, rel);
-    // Prevent path traversal outside public
-    if (!abs.startsWith(publicRoot)) return null;
+    if (!abs.startsWith(publicRoot)) return null; // security check
     return abs;
   } catch {
     return null;

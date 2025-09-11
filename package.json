@@ -16,7 +16,7 @@
     "pm2:backend:direct": "pm2 start apps/backend/dist/index.js --name \"asi-gyan-backend\"",
     "pm2:restart": "pm2 restart asi-gyan-backend",
     "pm2:stop": "pm2 stop asi-gyan-backend",
-    "pm2:delete": "pm2 stop asi-gyan-backend && pnpm run pm2:delete",
+    "pm2:delete": "pm2 stop asi-gyan-backend && pm2 delete asi-gyan-backend",
     "pm2:status": "pm2 status",
     "pm2:save": "pm2 save",
     "pm2:startup": "pm2 startup",
