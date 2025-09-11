@@ -16,7 +16,7 @@ const corsOptions: CorsOptions = {
 
 // Use production uploads folder when serving files
 const uploadsDir =
-  process.env.NODE_ENV === "production"
+  EnvSecret.NODE_ENV === "PRODUCTION"
     ? "/home/ubuntu/asigyan-uploads"
     : path.join(__dirname, "..", "public", "uploads");
 

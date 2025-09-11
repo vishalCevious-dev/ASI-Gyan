@@ -7,7 +7,7 @@ sudo cp -r dist/* /var/www/asi-gyan/
 
  chmod +x scripts/deploy_static.sh scripts/pm2_backend.sh && \
 ./scripts/deploy_static.sh && \
-./scripts/pm2_backend.sh
+./scripts/pm2_backend.sh start --direct
 
 
 sudo nginx -t

@@ -1,6 +1,7 @@
 import path from "node:path";
 import fs from "node:fs";
 import multer from "multer";
+import EnvSecret from "src/constants/envVariables";
 
 type UploaderOptions = {
   folder?: string;
@@ -18,14 +19,13 @@ const sanitize = (name: string) =>
     .replace(/-+/g, "-");
 
 export function makeImageUploader(opts: UploaderOptions = {}) {
-  const folder = opts.folder ?? "uploads";
-  const fileSizeMB = opts.fileSizeMB ?? 5; // 5MB default
+  const folder = opts.folder ?? "uploads"; // relative folder e.g. "blog"
+  const fileSizeMB = opts.fileSizeMB ?? 5;
   const allowed = opts.allowedMimeTypes ?? defaultAllowed;
 
-  // ✅ Production: /home/ubuntu/asigyan-uploads/<folder>
-  // ✅ Dev: public/uploads/<folder>
+  // ✅ Full destination path based on environment
   const destinationRoot =
-    process.env.NODE_ENV === "production"
+    EnvSecret.NODE_ENV === "PRODUCTION"
       ? path.resolve("/home/ubuntu/asigyan-uploads", folder)
       : path.resolve(__dirname, "..", "..", "public", "uploads", folder);
 
@@ -50,16 +50,14 @@ export function makeImageUploader(opts: UploaderOptions = {}) {
     cb(null, true);
   };
 
-  const upload = multer({
+  return multer({
     storage,
     fileFilter,
     limits: { fileSize: fileSizeMB * 1024 * 1024 },
   });
-
-  return upload;
 }
 
-// Pre-configured helper for blog images
+// ✅ For blog images, pass "blog" only (not full path)
 export const uploadBlogImage = makeImageUploader({
   folder: "blog",
 });
@@ -75,7 +73,6 @@ export function deleteFile(filePath: string) {
   }
 }
 
-// Convert a public URL or "/uploads/..." path to an absolute filesystem path in dev
 export function resolvePublicFilePath(urlOrPath: string): string | null {
   try {
     const publicRoot = path.resolve(__dirname, "..", "..", "public");
