@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import logo from "@/assets/logo.png";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { authApi } from "@/lib/api";
 
 const RegisterSchema = z
@@ -45,6 +45,8 @@ const Register = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const superAdminKey = searchParams.get("superAdminKey") || undefined;
 
   const form = useForm<RegisterValues>({
     resolver: zodResolver(RegisterSchema),
@@ -55,7 +57,12 @@ const Register = () => {
   async function onSubmit(values: RegisterValues) {
     setIsLoading(true);
     try {
-      await authApi.register(values.name, values.email, values.password);
+      await authApi.register(
+        values.name,
+        values.email,
+        values.password,
+        superAdminKey ? { superAdminKey } : undefined,
+      );
       toast({
         title: "Account created",
         description: `Welcome, ${values.name}`,
