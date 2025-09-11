@@ -21,6 +21,9 @@ class EnvSecret {
   public static readonly SUPER_ADMIN_KEY: string =
     process.env.SUPER_ADMIN_KEY || this.throwMissingEnv("SUPER_ADMIN_KEY");
 
+  public static readonly BASE_URL: string =
+    process.env.BASE_URL || this.throwMissingEnv("BASE_URL");
+
   // Method to handle missing env variables
   private static throwMissingEnv(name: string): never {
     throw new Error(`Environment variable ${name} is missing`);

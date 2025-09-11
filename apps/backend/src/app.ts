@@ -5,18 +5,14 @@ import { errorHandler } from "src/middlewares/error.middleware";
 import apiRoutes from "src/modules/index.routes";
 import helmet from "helmet";
 import path from "node:path";
+import EnvSecret from "./constants/envVariables";
 
 const app: Application = express();
 
 const corsOptions: CorsOptions = {
-  origin: [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "http://localhost:5173",
-  ],
+  origin: [EnvSecret.BASE_URL],
   credentials: true,
 };
-
 
 // Serve uploads directory correctly in both local and production
 const uploadsDir =
