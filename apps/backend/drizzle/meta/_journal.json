@@ -15,6 +15,13 @@
       "when": 1757410792268,
       "tag": "0001_previous_squadron_supreme",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1757936182396,
+      "tag": "0002_organic_yellowjacket",
+      "breakpoints": true
     }
   ]
 }

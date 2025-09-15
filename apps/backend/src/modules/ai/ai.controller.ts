@@ -171,12 +171,10 @@ export const imageGenerate = async (req: Request, res: Response) => {
     res.status(200).json({ success: true, message: "ok", data: { url, b64 } });
     return;
   } catch (err: any) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: err?.message || "Image generation failed",
-      });
+    res.status(500).json({
+      success: false,
+      message: err?.message || "Image generation failed",
+    });
     return;
   }
 };

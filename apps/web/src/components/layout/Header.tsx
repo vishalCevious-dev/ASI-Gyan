@@ -9,12 +9,14 @@ import {
   Settings,
   User,
   LogOut,
-  // Moon,
-  // Sun,
+  Moon,
+  Sun,
   Zap,
   Shield,
   HelpCircle,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -30,7 +32,9 @@ import { useNavigate } from "react-router-dom";
 // import { toast } from 'sonner';
 
 interface HeaderProps {
-  activeTab: string;
+  activeTab?: string;
+  isSidebarCollapsed?: boolean;
+  onToggleSidebar?: () => void;
 }
 
 const notifications = [
@@ -99,9 +103,36 @@ const getPageTitle = (activeTab: string) => {
   }
 };
 
-export function Header({ activeTab }: HeaderProps) {
+export function Header({
+  activeTab,
+  isSidebarCollapsed = false,
+  onToggleSidebar,
+}: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  // const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      const stored = localStorage.getItem("asi.theme");
+      if (stored === "dark") return true;
+      if (stored === "light") return false;
+      return (
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+      );
+    } catch {
+      return false;
+    }
+  });
+  React.useEffect(() => {
+    try {
+      const root = document.documentElement;
+      if (isDarkMode) root.classList.add("dark");
+      else root.classList.remove("dark");
+      localStorage.setItem("asi.theme", isDarkMode ? "dark" : "light");
+    } catch {
+      //
+    }
+  }, [isDarkMode]);
   const unreadCount = notifications.filter((n) => n.unread).length;
 
   const navigate = useNavigate();
@@ -128,13 +159,35 @@ export function Header({ activeTab }: HeaderProps) {
   };
 
   return (
-    <header className="fixed top-0 right-0 left-64 h-16 glassmorphism border-b border-primary/20 z-40">
+    <header
+      className={`fixed top-0 right-0 ${
+        isSidebarCollapsed ? "left-16" : "left-64"
+      } h-16 glassmorphism border-b border-primary/20 z-40 transition-[left] duration-200`}
+    >
       <div className="flex items-center justify-between h-full px-6">
         {/* Left Section - Page Title & Search */}
         <div className="flex items-center gap-6">
+          {/* Sidebar toggle */}
+          {typeof onToggleSidebar === "function" && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onToggleSidebar}
+              className="text-muted-foreground hover:text-foreground hover:bg-accent/20"
+              aria-label={
+                isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
+              }
+            >
+              {isSidebarCollapsed ? (
+                <ChevronRight className="w-4 h-4" />
+              ) : (
+                <ChevronLeft className="w-4 h-4" />
+              )}
+            </Button>
+          )}
           <div>
             <h1 className="text-lg font-semibold text-foreground">
-              {getPageTitle(activeTab)}
+              {getPageTitle(activeTab || "dashboard")}
             </h1>
             <div className="flex items-center gap-2 mt-1">
               <div className="w-2 h-2 rounded-full bg-accent-foreground animate-pulse" />
@@ -184,14 +237,22 @@ export function Header({ activeTab }: HeaderProps) {
           </div>
 
           {/* Theme Toggle */}
-          {/* <Button
+          <Button
             variant="ghost"
             size="icon"
-            onClick={() => setIsDarkMode(!isDarkMode)}
+            onClick={() => setIsDarkMode((v) => !v)}
             className="text-muted-foreground hover:text-foreground hover:bg-accent/20"
+            aria-label={
+              isDarkMode ? "Switch to light mode" : "Switch to dark mode"
+            }
+            title={isDarkMode ? "Light mode" : "Dark mode"}
           >
-            {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </Button> */}
+            {isDarkMode ? (
+              <Sun className="w-4 h-4" />
+            ) : (
+              <Moon className="w-4 h-4" />
+            )}
+          </Button>
 
           {/* Notifications */}
           <Popover>

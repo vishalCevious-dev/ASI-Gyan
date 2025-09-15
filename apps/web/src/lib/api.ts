@@ -268,6 +268,8 @@ type GalleryItem = {
   imageUrl?: string | null;
   videoUrl?: string | null;
   status: "DRAFT" | "PUBLISHED";
+  category?: string | null;
+  tags?: string[] | null;
   createdAt?: string;
 };
 
@@ -299,6 +301,8 @@ export const galleryApi = {
     imageUrl?: string;
     videoUrl?: string;
     status?: "DRAFT" | "PUBLISHED";
+    category?: string;
+    tags?: string[];
   }) {
     const fd = new FormData();
     fd.append("title", input.title);
@@ -308,6 +312,9 @@ export const galleryApi = {
     if (input.image) fd.append("image", input.image);
     if (input.imageUrl) fd.append("imageUrl", input.imageUrl);
     if (input.videoUrl) fd.append("videoUrl", input.videoUrl);
+    if (input.category) fd.append("category", input.category);
+    if (input.tags && input.tags.length)
+      fd.append("tags", JSON.stringify(input.tags));
     return apiFetch<ApiResponse<{ id: string }>>("/v1/gallery/add", {
       method: "POST",
       body: fd,
@@ -325,6 +332,8 @@ export const galleryApi = {
       imageUrl?: string;
       videoUrl?: string;
       removeImage?: boolean;
+      category?: string;
+      tags?: string[];
     },
   ) {
     const fd = new FormData();
@@ -338,6 +347,10 @@ export const galleryApi = {
     if (input.videoUrl !== undefined) fd.append("videoUrl", input.videoUrl);
     if (input.removeImage !== undefined)
       fd.append("removeImage", String(input.removeImage));
+    if (input.category !== undefined)
+      fd.append("category", input.category ?? "");
+    if (input.tags !== undefined)
+      fd.append("tags", input.tags ? JSON.stringify(input.tags) : "[]");
     return apiFetch<ApiResponse<{ id: string }>>(
       `/v1/gallery/update/${encodeURIComponent(id)}`,
       {

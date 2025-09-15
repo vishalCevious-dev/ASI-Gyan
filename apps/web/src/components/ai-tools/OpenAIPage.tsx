@@ -163,15 +163,12 @@ export default function OpenAIPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-3">
+      <div className="flex items-center justify-between -mt-2">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-foreground bg-clip-text text-transparent">
+          <h1 className="text-2xl ml-1 font-bold bg-gradient-to-r from-primary to-accent-foreground bg-clip-text text-transparent">
             OpenAI Chat
           </h1>
-          <p className="text-muted-foreground mt-2">
-            Uses the backend to call OpenAI with your configured API key.
-          </p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
@@ -213,7 +210,7 @@ export default function OpenAIPage() {
         </div>
       </div>
 
-      <Card className="glassmorphism border-primary/20">
+      <Card className="glassmorphism border-primary/20 -mt-2">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bot className="w-5 h-5 text-primary" />

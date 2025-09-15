@@ -32,11 +32,12 @@ export const listGallery = async (req: Request, res: Response) => {
       .select({
         id: Gallery.id,
         title: Gallery.title,
-        description: Gallery.description,
         type: Gallery.type,
         imageUrl: Gallery.imageUrl,
         videoUrl: Gallery.videoUrl,
         status: Gallery.status,
+        category: Gallery.category,
+        tags: Gallery.tags,
         createdAt: Gallery.createdAt,
       })
       .from(Gallery)
@@ -108,21 +109,34 @@ export const getGalleryItem = async (req: Request, res: Response) => {
 export const createGalleryItem = async (req: Request, res: Response) => {
   const file = (req as MulterRequest).file; // for cleanup
   try {
-    const { title, description, type, imageUrl, videoUrl, status } =
+    const { title, type, imageUrl, videoUrl, status, category, tags } =
       req.body as {
         title: string;
-        description?: string;
         type: "PHOTO" | "VIDEO";
         imageUrl?: string;
         videoUrl?: string;
         status?: "DRAFT" | "PUBLISHED";
+        category?: string;
+        tags?: string | string[];
       };
 
     const data: any = {
       title,
-      description,
       type,
       status: status ?? "PUBLISHED",
+      category: category ?? null,
+      tags: Array.isArray(tags)
+        ? tags
+        : typeof tags === "string" && tags.trim().length
+          ? (() => {
+              try {
+                const parsed = JSON.parse(tags);
+                return Array.isArray(parsed) ? parsed : [];
+              } catch {
+                return [];
+              }
+            })()
+          : [],
       updatedAt: new Date(),
     };
 
@@ -176,27 +190,42 @@ export const updateGalleryItem = async (req: Request, res: Response) => {
     const { id } = req.params;
     const {
       title,
-      description,
       type,
       imageUrl,
       videoUrl,
       status,
       removeImage,
+      category,
+      tags,
     } = req.body as {
       title?: string;
-      description?: string;
       type?: "PHOTO" | "VIDEO";
       imageUrl?: string;
       videoUrl?: string;
       status?: "DRAFT" | "PUBLISHED";
       removeImage?: boolean | "true" | "false";
+      category?: string;
+      tags?: string | string[];
     };
 
     const updates: any = { updatedAt: new Date() };
     if (title !== undefined) updates.title = title;
-    if (description !== undefined) updates.description = description;
     if (type !== undefined) updates.type = type;
     if (status !== undefined) updates.status = status;
+    if (category !== undefined) updates.category = category;
+    if (tags !== undefined)
+      updates.tags = Array.isArray(tags)
+        ? tags
+        : typeof tags === "string" && tags.trim().length
+          ? (() => {
+              try {
+                const parsed = JSON.parse(tags);
+                return Array.isArray(parsed) ? parsed : [];
+              } catch {
+                return [];
+              }
+            })()
+          : [];
 
     const shouldRemoveImage = removeImage === true || removeImage === "true";
     if (file) {

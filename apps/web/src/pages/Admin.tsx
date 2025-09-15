@@ -16,6 +16,7 @@ import {
   Settings,
 } from "lucide-react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import React from "react";
 
 function Courses() {
   return (
@@ -134,6 +135,27 @@ function SettingsPage() {
 
 export default function Admin() {
   const location = useLocation();
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState<boolean>(
+    () => {
+      try {
+        const v = localStorage.getItem("asi.sidebar.collapsed");
+        return v === "1" || v === "true";
+      } catch {
+        return false;
+      }
+    },
+  );
+  const toggleSidebar = React.useCallback(() => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("asi.sidebar.collapsed", next ? "1" : "0");
+      } catch {
+        //
+      }
+      return next;
+    });
+  }, []);
   const activeFromPath = (() => {
     const p = location.pathname || "";
     if (!p.startsWith("/dashboard")) return "dashboard";
@@ -144,9 +166,19 @@ export default function Admin() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Sidebar activeTab={activeFromPath} />
-      <Header activeTab={activeFromPath} />
-      <main className="ml-64 mt-16 p-8">
+      <Sidebar
+        activeTab={activeFromPath}
+        collapsed={isSidebarCollapsed}
+        onToggleSidebar={toggleSidebar}
+      />
+      <Header
+        activeTab={activeFromPath}
+        isSidebarCollapsed={isSidebarCollapsed}
+        onToggleSidebar={toggleSidebar}
+      />
+      <main
+        className={`${isSidebarCollapsed ? "ml-16" : "ml-64"} mt-16 p-8 transition-[margin] duration-200`}
+      >
         <div className="max-w-7xl mx-auto">
           {/* Admin route map for easy maintenance */}
           <Routes>
