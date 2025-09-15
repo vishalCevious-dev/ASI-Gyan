@@ -45,7 +45,9 @@ export function makeImageUploader(opts: UploaderOptions = {}) {
 
   const fileFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
     if (!allowed.includes(file.mimetype)) {
-      return cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE", file.fieldname));
+      return cb(
+        new multer.MulterError("LIMIT_UNEXPECTED_FILE", file.fieldname),
+      );
     }
     cb(null, true);
   };

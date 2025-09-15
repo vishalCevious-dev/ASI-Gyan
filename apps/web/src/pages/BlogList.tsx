@@ -40,13 +40,13 @@ export default function BlogList() {
         )}
         {isError && (
           <div className="text-center text-destructive">
-            Failed to load posts.
+            Failed to load posts. {isError}
           </div>
         )}
 
         {!isLoading && !isError && (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {posts.map((post: any) => (
+            {posts?.map((post: any) => (
               <Card
                 key={post.id}
                 className="bg-card border-border hover:border-primary/50 transition-colors"

@@ -120,6 +120,7 @@ export const createPost = async (req: Request, res: Response) => {
       excerpt,
       content,
       coverImageUrl,
+      videoUrl,
       status,
       category,
       tags,
@@ -130,6 +131,7 @@ export const createPost = async (req: Request, res: Response) => {
       excerpt?: string;
       content: string;
       coverImageUrl?: string;
+      videoUrl?: string;
       status?: "DRAFT" | "PUBLISHED";
       category?: string;
       tags?: string[];
@@ -170,6 +172,7 @@ export const createPost = async (req: Request, res: Response) => {
       : coverImageUrl
         ? buildFileUrl(coverImageUrl)
         : null;
+    const finalVideoUrl = videoUrl ? buildFileUrl(videoUrl) : null;
 
     const [inserted] = await db
       .insert(Blog)
@@ -179,6 +182,7 @@ export const createPost = async (req: Request, res: Response) => {
         excerpt,
         content,
         coverImageUrl: coverUrl,
+        videoUrl: finalVideoUrl || undefined,
         category: category || undefined,
         tags: Array.isArray(tags) ? tags : undefined,
         metaDescription: metaDescription || undefined,
@@ -217,6 +221,7 @@ export const updatePost = async (req: Request, res: Response) => {
       category,
       tags,
       metaDescription,
+      videoUrl,
       removeImage,
     } = req.body as {
       title?: string;
@@ -227,6 +232,7 @@ export const updatePost = async (req: Request, res: Response) => {
       category?: string;
       tags?: string[];
       metaDescription?: string;
+      videoUrl?: string;
       removeImage?: boolean | "true" | "false";
     };
 
@@ -246,6 +252,7 @@ export const updatePost = async (req: Request, res: Response) => {
       updates.tags = Array.isArray(tags) ? tags : undefined;
     if (metaDescription !== undefined)
       updates.metaDescription = metaDescription;
+    if (videoUrl !== undefined) updates.videoUrl = buildFileUrl(videoUrl);
 
     if (updates.slug) {
       // check for slug collision

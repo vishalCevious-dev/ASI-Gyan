@@ -25,6 +25,7 @@ import {
 } from "../ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { useLogout } from "@/hooks/useAuth";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 // import { toast } from 'sonner';
 
@@ -79,8 +80,12 @@ const getPageTitle = (activeTab: string) => {
       return "Courses";
     case "blog":
       return "Blog";
+    case "gallery":
+      return "Gallery";
     case "ai-tools":
       return "AI Tools";
+    case "openai":
+      return "OpenAI Chat";
     case "marketplace":
       return "Marketplace";
     case "payments":
@@ -101,11 +106,15 @@ export function Header({ activeTab }: HeaderProps) {
 
   const navigate = useNavigate();
   const { mutateAsync: logout, isPending: loggingOut } = useLogout();
+  const queryClient = useQueryClient();
 
   const handleLogout = async () => {
     try {
+      // Proactively clear auth to let guest routes render immediately
+      await queryClient.cancelQueries({ queryKey: ["auth", "me"] });
+      queryClient.setQueryData(["auth", "me"], undefined);
       await logout();
-      navigate("/login");
+      navigate("/login", { replace: true });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
     } catch (e: any) {
       // Toast is handled inside the mutation hook; keep user on page if it fails

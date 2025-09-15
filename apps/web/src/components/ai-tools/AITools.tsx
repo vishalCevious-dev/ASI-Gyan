@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -127,10 +128,18 @@ export function AITools() {
             Leverage powerful AI tools to enhance learning experiences.
           </p>
         </div>
-        <Button className="gradient-primary text-black font-medium hover:scale-105 transition-transform">
-          <Sparkles className="w-4 h-4 mr-2" />
-          Request New Tool
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            asChild
+            className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow-green"
+          >
+            <Link to="/dashboard/openai">Launch OpenAI Chat</Link>
+          </Button>
+          <Button className="gradient-primary text-black font-medium hover:scale-105 transition-transform">
+            <Sparkles className="w-4 h-4 mr-2" />
+            Request New Tool
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -233,22 +242,32 @@ export function AITools() {
                 </div>
 
                 {/* Action Button */}
-                <Button
-                  className={`w-full bg-gradient-to-r ${tool.gradient} text-black font-medium hover:scale-105 transition-transform group-hover:shadow-lg`}
-                  disabled={tool.status === "Coming Soon"}
-                >
-                  {tool.status === "Coming Soon" ? (
-                    <>
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Coming Soon
-                    </>
-                  ) : (
-                    <>
-                      Launch Tool
+                {tool.status === "Coming Soon" ? (
+                  <Button
+                    className={`w-full bg-gradient-to-r ${tool.gradient} text-black font-medium hover:scale-105 transition-transform group-hover:shadow-lg`}
+                    disabled
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Coming Soon
+                  </Button>
+                ) : tool.name === "Discussion Bot" ? (
+                  <Button
+                    asChild
+                    className={`w-full bg-gradient-to-r ${tool.gradient} text-black font-medium hover:scale-105 transition-transform group-hover:shadow-lg`}
+                  >
+                    <Link to="/dashboard/openai">
+                      OpenAI Chat
                       <ArrowRight className="w-4 h-4 ml-2" />
-                    </>
-                  )}
-                </Button>
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button
+                    className={`w-full bg-gradient-to-r ${tool.gradient} text-black font-medium hover:scale-105 transition-transform group-hover:shadow-lg`}
+                  >
+                    Launch Tool
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                )}
               </CardContent>
             </Card>
           );

@@ -1,8 +1,35 @@
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 const Header = () => {
+  const location = useLocation();
+
+  // Smoothly scroll to hash targets across routes and on-page
+  useEffect(() => {
+    const hash = location.hash;
+    if (!hash) return;
+    const id = decodeURIComponent(hash.replace(/^#/, ""));
+
+    // Try a few times in case content mounts after header
+    let attempts = 0;
+    const maxAttempts = 10;
+    const interval = setInterval(() => {
+      attempts++;
+      const el = document.getElementById(id);
+      if (el) {
+        const y = el.getBoundingClientRect().top + window.scrollY - 90; // offset for fixed header
+        window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+        clearInterval(interval);
+      } else if (attempts >= maxAttempts) {
+        clearInterval(interval);
+      }
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, [location.hash]);
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container mx-auto px-6 py-4">
@@ -24,36 +51,36 @@ const Header = () => {
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
-            <a
-              href="#courses"
+            <Link
+              to="/#courses"
               className="text-muted-foreground hover:text-primary transition-colors"
             >
               Courses
-            </a>
-            <a
-              href="#about"
+            </Link>
+            <Link
+              to="/#about"
               className="text-muted-foreground hover:text-primary transition-colors"
             >
               About
-            </a>
-            <a
-              href="#newsletter"
+            </Link>
+            <Link
+              to="/#newsletter"
               className="text-muted-foreground hover:text-primary transition-colors"
             >
               Newsletter
-            </a>
-            <a
-              href="#blog"
+            </Link>
+            <Link
+              to="/#blog"
               className="text-muted-foreground hover:text-primary transition-colors"
             >
               Blog
-            </a>
-            <a
-              href="#contact"
+            </Link>
+            <Link
+              to="/#contact"
               className="text-muted-foreground hover:text-primary transition-colors"
             >
               Contact
-            </a>
+            </Link>
           </div>
 
           {/* Actions */}
@@ -70,7 +97,7 @@ const Header = () => {
               variant="default"
               className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow-green animate-glow-pulse"
             >
-              <a href="#courses">Explore Courses</a>
+              <Link to="/#courses">Explore Courses</Link>
             </Button>
           </div>
         </nav>

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,7 +24,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import logo from "@/assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
-import { authApi } from "@/lib/api";
+import { useLogin } from "@/hooks/useAuth";
 
 const LoginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -36,7 +35,7 @@ type LoginValues = z.infer<typeof LoginSchema>;
 
 const Login = () => {
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const { mutateAsync: login, isPending: isLoading } = useLogin();
   const navigate = useNavigate();
 
   const form = useForm<LoginValues>({
@@ -46,29 +45,20 @@ const Login = () => {
   });
 
   async function onSubmit(values: LoginValues) {
-    setIsLoading(true);
     try {
-      const resp = await authApi.login(values.email, values.password);
-      toast({
-        title: "Signed in",
-        description: `Welcome back, ${values.email}`,
-      });
-      // Cookie is set by server; navigate based on role
+      // Use shared hook so auth cache invalidates and routes re-render
+      const resp = await login(values);
+      // Navigate immediately based on returned role
       const role = resp?.data?.role;
-      if (role === "ADMIN") {
-        navigate("/dashboard");
-      } else {
-        navigate("/");
-      }
+      navigate(role === "ADMIN" ? "/dashboard" : "/");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
+      // Show a friendly error; hook already toasts success
       toast({
         title: "Sign in failed",
         description: e.message || "Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   }
 

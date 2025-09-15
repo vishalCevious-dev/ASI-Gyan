@@ -6,20 +6,13 @@ type Props = { children: ReactNode };
 
 // Redirect authenticated users away from guest-only pages (login/register/etc)
 export default function RequireGuest({ children }: Props) {
-  const { isLoading, isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-muted-foreground">
-        Checking session…
-      </div>
-    );
-  }
-
+  // If authenticated, redirect away from guest pages
   if (isAuthenticated) {
-    // Send admins to dashboard, others to home
     return <Navigate to={isAdmin ? "/dashboard" : "/"} replace />;
   }
 
+  // Render guest content immediately; don't block on auth check
   return <>{children}</>;
 }

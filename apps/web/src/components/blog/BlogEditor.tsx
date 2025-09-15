@@ -43,11 +43,14 @@ export function BlogEditor({ post, onClose }: BlogEditorProps) {
   const navigate = useNavigate();
   const [title, setTitle] = useState(post?.title || "");
   const [excerpt, setExcerpt] = useState(post?.excerpt || "");
+  const [metaDescription, setMetaDescription] = useState(post?.excerpt || "");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState(post?.category || "");
   const [tags, setTags] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
   const [slug, setSlug] = useState("");
   const [slugEdited, setSlugEdited] = useState(false);
+  const [metaEdited, setMetaEdited] = useState(false);
   const [featuredImageFile, setFeaturedImageFile] = useState<File | null>(null);
   const [featuredPreview, setFeaturedPreview] = useState<string>("");
   const [isPublished, setIsPublished] = useState(post?.status === "Published");
@@ -119,7 +122,8 @@ export function BlogEditor({ post, onClose }: BlogEditorProps) {
         status,
         category: category || undefined,
         tags: tagArr,
-        metaDescription: excerpt || undefined,
+        metaDescription: metaDescription || undefined,
+        videoUrl: videoUrl || undefined,
       };
 
       const parsed = blogCreateSchema.safeParse(payload);
@@ -149,6 +153,7 @@ export function BlogEditor({ post, onClose }: BlogEditorProps) {
       if (parsed.data.category) fd.append("category", parsed.data.category);
       if (parsed.data.metaDescription)
         fd.append("metaDescription", parsed.data.metaDescription);
+      if (parsed.data.videoUrl) fd.append("videoUrl", parsed.data.videoUrl);
       if (Array.isArray(parsed.data.tags)) {
         for (const t of parsed.data.tags) fd.append("tags", t);
       }
@@ -264,19 +269,38 @@ export function BlogEditor({ post, onClose }: BlogEditorProps) {
                   id="excerpt"
                   value={excerpt}
                   onChange={(e) => {
-                    setExcerpt(e.target.value);
-                    if (fieldErrors.metaDescription)
-                      setFieldErrors((p) => ({
-                        ...p,
-                        metaDescription: undefined,
-                      }));
+                    const v = e.target.value;
+                    setExcerpt(v);
+                    if (!metaEdited) setMetaDescription(v);
+                    if (fieldErrors.excerpt)
+                      setFieldErrors((p) => ({ ...p, excerpt: undefined }));
                   }}
                   placeholder="Brief description of your post..."
                   className="bg-input border-primary/20 min-h-20"
                 />
-                {fieldErrors.metaDescription && (
+                {fieldErrors.excerpt && (
                   <p className="text-xs text-destructive">
-                    {fieldErrors.metaDescription}
+                    {fieldErrors.excerpt}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="video-url">Video URL</Label>
+                <Input
+                  id="video-url"
+                  value={videoUrl}
+                  onChange={(e) => {
+                    setVideoUrl(e.target.value);
+                    if (fieldErrors.videoUrl)
+                      setFieldErrors((p) => ({ ...p, videoUrl: undefined }));
+                  }}
+                  placeholder="https://example.com/video or /uploads/blog/video.mp4"
+                  className="bg-input border-primary/20"
+                />
+                {fieldErrors.videoUrl && (
+                  <p className="text-xs text-destructive">
+                    {fieldErrors.videoUrl}
                   </p>
                 )}
               </div>
@@ -456,14 +480,27 @@ export function BlogEditor({ post, onClose }: BlogEditorProps) {
               <div className="space-y-2">
                 <Label>Meta Description</Label>
                 <Textarea
-                  value={excerpt}
-                  onChange={(e) => setExcerpt(e.target.value)}
+                  value={metaDescription}
+                  onChange={(e) => {
+                    setMetaEdited(true);
+                    setMetaDescription(e.target.value);
+                    if (fieldErrors.metaDescription)
+                      setFieldErrors((p) => ({
+                        ...p,
+                        metaDescription: undefined,
+                      }));
+                  }}
                   placeholder="SEO description for search engines..."
                   className="bg-input border-primary/20 min-h-16"
                 />
                 <p className="text-xs text-muted-foreground">
-                  {excerpt.length}/160 characters
+                  {metaDescription.length}/160 characters
                 </p>
+                {fieldErrors.metaDescription && (
+                  <p className="text-xs text-destructive">
+                    {fieldErrors.metaDescription}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">

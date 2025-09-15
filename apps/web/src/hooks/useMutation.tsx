@@ -12,7 +12,7 @@ export function useAppMutation<TData = unknown, TVariables = void>(opts: {
   invalidate?: InvalidateQueryFilters | InvalidateQueryFilters[];
   successMessage?: ((data: TData) => Message) | Message;
   errorMessage?: ((err: any) => Message) | Message;
-  onSuccess?: (data: TData) => void;
+  onSuccess?: (data: TData) => void | Promise<void>;
 }) {
   const client = useQueryClient();
   const { toast } = useToast();
@@ -28,7 +28,7 @@ export function useAppMutation<TData = unknown, TVariables = void>(opts: {
             : opts.successMessage;
         toast({ title: m.title, description: m.description });
       }
-      if (opts.onSuccess) opts.onSuccess(data);
+      if (opts.onSuccess) await opts.onSuccess(data);
       if (opts.invalidate) {
         if (Array.isArray(opts.invalidate)) {
           await Promise.all(

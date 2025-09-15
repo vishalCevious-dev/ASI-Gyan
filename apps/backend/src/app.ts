@@ -10,7 +10,7 @@ import EnvSecret from "./constants/envVariables";
 const app: Application = express();
 
 const corsOptions: CorsOptions = {
-  origin: [EnvSecret.BASE_URL],
+  origin: [EnvSecret.BASE_URL, "http://localhost:5173"],
   credentials: true,
 };
 

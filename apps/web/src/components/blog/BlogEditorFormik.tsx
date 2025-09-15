@@ -46,6 +46,7 @@ export default function BlogEditorFormik({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState("");
   const [tagsInput, setTagsInput] = useState("");
+  const [metaEdited, setMetaEdited] = useState(false);
   const { mutate, isPending } = useBlogMutation(() => onClose());
 
   const {
@@ -63,6 +64,8 @@ export default function BlogEditorFormik({
       title: post?.title || "",
       slug: slugify(post?.title || ""),
       excerpt: post?.excerpt || "",
+      metaDescription: post?.excerpt || "",
+      videoUrl: "",
       content: "",
       status: "DRAFT" as "DRAFT" | "PUBLISHED",
       category: post?.category || "",
@@ -82,6 +85,16 @@ export default function BlogEditorFormik({
 
       if ((v.excerpt || "").length > 512)
         e.excerpt = "Excerpt must be at most 512 characters";
+
+      if ((v.metaDescription || "").length > 160)
+        e.metaDescription = "Meta description must be at most 160 characters";
+
+      if (v.videoUrl) {
+        const isAbs = /^https?:\/\//i.test(v.videoUrl);
+        const isRel = v.videoUrl.startsWith("/");
+        if (!isAbs && !isRel)
+          e.videoUrl = "Must be a valid URL or start with /";
+      }
 
       if (isRichTextEmpty(v.content)) e.content = "Content is required";
 
@@ -239,13 +252,57 @@ export default function BlogEditorFormik({
                   id="excerpt"
                   name="excerpt"
                   value={values.excerpt}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    handleChange(e);
+                    if (!metaEdited)
+                      setFieldValue("metaDescription", e.target.value);
+                  }}
                   onBlur={handleBlur}
                   placeholder="Brief description of your post..."
                   className="bg-input border-primary/20 min-h-20"
                 />
                 {touched.excerpt && errors.excerpt ? (
                   <p className="text-sm text-destructive">{errors.excerpt}</p>
+                ) : null}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="metaDescription">Meta Description</Label>
+                <Textarea
+                  id="metaDescription"
+                  name="metaDescription"
+                  value={values.metaDescription}
+                  onChange={(e) => {
+                    setMetaEdited(true);
+                    handleChange(e);
+                  }}
+                  onBlur={handleBlur}
+                  placeholder="SEO description for search engines..."
+                  className="bg-input border-primary/20 min-h-16"
+                />
+                <p className="text-xs text-muted-foreground">
+                  {(values.metaDescription || "").length}/160 characters
+                </p>
+                {touched.metaDescription && errors.metaDescription ? (
+                  <p className="text-sm text-destructive">
+                    {errors.metaDescription}
+                  </p>
+                ) : null}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="videoUrl">Video URL</Label>
+                <Input
+                  id="videoUrl"
+                  name="videoUrl"
+                  value={values.videoUrl}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="https://example.com/video or /uploads/blog/video.mp4"
+                  className="bg-input border-primary/20"
+                />
+                {touched.videoUrl && errors.videoUrl ? (
+                  <p className="text-sm text-destructive">{errors.videoUrl}</p>
                 ) : null}
               </div>
 

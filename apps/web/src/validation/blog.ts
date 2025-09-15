@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+// Allow either absolute URLs or site-relative paths like "/uploads/..."
+// eslint-disable-next-line no-useless-escape
+const relativePath = z.string().regex(/^\/[A-Za-z0-9_\-.\/]+$/, {
+  message: "Must start with / and contain only URL-safe characters",
+});
+
 export const blogCreateSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
   slug: z
@@ -13,6 +19,7 @@ export const blogCreateSchema = z.object({
   category: z.string().min(1).optional(),
   tags: z.array(z.string().min(1)).optional(),
   metaDescription: z.string().max(160).optional(),
+  videoUrl: z.union([z.url(), relativePath]).optional(),
 });
 
 export type BlogCreateInput = z.infer<typeof blogCreateSchema>;

@@ -5,18 +5,26 @@ import blogHeroImage from "@/assets/blog-hero.jpg";
 import { useQuery } from "@tanstack/react-query";
 import { blogApi } from "@/lib/api";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 const Blog = () => {
+  const [page, setPage] = useState(1);
+  const limit = 7; // keep 1 featured + 6 grid on first page
   const { data, isLoading } = useQuery({
-    queryKey: ["home-blog", 1],
-    queryFn: () => blogApi.list(1, 7),
+    queryKey: ["home-blog", page, limit],
+    queryFn: () => blogApi.list(page, limit),
     staleTime: 60_000,
+    keepPreviousData: true,
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const posts = (data?.data?.data as any[]) || [];
-  const featured = posts[0];
-  const rest = posts.slice(1);
+  const pagination = data?.data?.pagination as
+    | { page: number; pages: number; total: number; limit: number }
+    | undefined;
+  const isFirstPage = page === 1;
+  const featured = isFirstPage ? posts[0] : undefined;
+  const rest = isFirstPage ? posts.slice(1) : posts;
 
   return (
     <section id="blog" className="py-20 bg-background">
@@ -150,15 +158,36 @@ const Blog = () => {
             ))}
         </div>
 
-        {/* View All Button */}
-        <div className="text-center">
+        {/* Pagination + View All */}
+        <div className="mt-8 flex items-center justify-center gap-3">
+          <Button
+            variant="outline"
+            disabled={!pagination || page <= 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+          >
+            Previous
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Page {pagination?.page || page} of {pagination?.pages || "-"}
+          </span>
+          <Button
+            variant="outline"
+            disabled={!pagination || (pagination && page >= pagination.pages)}
+            onClick={() =>
+              setPage((p) =>
+                pagination ? Math.min(pagination.pages, p + 1) : p + 1,
+              )
+            }
+          >
+            Next
+          </Button>
           <Button
             asChild
             variant="outline"
-            size="lg"
-            className="border-secondary text-secondary hover:bg-secondary/10 mt-4"
+            size="sm"
+            className="ml-4 border-secondary text-secondary hover:bg-secondary/10"
           >
-            <Link to="/blog">View All Articles</Link>
+            <Link to="/blog">View All</Link>
           </Button>
         </div>
       </div>

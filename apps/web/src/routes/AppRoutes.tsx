@@ -1,47 +1,59 @@
-import { Routes, Route } from "react-router-dom";
-import Index from "@/pages/Index";
-import Login from "@/pages/Login";
-import Register from "@/pages/Register";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  matchPath,
+} from "react-router-dom";
 import NotFound from "@/pages/NotFound";
 import Admin from "@/pages/Admin";
-import RequireAdmin from "@/routes/RequireAdmin";
-import RequireGuest from "@/routes/RequireGuest";
-import BlogList from "@/pages/BlogList";
-import BlogPost from "@/pages/BlogPost";
+import { PUBLIC_ROUTES, GUEST_ROUTES } from "@/routes/routeConfig";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function AppRoutes() {
+  const { isLoading, isAuthenticated, isAdmin } = useAuth();
+  const location = useLocation();
+  const onGuestPath = GUEST_ROUTES.some(
+    (r) => !!matchPath(r.path, location.pathname),
+  );
+
+  if (isLoading && !onGuestPath) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-muted-foreground">
+        Checking permissions…
+      </div>
+    );
+  }
+  console.log("isAuthenticated", isAuthenticated);
+  console.log("isAdmin", isAdmin);
+
   return (
     <Routes>
-      {/* User routes */}
-      <Route path="/" element={<Index />} />
-      <Route
-        path="/login"
-        element={
-          <RequireGuest>
-            <Login />
-          </RequireGuest>
-        }
-      />
-      <Route
-        path="/register"
-        element={
-          <RequireGuest>
-            <Register />
-          </RequireGuest>
-        }
-      />
-      <Route path="/blog" element={<BlogList />} />
-      <Route path="/blog/:slug" element={<BlogPost />} />
+      {/* Public routes (always accessible) */}
+      {PUBLIC_ROUTES.map(({ path, element }) => (
+        <Route key={path} path={path} element={element} />
+      ))}
 
-      {/* Admin routes */}
-      <Route
-        path="/dashboard/*"
-        element={
-          <RequireAdmin>
-            <Admin />
-          </RequireAdmin>
-        }
-      />
+      {/* Guest-only routes: if authed, redirect away */}
+      {!isAuthenticated
+        ? GUEST_ROUTES.map(({ path, element }) => (
+            <Route key={path} path={path} element={element} />
+          ))
+        : GUEST_ROUTES.map(({ path }) => (
+            <Route
+              key={path}
+              path={path}
+              element={<Navigate to={isAdmin ? "/dashboard" : "/"} replace />}
+            />
+          ))}
+
+      {/* Admin routes: only mount dashboard for admins */}
+      {isAdmin ? (
+        <Route path="/dashboard/*" element={<Admin />} />
+      ) : (
+        // Non-admins hitting /dashboard get redirected to login
+        <Route path="/dashboard/*" element={<Navigate to="/login" replace />} />
+      )}
 
       {/* Catch-all */}
       <Route path="*" element={<NotFound />} />

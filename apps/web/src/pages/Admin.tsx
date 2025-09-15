@@ -4,7 +4,9 @@ import { Dashboard } from "@/components/dashboard/Dashboard";
 import { Communities } from "@/components/communities/Communities";
 import { Members } from "@/components/members/Members";
 import { AITools } from "@/components/ai-tools/AITools";
+import OpenAIPage from "@/components/ai-tools/OpenAIPage";
 import { Blog } from "@/components/blog/Blog";
+import Gallery from "@/components/gallery/Gallery";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BookOpen,
@@ -146,17 +148,32 @@ export default function Admin() {
       <Header activeTab={activeFromPath} />
       <main className="ml-64 mt-16 p-8">
         <div className="max-w-7xl mx-auto">
+          {/* Admin route map for easy maintenance */}
           <Routes>
-            <Route index element={<Dashboard />} />
-            <Route path="communities" element={<Communities />} />
-            <Route path="members" element={<Members />} />
-            <Route path="courses" element={<Courses />} />
-            <Route path="blog" element={<Blog />} />
-            <Route path="ai-tools" element={<AITools />} />
-            <Route path="marketplace" element={<Marketplace />} />
-            <Route path="payments" element={<Payments />} />
-            <Route path="analytics" element={<Analytics />} />
-            <Route path="settings" element={<SettingsPage />} />
+            {[
+              { index: true, element: <Dashboard /> },
+              { path: "communities", element: <Communities /> },
+              { path: "members", element: <Members /> },
+              { path: "courses", element: <Courses /> },
+              { path: "blog", element: <Blog /> },
+              { path: "gallery", element: <Gallery /> },
+              { path: "ai-tools", element: <AITools /> },
+              { path: "openai", element: <OpenAIPage /> },
+              { path: "marketplace", element: <Marketplace /> },
+              { path: "payments", element: <Payments /> },
+              { path: "analytics", element: <Analytics /> },
+              { path: "settings", element: <SettingsPage /> },
+            ].map((r, i) =>
+              r.index ? (
+                <Route key={`admin-index-${i}`} index element={r.element} />
+              ) : (
+                <Route
+                  key={`admin-${r.path}-${i}`}
+                  path={r.path!}
+                  element={r.element}
+                />
+              ),
+            )}
             {/* Back-compat: redirect unknown child paths to dashboard */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>

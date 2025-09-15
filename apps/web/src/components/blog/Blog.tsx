@@ -39,7 +39,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import BlogEditorFormik from "./BlogEditorFormik";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { blogApi } from "@/lib/api";
 
 type UIPost = {
@@ -83,11 +83,16 @@ export function Blog() {
     category: string;
   } | null>(null);
 
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
   // Load posts from API
   const { data, isLoading } = useQuery({
-    queryKey: ["blog", "list", 1, 50],
-    queryFn: () => blogApi.list(1, 50),
+    queryKey: ["blog", "list", page, limit],
+    queryFn: () => blogApi.list(page, limit),
     staleTime: 60_000,
+    placeholderData: keepPreviousData,
   });
 
   const blogPosts: UIPost[] = useMemo(() => {
@@ -105,6 +110,11 @@ export function Blog() {
       readTime: p.readTime || undefined,
     }));
   }, [data]);
+
+  const pagination =
+    (data?.data?.pagination as
+      | { page: number; pages: number; total: number; limit: number }
+      | undefined) || undefined;
 
   const handleCreatePost = () => {
     setEditingPost(null);
@@ -221,6 +231,54 @@ export function Blog() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Pagination Controls */}
+      <div className="mt-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Rows per page</span>
+          <Select
+            value={String(limit)}
+            onValueChange={(v) => {
+              setLimit(Number(v));
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="w-24 bg-input border-primary/20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="glassmorphism border-primary/20">
+              <SelectItem value="5">5</SelectItem>
+              <SelectItem value="10">10</SelectItem>
+              <SelectItem value="20">20</SelectItem>
+              <SelectItem value="50">50</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            disabled={!pagination || page <= 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+          >
+            Previous
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Page {pagination?.page || page} of {pagination?.pages || "-"}
+          </span>
+          <Button
+            variant="outline"
+            disabled={!pagination || (pagination && page >= pagination.pages)}
+            onClick={() =>
+              setPage((p) =>
+                pagination ? Math.min(pagination.pages, p + 1) : p + 1,
+              )
+            }
+          >
+            Next
+          </Button>
+        </div>
+      </div>
 
       {/* Blog Posts Table */}
       <Card className="glassmorphism border-primary/20">

@@ -16,7 +16,10 @@ export const blogCreateSchema = z.object({
   excerpt: z.string().max(512).optional(),
   content: z.string().min(1, { message: "Content is required" }),
   coverImageUrl: z.union([z.url(), relativePath]).optional(),
-  videoUrl: z.union([z.url(), relativePath]).optional(),
+  videoUrl: z.preprocess(
+    (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+    z.union([z.url(), relativePath]).optional(),
+  ),
   category: z.string().min(1, { message: "Category is required" }).optional(),
   tags: z.preprocess(
     (v) => {
@@ -46,7 +49,10 @@ export const blogUpdateSchema = z.object({
     .optional(),
   excerpt: z.string().max(512).optional(),
   content: z.string().min(1).optional(),
-  videoUrl: z.union([z.url(), relativePath]).optional(),
+  videoUrl: z.preprocess(
+    (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+    z.union([z.url(), relativePath]).optional(),
+  ),
   category: z.string().min(1).optional(),
   tags: z.preprocess(
     (v) => {

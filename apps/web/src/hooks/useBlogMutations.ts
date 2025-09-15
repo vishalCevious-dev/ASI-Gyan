@@ -12,6 +12,7 @@ type CreateInput = {
   category?: string;
   tags?: string[];
   metaDescription?: string;
+  videoUrl?: string;
   image?: File;
 };
 
@@ -26,6 +27,7 @@ type UpdateInput = {
   category?: string;
   tags?: string[];
   metaDescription?: string;
+  videoUrl?: string;
   image?: File;
   removeImage?: boolean;
 };

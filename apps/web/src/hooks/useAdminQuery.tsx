@@ -8,5 +8,7 @@ export function useAdminBlogList(page = 1, limit = 20) {
     queryFn: () => blogApi.list(page, limit),
     staleTime: 30_000,
     gcTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 }

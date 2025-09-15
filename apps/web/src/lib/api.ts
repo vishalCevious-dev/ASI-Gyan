@@ -16,6 +16,24 @@ const client = axios.create({
   withCredentials: true,
 });
 
+// Allow setting/removing bearer token for auth when cookies are unavailable
+export function setAuthToken(token?: string) {
+  if (token) {
+    (client.defaults.headers.common as any)["Authorization"] =
+      `Bearer ${token}`;
+  } else {
+    delete (client.defaults.headers.common as any)["Authorization"];
+  }
+}
+
+export function getAuthToken() {
+  return (client.defaults.headers.common as any)["Authorization"] as
+    | string
+    | undefined;
+}
+
+export const API_BASE = client.defaults.baseURL as string;
+
 type FetchOptions = {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   json?: unknown;
@@ -95,6 +113,7 @@ type BlogPost = {
   content?: string;
   coverImageUrl?: string | null;
   videoUrl?: string | null;
+  metaDescription?: string | null;
   status: "DRAFT" | "PUBLISHED";
   createdAt?: string;
   updatedAt?: string;
@@ -130,6 +149,7 @@ export const blogApi = {
     category?: string;
     tags?: string[];
     metaDescription?: string;
+    videoUrl?: string;
   }) {
     const fd = new FormData();
     fd.append("title", input.title);
@@ -141,6 +161,7 @@ export const blogApi = {
     if (input.category) fd.append("category", input.category);
     if (input.metaDescription)
       fd.append("metaDescription", input.metaDescription);
+    if (input.videoUrl) fd.append("videoUrl", input.videoUrl);
     if (input.tags && Array.isArray(input.tags)) {
       fd.append("tags", JSON.stringify(input.tags));
     }
@@ -169,6 +190,7 @@ export const blogApi = {
       category?: string;
       tags?: string[];
       metaDescription?: string;
+      videoUrl?: string;
       removeImage?: boolean;
     },
   ) {
@@ -181,6 +203,7 @@ export const blogApi = {
     if (input.category !== undefined) fd.append("category", input.category);
     if (input.metaDescription !== undefined)
       fd.append("metaDescription", input.metaDescription);
+    if (input.videoUrl !== undefined) fd.append("videoUrl", input.videoUrl);
     if (Array.isArray(input.tags)) {
       fd.append("tags", JSON.stringify(input.tags));
     }
@@ -212,6 +235,122 @@ export const blogApi = {
       {
         method: "DELETE",
       },
+    );
+  },
+};
+
+// AI API
+type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
+export const aiApi = {
+  async chat(messages: ChatMessage[], model?: string) {
+    return apiFetch<
+      ApiResponse<{
+        model: string;
+        content: string;
+        finish_reason: string | null;
+      }>
+    >("/v1/ai/chat", { method: "POST", json: { messages, model } });
+  },
+  async image(prompt: string, size?: "256x256" | "512x512" | "1024x1024") {
+    return apiFetch<ApiResponse<{ url?: string; b64?: string }>>(
+      "/v1/ai/image",
+      { method: "POST", json: { prompt, size } },
+    );
+  },
+};
+
+// Gallery API
+type GalleryItem = {
+  id: string;
+  title: string;
+  description?: string | null;
+  type: "PHOTO" | "VIDEO";
+  imageUrl?: string | null;
+  videoUrl?: string | null;
+  status: "DRAFT" | "PUBLISHED";
+  createdAt?: string;
+};
+
+export const galleryApi = {
+  async list(page = 1, limit = 12) {
+    return apiFetch<
+      ApiResponse<{
+        data: GalleryItem[];
+        pagination: {
+          page: number;
+          limit: number;
+          total: number;
+          pages: number;
+        };
+      }>
+    >("/v1/gallery", { method: "GET", params: { page, limit } });
+  },
+  async get(id: string) {
+    return apiFetch<ApiResponse<GalleryItem>>(
+      `/v1/gallery/${encodeURIComponent(id)}`,
+      { method: "GET" },
+    );
+  },
+  async add(input: {
+    title: string;
+    description?: string;
+    type: "PHOTO" | "VIDEO";
+    image?: File; // for PHOTO or thumbnail for VIDEO
+    imageUrl?: string;
+    videoUrl?: string;
+    status?: "DRAFT" | "PUBLISHED";
+  }) {
+    const fd = new FormData();
+    fd.append("title", input.title);
+    if (input.description) fd.append("description", input.description);
+    fd.append("type", input.type);
+    if (input.status) fd.append("status", input.status);
+    if (input.image) fd.append("image", input.image);
+    if (input.imageUrl) fd.append("imageUrl", input.imageUrl);
+    if (input.videoUrl) fd.append("videoUrl", input.videoUrl);
+    return apiFetch<ApiResponse<{ id: string }>>("/v1/gallery/add", {
+      method: "POST",
+      body: fd,
+      headers: undefined,
+    });
+  },
+  async update(
+    id: string,
+    input: {
+      title?: string;
+      description?: string;
+      type?: "PHOTO" | "VIDEO";
+      status?: "DRAFT" | "PUBLISHED";
+      image?: File;
+      imageUrl?: string;
+      videoUrl?: string;
+      removeImage?: boolean;
+    },
+  ) {
+    const fd = new FormData();
+    if (input.title !== undefined) fd.append("title", input.title);
+    if (input.description !== undefined)
+      fd.append("description", input.description);
+    if (input.type !== undefined) fd.append("type", input.type);
+    if (input.status !== undefined) fd.append("status", input.status);
+    if (input.image) fd.append("image", input.image);
+    if (input.imageUrl !== undefined) fd.append("imageUrl", input.imageUrl);
+    if (input.videoUrl !== undefined) fd.append("videoUrl", input.videoUrl);
+    if (input.removeImage !== undefined)
+      fd.append("removeImage", String(input.removeImage));
+    return apiFetch<ApiResponse<{ id: string }>>(
+      `/v1/gallery/update/${encodeURIComponent(id)}`,
+      {
+        method: "PUT",
+        body: fd,
+        headers: undefined,
+      },
+    );
+  },
+  async remove(id: string) {
+    return apiFetch<ApiResponse<{ id: string }>>(
+      `/v1/gallery/${encodeURIComponent(id)}`,
+      { method: "DELETE" },
     );
   },
 };

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
 import logo from "@/assets/logo.png";
 const Footer = () => {
   const footerSections = [
@@ -22,7 +23,7 @@ const Footer = () => {
     },
     {
       title: "Community",
-      links: ["Discord", "LinkedIn", "Twitter", "YouTube"],
+      links: ["Public Gallery", "Discord", "LinkedIn", "Twitter", "YouTube"],
     },
   ];
   return (
@@ -51,12 +52,21 @@ const Footer = () => {
               <ul className="space-y-2">
                 {section.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
-                    <a
-                      href="#"
-                      className="text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      {link}
-                    </a>
+                    {link === "Public Gallery" ? (
+                      <Link
+                        to="/gallery"
+                        className="text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        Gallery
+                      </Link>
+                    ) : (
+                      <a
+                        href="#"
+                        className="text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        {link}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>

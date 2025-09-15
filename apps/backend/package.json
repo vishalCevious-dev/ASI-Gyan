@@ -37,6 +37,7 @@
     "nodemailer": "^7.0.5",
     "pg": "^8.16.3",
     "postgres": "^3.4.7",
+    "openai": "^4.0.0",
     "prettier": "^3.6.2",
     "tsconfig-paths": "4.2.0",
     "uuid": "^11.1.0",

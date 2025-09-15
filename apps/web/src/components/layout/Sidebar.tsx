@@ -6,13 +6,16 @@ import {
   UserCheck,
   BookOpen,
   FileText,
+  Image,
   Zap,
   ShoppingBag,
   CreditCard,
   BarChart3,
   Settings,
   Brain,
+  Bot,
 } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface SidebarProps {
   activeTab?: string;
@@ -24,7 +27,9 @@ const navigation = [
   { id: "members", label: "Members", icon: UserCheck },
   { id: "courses", label: "Courses", icon: BookOpen },
   { id: "blog", label: "Blog", icon: FileText },
+  { id: "gallery", label: "Gallery", icon: Image },
   { id: "ai-tools", label: "AI Tools", icon: Zap },
+  { id: "openai", label: "OpenAI", icon: Bot },
   { id: "marketplace", label: "Marketplace", icon: ShoppingBag },
   { id: "payments", label: "Payments", icon: CreditCard },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
@@ -43,9 +48,9 @@ export function Sidebar({ activeTab }: SidebarProps) {
   }, [location.pathname, activeTab]);
 
   return (
-    <div className="fixed left-0 top-0 h-full w-64 glassmorphism border-r border-primary/20 p-6 z-50">
+    <div className="fixed left-0 top-0 h-screen w-64 glassmorphism border-r border-primary/20 p-6 z-50 flex flex-col overflow-hidden">
       {/* Logo */}
-      <div className="flex items-center gap-3 mb-8">
+      <div className="flex items-center gap-3 mb-6 shrink-0">
         <div className="p-2 rounded-xl gradient-primary">
           <Brain className="w-6 h-6 text-black" />
         </div>
@@ -58,35 +63,37 @@ export function Sidebar({ activeTab }: SidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="space-y-2">
-        {navigation?.map((item) => {
-          const Icon = item.icon;
-          const to =
-            item.id === "dashboard" ? "/dashboard" : `/dashboard/${item.id}`;
-          const isActive = currentFromPath === item.id;
+      <ScrollArea className="flex-1 pr-1">
+        <nav className="space-y-2 py-1">
+          {navigation?.map((item) => {
+            const Icon = item.icon;
+            const to =
+              item.id === "dashboard" ? "/dashboard" : `/dashboard/${item.id}`;
+            const isActive = currentFromPath === item.id;
 
-          return (
-            <Link
-              key={item.id}
-              to={to}
-              className={`
-                w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
-                ${
-                  isActive
-                    ? "bg-primary/20 text-primary neon-glow border border-primary/30"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                }
-              `}
-            >
-              <Icon className="w-5 h-5" />
-              <span className="font-medium">{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
+            return (
+              <Link
+                key={item.id}
+                to={to}
+                className={`
+                  w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
+                  ${
+                    isActive
+                      ? "bg-primary/20 text-primary neon-glow border border-primary/30"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                  }
+                `}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="font-medium">{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </ScrollArea>
 
       {/* Bottom decoration */}
-      <div className="absolute bottom-6 left-6 right-6">
+      <div className="mt-4 pt-4 shrink-0">
         <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         <div className="mt-4 text-center">
           <div className="w-8 h-8 mx-auto gradient-secondary rounded-lg flex items-center justify-center">
