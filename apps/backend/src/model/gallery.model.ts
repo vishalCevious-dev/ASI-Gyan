@@ -16,7 +16,6 @@ export const galleryStatusEnum = pgEnum("gallery_status", [
 
 export const Gallery = pgTable("gallery", {
   id: uuid("id").primaryKey().defaultRandom(),
-  title: varchar("title", { length: 255 }).notNull(),
   type: galleryTypeEnum("type").notNull().default("PHOTO"),
   imageUrl: varchar("image_url", { length: 512 }),
   videoUrl: varchar("video_url", { length: 512 }),

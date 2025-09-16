@@ -1,87 +1,111 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { motion, useReducedMotion } from "framer-motion";
 import heroRocket from "@/assets/hero-rocket.jpg";
 
+const HEADLINE_LINE_ONE = ["Learn", "AI.", "Build", "Skills."] as const;
+const HEADLINE_LINE_TWO = ["Transform", "Your", "Career."] as const;
+const TAGLINE_WORDS = [
+  "Made",
+  "in",
+  "Bharat,",
+  "Scaling",
+  "to",
+  "the",
+  "World",
+] as const;
+const VALUE_BADGES = [
+  {
+    text: "* Innovation",
+    className: "border-primary text-primary bg-primary/10",
+    delay: 1.2,
+  },
+  {
+    text: "* Global Impact",
+    className: "border-secondary text-secondary bg-secondary/10",
+    delay: 1.3,
+  },
+  {
+    text: "* Learning & Growth",
+    className: "border-ai-green text-ai-green bg-ai-green/10",
+    delay: 1.4,
+  },
+  {
+    text: "* ASI Ethics",
+    className: "border-accent text-accent bg-accent/10",
+    delay: 1.5,
+  },
+] as const;
+const TRUSTED_COMPANIES = ["Google", "Microsoft", "OpenAI", "Meta", "Tesla"] as const;
+const SUPPORTING_COPY =
+  "Join the fastest-growing AI-skilled community - 100M learners strong.";
+
 const Hero = () => {
+  const prefersReducedMotion = useReducedMotion();
+
+  const fadeInUp = (delay = 0, distance = 32, duration = 0.6) => ({
+    initial: {
+      opacity: prefersReducedMotion ? 1 : 0,
+      y: prefersReducedMotion ? 0 : distance,
+    },
+    animate: { opacity: 1, y: 0 },
+    transition: {
+      delay: prefersReducedMotion ? 0 : delay,
+      duration: prefersReducedMotion ? 0.01 : duration,
+      ease: "easeOut" as const,
+    },
+  });
+
+  const fadeIn = (delay = 0, duration = 0.6) => ({
+    initial: { opacity: prefersReducedMotion ? 1 : 0 },
+    animate: { opacity: 1 },
+    transition: {
+      delay: prefersReducedMotion ? 0 : delay,
+      duration: prefersReducedMotion ? 0.01 : duration,
+      ease: "easeOut" as const,
+    },
+  });
+
+  const scaleIn = (delay = 0, duration = 0.6) => ({
+    initial: {
+      opacity: prefersReducedMotion ? 1 : 0,
+      scale: prefersReducedMotion ? 1 : 0.95,
+    },
+    animate: { opacity: 1, scale: 1 },
+    transition: {
+      delay: prefersReducedMotion ? 0 : delay,
+      duration: prefersReducedMotion ? 0.01 : duration,
+      ease: "easeOut" as const,
+    },
+  });
+
   return (
-    <section className="min-h-screen relative overflow-hidden flex items-center justify-center bg-space-depth">
-      {/* Background Image */}
+    <section className="relative hidden min-h-screen overflow-hidden bg-space-depth md:flex md:items-center md:justify-center md:py-24">
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-70"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-80"
         style={{ backgroundImage: `url(${heroRocket})` }}
       />
+      <div className="absolute inset-0 bg-neon-core opacity-10" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/75 to-background/90 dark:from-black/70 dark:via-black/60 dark:to-black/70 backdrop-blur-sm" />
 
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-neon-core opacity-20" />
-
-      {/* Content */}
       <motion.div
-        className="relative z-10 container mx-auto px-6"
+        className="relative z-10 container mx-auto px-6 md:px-12"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
+        transition={{ delay: 0, duration: 0.8, ease: "easeInOut" as const }}
       >
-        <motion.div
-          className="max-w-6xl"
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          {/* Mission Statement */}
-          <motion.div
-            className="mb-8"
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-            >
-              <Badge
-                variant="secondary"
-                className="bg-secondary/20 text-secondary border-secondary/30 mb-4"
-              >
-                🚀 AI Learning Revolution
-              </Badge>
-            </motion.div>
-            <motion.p
-              className="text-lg text-muted-foreground mb-6 max-w-2xl"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
-            >
-              Empowering the next generation of AI leaders through innovation,
-              global impact, and transformative learning experiences in
-              Artificial Super-Intelligence
-            </motion.p>
-          </motion.div>
-
-          {/* Main Heading */}
+        <motion.div className="max-w-6xl" {...fadeInUp(0.2, 56, 0.8)}>
           <motion.h1
-            className="text-5xl md:text-7xl font-bold mb-6 leading-tight max-w-4xl"
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
+            className="text-5xl md:text-7xl font-bold mb-6 leading-tight max-w-4xl text-balance"
+            {...fadeInUp(0.3, 50, 0.8)}
           >
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-            >
-              {["Learn", "AI.", "Build", "Skills."].map((word, index) => (
+            <motion.span {...fadeIn(0.5, 0.8)}>
+              {HEADLINE_LINE_ONE.map((word, index) => (
                 <motion.span
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.5,
-                    delay: 0.5 + index * 0.2,
-                    ease: "easeOut",
-                  }}
+                  key={word}
                   className="inline-block mr-4"
+                  {...fadeInUp(0.5 + index * 0.15, 20, 0.5)}
                 >
                   {word}
                 </motion.span>
@@ -89,22 +113,14 @@ const Hero = () => {
             </motion.span>
             <br />
             <motion.span
-              className="bg-cyber-sheen bg-clip-text text-transparent"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 1.3 }}
+              className="bg-cyber-sheen bg-clip-text text-transparent inline-flex flex-wrap"
+              {...scaleIn(1.2, 0.8)}
             >
-              {["Transform", "Your", "Career."].map((word, index) => (
+              {HEADLINE_LINE_TWO.map((word, index) => (
                 <motion.span
-                  key={index}
-                  initial={{ opacity: 0, rotateX: 90 }}
-                  animate={{ opacity: 1, rotateX: 0 }}
-                  transition={{
-                    duration: 0.6,
-                    delay: 1.5 + index * 0.15,
-                    ease: "easeOut",
-                  }}
+                  key={word}
                   className="inline-block mr-4"
+                  {...scaleIn(1.4 + index * 0.15, 0.6)}
                 >
                   {word}
                 </motion.span>
@@ -112,92 +128,39 @@ const Hero = () => {
             </motion.span>
           </motion.h1>
 
-          {/* Subheading */}
           <motion.p
-            className="text-xl md:text-2xl text-secondary mb-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 2.2 }}
+            className="text-xl md:text-2xl text-secondary mb-4 flex flex-wrap gap-2"
+            {...fadeInUp(0.9, 16, 0.5)}
           >
-            {"Made in Bharat, Scaling to the World"
-              .split("")
-              .map((char, index) => (
-                <motion.span
-                  key={index}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.05,
-                    delay: 2.2 + index * 0.03,
-                    ease: "easeOut",
-                  }}
-                  className={char === " " ? "inline-block w-2" : "inline-block"}
-                >
-                  {char === " " ? "\u00A0" : char}
-                </motion.span>
-              ))}
+            {TAGLINE_WORDS.map((word, index) => (
+              <motion.span
+                key={`${word}-${index}`}
+                className="inline-block"
+                {...fadeInUp(0.9 + index * 0.1, 12, 0.4)}
+              >
+                {word}
+              </motion.span>
+            ))}
           </motion.p>
 
           <motion.p
-            className="text-lg text-muted-foreground mb-8 max-w-2xl"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 3.0 }}
+            className="text-lg text-foreground/80 mb-8 max-w-2xl"
+            {...fadeInUp(1.3, 20, 0.6)}
           >
-            {"Join the fastest-growing AI-skilled community—100M learners strong."
-              .split(" ")
-              .map((word, index) => (
-                <motion.span
-                  key={index}
-                  initial={{ opacity: 0, filter: "blur(10px)" }}
-                  animate={{ opacity: 1, filter: "blur(0px)" }}
-                  transition={{
-                    duration: 0.3,
-                    delay: 3.0 + index * 0.08,
-                    ease: "easeOut",
-                  }}
-                  className="inline-block mr-1"
-                >
-                  {word}
-                </motion.span>
-              ))}
+            {SUPPORTING_COPY}
           </motion.p>
 
-          {/* Value Badges */}
           <motion.div
             className="flex flex-wrap gap-4 mb-12"
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 1.0 }}
+            {...fadeInUp(1.0, 24, 0.6)}
           >
-            {[
-              {
-                text: "• Innovation",
-                className: "border-primary text-primary bg-primary/10",
-                delay: 1.2,
-              },
-              {
-                text: "• Global Impact",
-                className: "border-secondary text-secondary bg-secondary/10",
-                delay: 1.3,
-              },
-              {
-                text: "• Learning & Growth",
-                className: "border-ai-green text-ai-green bg-ai-green/10",
-                delay: 1.4,
-              },
-              {
-                text: "• ASI Ethics",
-                className: "border-accent text-accent bg-accent/10",
-                delay: 1.5,
-              },
-            ].map((badge, index) => (
+            {VALUE_BADGES.map((badge) => (
               <motion.div
-                key={index}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.4, delay: badge.delay }}
-                whileHover={{ scale: 1.05 }}
+                key={badge.text}
+                {...scaleIn(badge.delay, 0.4)}
+                whileHover={
+                  prefersReducedMotion ? undefined : { scale: 1.05 }
+                }
               >
                 <Badge variant="outline" className={badge.className}>
                   {badge.text}
@@ -206,33 +169,37 @@ const Hero = () => {
             ))}
           </motion.div>
 
-          {/* CTA Buttons */}
           <motion.div
             className="flex flex-col sm:flex-row gap-4 mb-12"
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 1.6 }}
+            {...fadeInUp(1.6, 24, 0.6)}
           >
             <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 1.8 }}
+              {...fadeInUp(1.8, 16, 0.5)}
+              whileHover={
+                prefersReducedMotion ? undefined : { scale: 1.05 }
+              }
+              whileTap={
+                prefersReducedMotion ? undefined : { scale: 0.98 }
+              }
             >
               <Button
                 size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow-green px-8 py-4 text-lg animate-glow-pulse"
+                className={cn(
+                  "bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow-green px-8 py-4 text-lg",
+                  !prefersReducedMotion && "animate-glow-pulse"
+                )}
               >
                 Explore Courses
               </Button>
             </motion.div>
             <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
-              initial={{ x: 20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 2.0 }}
+              {...fadeInUp(2.0, 16, 0.5)}
+              whileHover={
+                prefersReducedMotion ? undefined : { scale: 1.05 }
+              }
+              whileTap={
+                prefersReducedMotion ? undefined : { scale: 0.98 }
+              }
             >
               <Button
                 size="lg"
@@ -244,54 +211,47 @@ const Hero = () => {
             </motion.div>
           </motion.div>
 
-          {/* Trusted By */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 2.4 }}
-          >
+          <motion.div {...fadeInUp(2.0, 24, 0.6)}>
             <motion.p
               className="text-muted-foreground mb-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4, delay: 2.6 }}
+              {...fadeIn(2.2, 0.4)}
             >
               Trusted by professionals from:
             </motion.p>
             <div className="flex flex-wrap items-center gap-8 text-muted-foreground">
-              {["Google", "Microsoft", "OpenAI", "Meta", "Tesla"].map(
-                (company, index) => (
-                  <motion.span
-                    key={company}
-                    className="text-lg font-medium hover:text-primary transition-colors cursor-pointer"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{
-                      duration: 0.4,
-                      delay: 2.8 + index * 0.1,
-                      ease: "easeOut",
-                    }}
-                    whileHover={{
-                      scale: 1.1,
-                      transition: { duration: 0.2 },
-                    }}
-                  >
-                    {company}
-                  </motion.span>
-                ),
-              )}
+              {TRUSTED_COMPANIES.map((company, index) => (
+                <motion.span
+                  key={company}
+                  className="text-lg font-medium hover:text-primary transition-colors cursor-pointer"
+                  {...fadeInUp(2.3 + index * 0.1, 16, 0.4)}
+                  whileHover={
+                    prefersReducedMotion
+                      ? undefined
+                      : { scale: 1.05, transition: { duration: 0.2 } }
+                  }
+                >
+                  {company}
+                </motion.span>
+              ))}
             </div>
           </motion.div>
         </motion.div>
       </motion.div>
 
-      {/* Floating Animation Element */}
-      <div className="absolute top-20 right-10 animate-float hidden lg:block">
+      <div
+        className={cn(
+          "absolute top-20 right-10 hidden lg:block",
+          !prefersReducedMotion && "animate-float"
+        )}
+      >
         <div className="w-4 h-4 bg-primary rounded-full shadow-glow-green" />
       </div>
       <div
-        className="absolute bottom-20 left-10 animate-float hidden lg:block"
-        style={{ animationDelay: "2s" }}
+        className={cn(
+          "absolute bottom-20 left-10 hidden lg:block",
+          !prefersReducedMotion && "animate-float"
+        )}
+        style={prefersReducedMotion ? undefined : { animationDelay: "2s" }}
       >
         <div className="w-3 h-3 bg-secondary rounded-full shadow-glow-cyan" />
       </div>

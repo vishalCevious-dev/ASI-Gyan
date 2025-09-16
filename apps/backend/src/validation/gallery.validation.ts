@@ -6,7 +6,7 @@ export const galleryCreateSchema = z.object({
   // For PHOTO: either file upload or imageUrl
   imageUrl: z.url().optional(),
   // For VIDEO: require videoUrl
-  videoUrl: z.string().url().optional(),
+  videoUrl: z.url().optional(),
   status: z.enum(["DRAFT", "PUBLISHED"]).optional(),
   category: z.string().max(128).optional(),
   // Tags can arrive as a JSON string or array in JSON bodies

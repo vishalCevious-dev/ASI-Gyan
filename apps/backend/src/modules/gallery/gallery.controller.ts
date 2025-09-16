@@ -6,13 +6,13 @@ import { ApiError } from "src/utils/ApiError";
 import { ApiResponse } from "src/utils/ApiResponse";
 import {
   deleteFile,
-  makeImageUploader,
+  makeMediaUploader,
   resolvePublicFilePath,
-  type MulterRequest,
+  type MultiMulterRequest,
 } from "src/middlewares/upload.middleware";
 import { buildFileUrl } from "src/utils/url";
 
-export const uploadGalleryImage = makeImageUploader({ folder: "gallery" });
+export const uploadGalleryMedia = makeMediaUploader({ folder: "gallery" });
 
 export const listGallery = async (req: Request, res: Response) => {
   try {
@@ -31,7 +31,6 @@ export const listGallery = async (req: Request, res: Response) => {
     const items = await db
       .select({
         id: Gallery.id,
-        title: Gallery.title,
         type: Gallery.type,
         imageUrl: Gallery.imageUrl,
         videoUrl: Gallery.videoUrl,
@@ -107,11 +106,12 @@ export const getGalleryItem = async (req: Request, res: Response) => {
 };
 
 export const createGalleryItem = async (req: Request, res: Response) => {
-  const file = (req as MulterRequest).file; // for cleanup
+  const files = (req as MultiMulterRequest).files || {};
+  const imageFile = files["image"]?.[0];
+  const videoFile = files["video"]?.[0];
   try {
-    const { title, type, imageUrl, videoUrl, status, category, tags } =
+    const { type, imageUrl, videoUrl, status, category, tags } =
       req.body as {
-        title: string;
         type: "PHOTO" | "VIDEO";
         imageUrl?: string;
         videoUrl?: string;
@@ -121,7 +121,6 @@ export const createGalleryItem = async (req: Request, res: Response) => {
       };
 
     const data: any = {
-      title,
       type,
       status: status ?? "PUBLISHED",
       category: category ?? null,
@@ -129,20 +128,20 @@ export const createGalleryItem = async (req: Request, res: Response) => {
         ? tags
         : typeof tags === "string" && tags.trim().length
           ? (() => {
-              try {
-                const parsed = JSON.parse(tags);
-                return Array.isArray(parsed) ? parsed : [];
-              } catch {
-                return [];
-              }
-            })()
+            try {
+              const parsed = JSON.parse(tags);
+              return Array.isArray(parsed) ? parsed : [];
+            } catch {
+              return [];
+            }
+          })()
           : [],
       updatedAt: new Date(),
     };
 
     if (type === "PHOTO") {
-      if (file) {
-        data.imageUrl = buildFileUrl(`/uploads/gallery/${file.filename}`);
+      if (imageFile) {
+        data.imageUrl = buildFileUrl(`/uploads/gallery/images/${imageFile.filename}`);
       } else if (imageUrl) {
         data.imageUrl = buildFileUrl(imageUrl);
       } else {
@@ -153,16 +152,26 @@ export const createGalleryItem = async (req: Request, res: Response) => {
       }
       data.videoUrl = null;
     } else if (type === "VIDEO") {
-      if (!videoUrl) {
+      if (videoFile) {
+        data.videoUrl = buildFileUrl(`/uploads/gallery/videos/${videoFile.filename}`);
+      } else if (videoUrl) {
+        data.videoUrl = buildFileUrl(videoUrl);
+      } else {
         res
           .status(400)
-          .json(ApiError(400, "videoUrl is required for VIDEO", req));
+          .json(
+            ApiError(400, "Provide a video file or videoUrl for VIDEO", req),
+          );
         return;
       }
-      data.videoUrl = buildFileUrl(videoUrl);
-      data.imageUrl = file
-        ? buildFileUrl(`/uploads/gallery/${file.filename}`)
-        : (imageUrl ?? null);
+      // optional poster image
+      //   if (imageFile) {
+      //     data.imageUrl = buildFileUrl(`/uploads/gallery/${imageFile.filename}`);
+      //   } else if (imageUrl) {
+      //     data.imageUrl = buildFileUrl(imageUrl);
+      //   } else {
+      //     data.imageUrl = null;
+      //   }
     }
 
     const [inserted] = await db
@@ -170,7 +179,8 @@ export const createGalleryItem = async (req: Request, res: Response) => {
       .values(data)
       .returning({ id: Gallery.id });
     if (!inserted) {
-      if (file) deleteFile(file.path);
+      if (imageFile) deleteFile(imageFile.path);
+      if (videoFile) deleteFile(videoFile.path);
       res.status(500).json(ApiError(500, "Failed to create item", req));
       return;
     }
@@ -178,18 +188,20 @@ export const createGalleryItem = async (req: Request, res: Response) => {
     res.status(201).json(ApiResponse(201, inserted, "Item created"));
     return;
   } catch (err) {
-    if (file) deleteFile(file.path);
+    if (imageFile) deleteFile(imageFile.path);
+    if (videoFile) deleteFile(videoFile.path);
     res.status(500).json(ApiError(500, "Failed to create item", req));
     return;
   }
 };
 
 export const updateGalleryItem = async (req: Request, res: Response) => {
-  const file = (req as MulterRequest).file; // for cleanup
+  const files = (req as MultiMulterRequest).files || {};
+  const imageFile = files["image"]?.[0];
+  const videoFile = files["video"]?.[0];
   try {
     const { id } = req.params;
     const {
-      title,
       type,
       imageUrl,
       videoUrl,
@@ -198,7 +210,6 @@ export const updateGalleryItem = async (req: Request, res: Response) => {
       category,
       tags,
     } = req.body as {
-      title?: string;
       type?: "PHOTO" | "VIDEO";
       imageUrl?: string;
       videoUrl?: string;
@@ -209,7 +220,6 @@ export const updateGalleryItem = async (req: Request, res: Response) => {
     };
 
     const updates: any = { updatedAt: new Date() };
-    if (title !== undefined) updates.title = title;
     if (type !== undefined) updates.type = type;
     if (status !== undefined) updates.status = status;
     if (category !== undefined) updates.category = category;
@@ -218,27 +228,31 @@ export const updateGalleryItem = async (req: Request, res: Response) => {
         ? tags
         : typeof tags === "string" && tags.trim().length
           ? (() => {
-              try {
-                const parsed = JSON.parse(tags);
-                return Array.isArray(parsed) ? parsed : [];
-              } catch {
-                return [];
-              }
-            })()
+            try {
+              const parsed = JSON.parse(tags);
+              return Array.isArray(parsed) ? parsed : [];
+            } catch {
+              return [];
+            }
+          })()
           : [];
 
     const shouldRemoveImage = removeImage === true || removeImage === "true";
-    if (file) {
-      updates.imageUrl = buildFileUrl(`/uploads/gallery/${file.filename}`);
+    if (imageFile) {
+      updates.imageUrl = buildFileUrl(`/uploads/gallery/${imageFile.filename}`);
     } else if (imageUrl !== undefined) {
       updates.imageUrl = buildFileUrl(imageUrl);
     } else if (shouldRemoveImage) {
       updates.imageUrl = null;
     }
-    if (videoUrl !== undefined) updates.videoUrl = buildFileUrl(videoUrl);
+    if (videoFile) {
+      updates.videoUrl = buildFileUrl(`/uploads/gallery/${videoFile.filename}`);
+    } else if (videoUrl !== undefined) {
+      updates.videoUrl = buildFileUrl(videoUrl);
+    }
 
     // delete old image if replaced or removed
-    if (file || shouldRemoveImage) {
+    if (imageFile || shouldRemoveImage) {
       const [current] = await db
         .select({ imageUrl: Gallery.imageUrl })
         .from(Gallery)
@@ -246,6 +260,17 @@ export const updateGalleryItem = async (req: Request, res: Response) => {
         .limit(1);
       if (current?.imageUrl) {
         const abs = resolvePublicFilePath(current.imageUrl);
+        if (abs) deleteFile(abs);
+      }
+    }
+    if (videoFile) {
+      const [current] = await db
+        .select({ videoUrl: Gallery.videoUrl })
+        .from(Gallery)
+        .where(eq(Gallery.id, id))
+        .limit(1);
+      if (current?.videoUrl) {
+        const abs = resolvePublicFilePath(current.videoUrl);
         if (abs) deleteFile(abs);
       }
     }
@@ -257,7 +282,8 @@ export const updateGalleryItem = async (req: Request, res: Response) => {
       .returning({ id: Gallery.id });
 
     if (!result) {
-      if (file) deleteFile(file.path);
+      if (imageFile) deleteFile(imageFile.path);
+      if (videoFile) deleteFile(videoFile.path);
       res.status(404).json(ApiError(404, "Item not found", req));
       return;
     }
@@ -265,10 +291,18 @@ export const updateGalleryItem = async (req: Request, res: Response) => {
     res.status(200).json(ApiResponse(200, result, "Item updated"));
     return;
   } catch (err) {
-    if (file) deleteFile(file.path);
+    const files = (req as MultiMulterRequest).files;
+
+    if (files && Array.isArray(files)) {
+      for (const file of files) {
+        deleteFile(file.path);
+      }
+    }
+
     res.status(500).json(ApiError(500, "Failed to update item", req));
     return;
   }
+
 };
 
 export const deleteGalleryItem = async (req: Request, res: Response) => {

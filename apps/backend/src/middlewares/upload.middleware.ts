@@ -10,6 +10,13 @@ type UploaderOptions = {
 };
 
 const defaultAllowed = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+const defaultVideo = [
+  "video/mp4",
+  "video/webm",
+  "video/ogg",
+  "video/quicktime",
+  "video/x-matroska",
+];
 
 const sanitize = (name: string) =>
   name
@@ -65,6 +72,18 @@ export const uploadBlogImage = makeImageUploader({
 });
 
 export type MulterRequest = Express.Request & { file?: Express.Multer.File };
+
+export type MultiMulterRequest = Express.Request & {
+  files?: Record<string, Express.Multer.File[]>;
+};
+
+export function makeMediaUploader(opts: UploaderOptions = {}) {
+  return makeImageUploader({
+    ...opts,
+    fileSizeMB: opts.fileSizeMB ?? 200,
+    allowedMimeTypes: opts.allowedMimeTypes ?? [...defaultAllowed, ...defaultVideo],
+  });
+}
 
 export function deleteFile(filePath: string) {
   try {

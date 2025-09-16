@@ -29,6 +29,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { useLogout } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "@/providers/theme-provider";
 // import { toast } from 'sonner';
 
 interface HeaderProps {
@@ -109,30 +110,8 @@ export function Header({
   onToggleSidebar,
 }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    try {
-      const stored = localStorage.getItem("asi.theme");
-      if (stored === "dark") return true;
-      if (stored === "light") return false;
-      return (
-        window.matchMedia &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches
-      );
-    } catch {
-      return false;
-    }
-  });
-  React.useEffect(() => {
-    try {
-      const root = document.documentElement;
-      if (isDarkMode) root.classList.add("dark");
-      else root.classList.remove("dark");
-      localStorage.setItem("asi.theme", isDarkMode ? "dark" : "light");
-    } catch {
-      //
-    }
-  }, [isDarkMode]);
+  const { isDark, toggleTheme } = useTheme();
+  const ThemeToggleIcon = isDark ? Sun : Moon;
   const unreadCount = notifications.filter((n) => n.unread).length;
 
   const navigate = useNavigate();
@@ -186,7 +165,7 @@ export function Header({
             </Button>
           )}
           <div>
-            <h1 className="text-lg font-semibold text-foreground">
+            <h1 className="text-md font-semibold text-foreground">
               {getPageTitle(activeTab || "dashboard")}
             </h1>
             <div className="flex items-center gap-2 mt-1">
@@ -196,7 +175,7 @@ export function Header({
           </div>
 
           {/* Global Search */}
-          <form onSubmit={handleSearch} className="relative">
+          <form onSubmit={handleSearch} className="relative gap-2">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               type="text"
@@ -226,7 +205,7 @@ export function Header({
         </div>
 
         {/* Right Section - Actions & Profile */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 mx-1">
           {/* AI Status Indicator */}
           <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 border border-accent-foreground/30">
             <Zap className="w-4 h-4 text-accent-foreground" />
@@ -238,20 +217,17 @@ export function Header({
 
           {/* Theme Toggle */}
           <Button
+            type="button"
             variant="ghost"
             size="icon"
-            onClick={() => setIsDarkMode((v) => !v)}
+            onClick={toggleTheme}
             className="text-muted-foreground hover:text-foreground hover:bg-accent/20"
             aria-label={
-              isDarkMode ? "Switch to light mode" : "Switch to dark mode"
+              isDark ? "Switch to light mode" : "Switch to dark mode"
             }
-            title={isDarkMode ? "Light mode" : "Dark mode"}
+            title={isDark ? "Light mode" : "Dark mode"}
           >
-            {isDarkMode ? (
-              <Sun className="w-4 h-4" />
-            ) : (
-              <Moon className="w-4 h-4" />
-            )}
+            <ThemeToggleIcon className="w-4 h-4" />
           </Button>
 
           {/* Notifications */}
@@ -406,3 +382,4 @@ export function Header({
     </header>
   );
 }
+

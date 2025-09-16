@@ -2,9 +2,15 @@ import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { cn } from "@/lib/utils";
+import { useReducedMotion } from "framer-motion";
+import { useTheme } from "@/providers/theme-provider";
+import { Moon, Sun } from "lucide-react";
 
 const Header = () => {
   const location = useLocation();
+  const prefersReducedMotion = useReducedMotion();
+  const { isDark, toggleTheme } = useTheme();
 
   // Smoothly scroll to hash targets across routes and on-page
   useEffect(() => {
@@ -30,6 +36,8 @@ const Header = () => {
     return () => clearInterval(interval);
   }, [location.hash]);
 
+  const ThemeIcon = isDark ? Sun : Moon;
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container mx-auto px-6 py-4">
@@ -44,7 +52,10 @@ const Header = () => {
               <img
                 src={logo}
                 alt="ASI Gyan Logo"
-                className="h-16 w-auto animate-logo-float animate-logo-glow transition-all duration-300 hover:scale-110 cursor-pointer"
+                className={cn(
+                  "h-20 w-auto transition-all duration-300 hover:scale-110 cursor-pointer",
+                  !prefersReducedMotion && "animate-logo-glow"
+                )}
               />
             </Link>
           </div>
@@ -86,6 +97,16 @@ const Header = () => {
           {/* Actions */}
           <div className="flex items-center gap-2">
             <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${isDark ? "light" : "dark"} theme`}
+              className="text-muted-foreground hover:text-primary"
+            >
+              <ThemeIcon className="h-5 w-5" />
+            </Button>
+            <Button
               asChild
               variant="outline"
               className="border-secondary text-secondary hover:bg-secondary/10"
@@ -95,7 +116,10 @@ const Header = () => {
             <Button
               asChild
               variant="default"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow-green animate-glow-pulse"
+              className={cn(
+                "bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow-green",
+                !prefersReducedMotion && "animate-glow-pulse"
+              )}
             >
               <Link to="/#courses">Explore Courses</Link>
             </Button>

@@ -56,12 +56,12 @@ type UIPost = {
 };
 
 const stats = [
-  { label: "Total Posts", value: "247", change: "+12", color: "text-primary" },
+  { label: "Total Posts", value: "247", change: "+12", color: "text-mute-foreground" },
   {
     label: "Published",
     value: "189",
     change: "+8",
-    color: "text-accent-foreground",
+    color: "text-mute-foreground",
   },
   { label: "Drafts", value: "42", change: "+3", color: "text-chart-4" },
   {
@@ -181,7 +181,7 @@ export function Blog() {
                 </div>
                 <Badge
                   variant="secondary"
-                  className="bg-accent/20 text-accent-foreground border-accent-foreground/20"
+                  className="bg-input text-accent-foreground border-accent-foreground/20"
                 >
                   {stat.change}
                 </Badge>
@@ -208,7 +208,7 @@ export function Blog() {
               <SelectTrigger className="w-48 bg-input border-primary/20">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
-              <SelectContent className="glassmorphism border-primary/20">
+              <SelectContent className="glassmorphism  border-primary/20">
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="published">Published</SelectItem>
                 <SelectItem value="draft">Draft</SelectItem>
@@ -357,7 +357,7 @@ export function Blog() {
                     <TableCell>
                       <Badge
                         variant="outline"
-                        className="border-accent-foreground/30 text-accent-foreground"
+                        className="border-accent-foreground/30 text-muted-foreground"
                       >
                         {post.category}
                       </Badge>
@@ -373,7 +373,7 @@ export function Blog() {
                         }
                         className={
                           post.status === "Published"
-                            ? "bg-accent-foreground/20 text-accent-foreground border-accent-foreground/30"
+                            ? "bg-accent-foreground/20 text-muted-foreground border-accent-foreground/30"
                             : post.status === "Draft"
                               ? "bg-chart-4/20 text-chart-4 border-chart-4/30"
                               : "bg-chart-5/20 text-chart-5 border-chart-5/30"

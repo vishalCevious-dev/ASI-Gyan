@@ -14,7 +14,7 @@ import {
   getGalleryItem,
   listGallery,
   updateGalleryItem,
-  uploadGalleryImage,
+  uploadGalleryMedia,
 } from "./gallery.controller";
 
 const router = Router();
@@ -28,7 +28,10 @@ router.post(
   "/add",
   authMiddleware,
   rbac(UserRole.Admin),
-  uploadGalleryImage.single("image"),
+  uploadGalleryMedia.fields([
+    { name: "image", maxCount: 1 },
+    { name: "video", maxCount: 1 },
+  ]),
   validateBody(galleryCreateSchema),
   asyncHandler(createGalleryItem),
 );
@@ -36,7 +39,10 @@ router.put(
   "/update/:id",
   authMiddleware,
   rbac(UserRole.Admin),
-  uploadGalleryImage.single("image"),
+  uploadGalleryMedia.fields([
+    { name: "image", maxCount: 1 },
+    { name: "video", maxCount: 1 },
+  ]),
   validateBody(galleryUpdateSchema),
   asyncHandler(updateGalleryItem),
 );
