@@ -26,3 +26,4 @@ if newly create folder for image and add permission
 sudo mkdir -p /home/ubuntu/asigyan-uploads/blog
 sudo chown -R ubuntu:ubuntu /home/ubuntu/asigyan-uploads
 sudo chmod -R 755 /home/ubuntu/asigyan-uploads
+

@@ -5,16 +5,24 @@ import Courses from "@/components/sections/courses";
 import Newsletter from "@/components/sections/newsletter";
 import Blog from "@/components/sections/blog";
 import Footer from "@/components/ui/footer";
+import WhyASIGyan from "@/components/ui/whyAsiGyan";
+import ImmersionExperience from "@/components/ui/ImmersionExperience";
+import GlobalCommunity from "@/components/ui/GlobalCommunity";
+import Testimonials from "@/components/ui/Testimonials";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <Hero />
-      <Courses />
+      <WhyASIGyan/>
+      <ImmersionExperience/>
+      <GlobalCommunity/>
+      <Testimonials/>
+      <Blog/>
+      {/* <Courses /> */}
       <About />
       <Newsletter />
-      <Blog />
       <Footer />
     </div>
   );
