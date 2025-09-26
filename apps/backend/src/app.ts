@@ -10,7 +10,13 @@ import EnvSecret from "./constants/envVariables";
 const app: Application = express();
 
 const corsOptions: CorsOptions = {
-  origin: [EnvSecret.BASE_URL, "http://localhost:5173"],
+  origin: [
+    EnvSecret.BASE_URL, 
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:3000",
+    "http://localhost:3001"
+  ],
   credentials: true,
 };
 
@@ -21,7 +27,9 @@ const uploadsDir =
     : path.join(__dirname, "..", "public", "uploads");
 
 // Use middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
