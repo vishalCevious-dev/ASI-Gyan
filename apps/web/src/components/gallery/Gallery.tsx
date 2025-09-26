@@ -131,10 +131,10 @@ export default function Gallery() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Filter bar */}
-      <div className="flex flex-col lg:flex-row items-center justify-between gap-4 bg-card/50 border border-border rounded-xl py-4 px-4">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-col lg:flex-row items-center justify-between gap-4 bg-card/50 border border-border rounded-xl py-4 sm:py-6 px-4 sm:px-6">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <div className="flex items-center rounded-[10px] px-3 py-2 gradient-primary">
             <span className="text-white text-sm font-bold mr-2">All</span>
             <span className="text-white text-xs font-bold bg-white/10 rounded-full px-3 py-1">
@@ -171,13 +171,13 @@ export default function Gallery() {
 
       {/* Admin: create new item */}
       <Card className="glassmorphism border-primary/20">
-        <CardHeader>
+        <CardHeader className="pb-4">
           <CardTitle>Create New Gallery Item</CardTitle>
         </CardHeader>
         <CardContent>
           <form
             onSubmit={handleCreate}
-            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+            className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6"
           >
             {/* Description field removed */}
             <div className="space-y-2">
@@ -268,50 +268,50 @@ export default function Gallery() {
       </Card>
 
       {/* Stats Cards (like dashboard) */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <Card className="glassmorphism border-primary/20">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Items</p>
-                <p className="text-2xl font-bold text-primary">{total}</p>
+                <p className="text-xl sm:text-2xl font-bold text-primary">{total}</p>
               </div>
-              <Tag className="w-8 h-8 text-primary" />
+              <Tag className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
             </div>
           </CardContent>
         </Card>
         <Card className="glassmorphism border-primary/20">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Photos</p>
-                <p className="text-2xl font-bold text-accent-foreground">
+                <p className="text-xl sm:text-2xl font-bold text-accent-foreground">
                   {photos}
                 </p>
               </div>
-              <ImageIcon className="w-8 h-8 text-accent-foreground" />
+              <ImageIcon className="w-6 h-6 sm:w-8 sm:h-8 text-accent-foreground" />
             </div>
           </CardContent>
         </Card>
         <Card className="glassmorphism border-primary/20">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Videos</p>
-                <p className="text-2xl font-bold text-chart-3">{videos}</p>
+                <p className="text-xl sm:text-2xl font-bold text-chart-3">{videos}</p>
               </div>
-              <Video className="w-8 h-8 text-chart-3" />
+              <Video className="w-6 h-6 sm:w-8 sm:h-8 text-chart-3" />
             </div>
           </CardContent>
         </Card>
         <Card className="glassmorphism border-primary/20">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Published</p>
-                <p className="text-2xl font-bold text-chart-4">{published}</p>
+                <p className="text-xl sm:text-2xl font-bold text-chart-4">{published}</p>
               </div>
-              <Calendar className="w-8 h-8 text-chart-4" />
+              <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-chart-4" />
             </div>
           </CardContent>
         </Card>
@@ -319,7 +319,7 @@ export default function Gallery() {
 
       {/* Filters and Search like the reference design, with Type and Status */}
       <Card className="glassmorphism border-primary/20">
-        <CardContent className="p-6">
+        <CardContent className="p-4 sm:p-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
               <Select
@@ -390,8 +390,8 @@ export default function Gallery() {
         <div
           className={
             viewMode === "grid"
-              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-              : "space-y-4"
+              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+              : "space-y-3 sm:space-y-4"
           }
         >
           {filteredItems.map((g: any) => (
