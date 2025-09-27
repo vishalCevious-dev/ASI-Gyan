@@ -1,7 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { Play, ArrowRight } from "lucide-react";
+import { useState, useRef } from "react";
 
 export default function GalleryBanner() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handlePlayClick = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        videoRef.current.play();
+        setIsPlaying(true);
+      }
+    }
+  };
+
   return (
     <div className="relative overflow-hidden">
       {/* Background with gradient - matching the image */}
@@ -71,16 +87,35 @@ export default function GalleryBanner() {
             </div>
           </div>
 
-          {/* Right side - Featured image */}
+          {/* Right side - Featured video */}
           <div className="relative">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-              {/* Featured image placeholder - replace with actual image */}
-              <div className="w-full h-64 sm:h-72 lg:h-80 bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center">
-                <div className="text-center text-white">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 bg-white/20 rounded-full flex items-center justify-center">
-                    <Play className="w-6 h-6 sm:w-8 sm:h-8" />
+              {/* Featured video */}
+              <div className="w-full h-64 sm:h-72 lg:h-80 bg-gradient-to-br from-slate-700 to-slate-800 relative">
+                <video 
+                  ref={videoRef}
+                  className="w-full h-full object-cover"
+                  poster=""
+                  preload="metadata"
+                  muted
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
+                  onEnded={() => setIsPlaying(false)}
+                >
+                  <source src="https://cdn.pixabay.com/video/2024/06/06/215470_tiny.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+                
+                {/* Video overlay with play button */}
+                <div 
+                  className={`absolute inset-0 bg-black/20 flex items-center justify-center transition-opacity duration-300 ${
+                    isPlaying ? 'opacity-0' : 'opacity-100'
+                  }`}
+                  onClick={handlePlayClick}
+                >
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm cursor-pointer hover:bg-white/30 transition-colors">
+                    <Play className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                   </div>
-                  <p className="text-xs sm:text-sm">Featured Gallery Content</p>
                 </div>
               </div>
               
