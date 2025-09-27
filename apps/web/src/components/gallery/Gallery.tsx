@@ -776,6 +776,7 @@ function GalleryDetail({
       setSaving(false);
     }
   }
+  
 
   async function remove() {
     if (!confirm("Delete this item?")) return;
