@@ -35,7 +35,51 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static("public"));
-app.use("/uploads", express.static(uploadsDir));
+app.use("/uploads", express.static(uploadsDir, {
+  setHeaders: (res, path) => {
+    // Set correct Content-Type headers for video files
+    if (path.endsWith('.mp4')) {
+      res.setHeader('Content-Type', 'video/mp4');
+    }
+    if (path.endsWith('.webm')) {
+      res.setHeader('Content-Type', 'video/webm');
+    }
+    if (path.endsWith('.ogg')) {
+      res.setHeader('Content-Type', 'video/ogg');
+    }
+    if (path.endsWith('.avi')) {
+      res.setHeader('Content-Type', 'video/x-msvideo');
+    }
+    if (path.endsWith('.mov')) {
+      res.setHeader('Content-Type', 'video/quicktime');
+    }
+    if (path.endsWith('.wmv')) {
+      res.setHeader('Content-Type', 'video/x-ms-wmv');
+    }
+    if (path.endsWith('.flv')) {
+      res.setHeader('Content-Type', 'video/x-flv');
+    }
+    if (path.endsWith('.mkv')) {
+      res.setHeader('Content-Type', 'video/x-matroska');
+    }
+    // Set correct Content-Type headers for image files
+    if (path.endsWith('.jpg') || path.endsWith('.jpeg')) {
+      res.setHeader('Content-Type', 'image/jpeg');
+    }
+    if (path.endsWith('.png')) {
+      res.setHeader('Content-Type', 'image/png');
+    }
+    if (path.endsWith('.gif')) {
+      res.setHeader('Content-Type', 'image/gif');
+    }
+    if (path.endsWith('.webp')) {
+      res.setHeader('Content-Type', 'image/webp');
+    }
+    if (path.endsWith('.svg')) {
+      res.setHeader('Content-Type', 'image/svg+xml');
+    }
+  }
+}));
 
 // Routes
 app.use("/api/v1", apiRoutes);

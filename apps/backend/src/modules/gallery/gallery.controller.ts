@@ -141,7 +141,7 @@ export const createGalleryItem = async (req: Request, res: Response) => {
 
     if (type === "PHOTO") {
       if (imageFile) {
-        data.imageUrl = buildFileUrl(`/uploads/gallery/images/${imageFile.filename}`);
+        data.imageUrl = buildFileUrl(`/uploads/gallery/${imageFile.filename}`);
       } else if (imageUrl) {
         data.imageUrl = buildFileUrl(imageUrl);
       } else {
@@ -153,8 +153,19 @@ export const createGalleryItem = async (req: Request, res: Response) => {
       data.videoUrl = null;
     } else if (type === "VIDEO") {
       if (videoFile) {
-        data.videoUrl = buildFileUrl(`/uploads/gallery/videos/${videoFile.filename}`);
+        data.videoUrl = buildFileUrl(`/uploads/gallery/${videoFile.filename}`);
       } else if (videoUrl) {
+        // Validate video URL format
+        if (!/^https?:\/\/.+\.(mp4|webm|ogg|mov|avi|mkv)(\?.*)?$/i.test(videoUrl) && 
+            !videoUrl.includes('youtube.com') && 
+            !videoUrl.includes('youtu.be') && 
+            !videoUrl.includes('vimeo.com') && 
+            !videoUrl.includes('dailymotion.com')) {
+          res.status(400).json(
+            ApiError(400, "Invalid video URL format. Please provide a valid video URL or upload a video file.", req)
+          );
+          return;
+        }
         data.videoUrl = buildFileUrl(videoUrl);
       } else {
         res
@@ -164,14 +175,16 @@ export const createGalleryItem = async (req: Request, res: Response) => {
           );
         return;
       }
-      // optional poster image
-      //   if (imageFile) {
-      //     data.imageUrl = buildFileUrl(`/uploads/gallery/${imageFile.filename}`);
-      //   } else if (imageUrl) {
-      //     data.imageUrl = buildFileUrl(imageUrl);
-      //   } else {
-      //     data.imageUrl = null;
-      //   }
+      
+      // Handle poster image for video (thumbnail)
+      if (imageFile) {
+        data.imageUrl = buildFileUrl(`/uploads/gallery/${imageFile.filename}`);
+      } else if (imageUrl) {
+        data.imageUrl = buildFileUrl(imageUrl);
+      } else {
+        // Generate a default video thumbnail placeholder
+        data.imageUrl = null; // Will be handled in frontend
+      }
     }
 
     const [inserted] = await db
