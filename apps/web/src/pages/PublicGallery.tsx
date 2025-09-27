@@ -5,8 +5,8 @@ import FeaturedContent from "@/components/sections/FeaturedContent";
 import ShareJourney from "@/components/sections/ShareJourney";
 import { usePublicGalleryList } from "@/hooks/usePublicQuery";
 import Footer from "@/components/ui/footer";
-import { Video, Play } from "lucide-react";
-import { useState } from "react";
+import { Video, Play, Grid3X3, List, ChevronDown, Filter } from "lucide-react";
+import { useState, useMemo } from "react";
 
 // Utility function to generate video thumbnails for external URLs
 const getVideoThumbnail = (videoUrl: string): string | null => {
@@ -157,6 +157,65 @@ export default function PublicGallery() {
     title: string;
   } | null>(null);
 
+  // Filter and view state
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [sortBy, setSortBy] = useState<string>("Newest First");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
+  // Calculate category counts
+  const categoryCounts = useMemo(() => {
+    const total = items.length;
+    const photos = items.filter((item: any) => item.type === "PHOTO").length;
+    const videos = items.filter((item: any) => item.type === "VIDEO").length;
+    const events = items.filter((item: any) => item.category === "Events").length;
+    const community = items.filter((item: any) => item.category === "Community").length;
+    const featured = items.filter((item: any) => item.category === "Featured").length;
+    
+    return { total, photos, videos, events, community, featured };
+  }, [items]);
+
+  // Filter items based on selected category
+  const filteredItems = useMemo(() => {
+    if (selectedCategory === "All") return items;
+    
+    switch (selectedCategory) {
+      case "Photos":
+        return items.filter((item: any) => item.type === "PHOTO");
+      case "Videos":
+        return items.filter((item: any) => item.type === "VIDEO");
+      case "Events":
+        return items.filter((item: any) => item.category === "Events");
+      case "Community":
+        return items.filter((item: any) => item.category === "Community");
+      case "Featured":
+        return items.filter((item: any) => item.category === "Featured");
+      default:
+        return items;
+    }
+  }, [items, selectedCategory]);
+
+  // Sort items based on selected sort option
+  const sortedItems = useMemo(() => {
+    const sorted = [...filteredItems];
+    
+    switch (sortBy) {
+      case "Newest First":
+        return sorted.sort((a: any, b: any) => 
+          new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+        );
+      case "Oldest First":
+        return sorted.sort((a: any, b: any) => 
+          new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime()
+        );
+      case "A-Z":
+        return sorted.sort((a: any, b: any) => a.title.localeCompare(b.title));
+      case "Z-A":
+        return sorted.sort((a: any, b: any) => b.title.localeCompare(a.title));
+      default:
+        return sorted;
+    }
+  }, [filteredItems, sortBy]);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -165,6 +224,101 @@ export default function PublicGallery() {
         <GalleryBanner />
         
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+          {/* Filter Bar */}
+          <div className="mb-8">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-4 bg-card/50 border border-border rounded-xl py-4 sm:py-6 px-4 sm:px-6">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                {/* All button - highlighted */}
+                <button
+                  onClick={() => setSelectedCategory("All")}
+                  className={`flex items-center rounded-[10px] px-3 py-2 transition-all duration-200 ${
+                    selectedCategory === "All"
+                      ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                      : "bg-card text-foreground hover:bg-accent"
+                  }`}
+                >
+                  <span className="text-sm font-bold mr-2">All</span>
+                  <span className="text-xs font-bold bg-white/10 rounded-full px-3 py-1">
+                    {categoryCounts.total}
+                  </span>
+                </button>
+
+                {/* Category buttons */}
+                {[
+                  { name: "Photos", count: categoryCounts.photos },
+                  { name: "Videos", count: categoryCounts.videos },
+                  { name: "Events", count: categoryCounts.events },
+                  { name: "Community", count: categoryCounts.community },
+                  { name: "Featured", count: categoryCounts.featured },
+                ].map((category) => (
+                  <button
+                    key={category.name}
+                    onClick={() => setSelectedCategory(category.name)}
+                    className={`flex items-center rounded-[10px] px-3 py-2 transition-all duration-200 ${
+                      selectedCategory === category.name
+                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                        : "bg-card text-foreground hover:bg-accent border border-border"
+                    }`}
+                  >
+                    <span className="text-sm font-bold mr-2">{category.name}</span>
+                    <span className="text-xs font-bold bg-secondary/40 rounded-full px-3 py-1">
+                      {category.count}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Right side controls */}
+              <div className="flex items-center gap-3">
+                {/* Sort dropdown */}
+                <div className="relative">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="appearance-none bg-card border border-border rounded-[10px] px-3 py-2 pr-8 text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value="Newest First">Newest First</option>
+                    <option value="Oldest First">Oldest First</option>
+                    <option value="A-Z">A-Z</option>
+                    <option value="Z-A">Z-A</option>
+                  </select>
+                  <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground pointer-events-none" />
+                </div>
+
+                {/* View toggle buttons */}
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setViewMode("grid")}
+                    className={`p-2 rounded-[10px] transition-all duration-200 ${
+                      viewMode === "grid"
+                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                        : "bg-card text-foreground hover:bg-accent border border-border"
+                    }`}
+                    aria-label="Grid view"
+                  >
+                    <Grid3X3 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode("list")}
+                    className={`p-2 rounded-[10px] transition-all duration-200 ${
+                      viewMode === "list"
+                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                        : "bg-card text-foreground hover:bg-accent border border-border"
+                    }`}
+                    aria-label="List view"
+                  >
+                    <List className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Filters button */}
+                <button className="flex items-center gap-2 bg-card text-foreground hover:bg-accent border border-border rounded-[10px] px-3 py-2 transition-all duration-200">
+                  <Filter className="w-4 h-4" />
+                  <span className="text-sm font-bold">Filters</span>
+                </button>
+              </div>
+            </div>
+          </div>
           <div className="text-center mb-8 sm:mb-12">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-4">Gallery</h1>
             <p className="text-muted-foreground text-sm sm:text-base">
@@ -181,23 +335,37 @@ export default function PublicGallery() {
               <div className="text-destructive">Failed to load gallery.</div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16 lg:mb-20">
-              {items?.map((g: any) => (
+            <div className={
+              viewMode === "grid"
+                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16 lg:mb-20"
+                : "space-y-4 mb-12 sm:mb-16 lg:mb-20"
+            }>
+              {sortedItems?.map((g: any) => (
                 <div
                   key={g.id}
-                  className="group rounded-xl overflow-hidden border border-primary/20 bg-accent/10 hover:border-primary/40 transition-all duration-300 hover:shadow-lg"
+                  className={`group rounded-xl overflow-hidden border border-primary/20 bg-accent/10 hover:border-primary/40 transition-all duration-300 hover:shadow-lg ${
+                    viewMode === "list" ? "flex items-center gap-4" : ""
+                  }`}
                 >
                   {g.type === "PHOTO" ? (
                     <img
                       src={g.imageUrl}
                       alt={g.title}
-                      className="w-full h-48 sm:h-56 object-cover group-hover:scale-105 transition-transform duration-300"
+                      className={`object-cover group-hover:scale-105 transition-transform duration-300 ${
+                        viewMode === "list" 
+                          ? "w-24 h-24 rounded-lg" 
+                          : "w-full h-48 sm:h-56"
+                      }`}
                     />
                   ) : (
                     g.videoUrl ? (
                       isExternalVideo(g.videoUrl) ? (
                         <div 
-                          className="relative w-full h-48 sm:h-56 cursor-pointer"
+                          className={`relative cursor-pointer ${
+                            viewMode === "list" 
+                              ? "w-24 h-24 rounded-lg" 
+                              : "w-full h-48 sm:h-56"
+                          }`}
                           onClick={() => setSelectedVideo({ url: g.videoUrl, title: g.title })}
                         >
                           <EmbeddedVideoPlayer 
@@ -213,7 +381,11 @@ export default function PublicGallery() {
                         </div>
                       ) : (
                         <div 
-                          className="relative w-full h-48 sm:h-56 cursor-pointer"
+                          className={`relative cursor-pointer ${
+                            viewMode === "list" 
+                              ? "w-24 h-24 rounded-lg" 
+                              : "w-full h-48 sm:h-56"
+                          }`}
                           onClick={() => setSelectedVideo({ url: g.videoUrl, title: g.title })}
                         >
                           <video
@@ -252,11 +424,23 @@ export default function PublicGallery() {
                       </div>
                     )
                   )}
-                  <div className="p-3 sm:p-4">
+                  <div className={`p-3 sm:p-4 ${viewMode === "list" ? "flex-1" : ""}`}>
                     <div className="font-medium text-sm sm:text-base mb-1">{g.title}</div>
                     {g.description && (
                       <div className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
                         {g.description}
+                      </div>
+                    )}
+                    {viewMode === "list" && (
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-xs text-muted-foreground bg-secondary/20 px-2 py-1 rounded">
+                          {g.type}
+                        </span>
+                        {g.category && (
+                          <span className="text-xs text-muted-foreground bg-secondary/20 px-2 py-1 rounded">
+                            {g.category}
+                          </span>
+                        )}
                       </div>
                     )}
                   </div>
