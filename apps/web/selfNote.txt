@@ -10,6 +10,7 @@ sudo cp -r dist/* /var/www/asi-gyan/
 ./scripts/pm2_backend.sh start --direct
 
 
+
 sudo nginx -t
 sudo systemctl reload nginx
 
