@@ -267,6 +267,12 @@ type GalleryItem = {
   type: "PHOTO" | "VIDEO";
   imageUrl?: string | null;
   videoUrl?: string | null;
+  videoPlatform?: string | null;
+  videoType?: string | null;
+  videoId?: string | null;
+  embedUrl?: string | null;
+  thumbnailUrl?: string | null;
+  isShortForm?: boolean | null;
   status: "DRAFT" | "PUBLISHED";
   category?: string | null;
   tags?: string[] | null;

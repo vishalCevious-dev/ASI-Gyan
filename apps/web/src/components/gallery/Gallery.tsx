@@ -16,6 +16,8 @@ import { useToast } from "../ui/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { galleryApi } from "@/lib/api";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
+import { VideoCard } from "../ui/VideoCard";
+import { VideoSelector } from "../ui/VideoSelector";
 import {
   Grid3X3,
   List as ListIcon,
@@ -31,89 +33,6 @@ import {
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
-// Utility function to generate video thumbnails for external URLs
-const getVideoThumbnail = (videoUrl: string): string | null => {
-  if (!videoUrl) return null;
-  
-  // YouTube thumbnails
-  if (videoUrl.includes('youtube.com/watch') || videoUrl.includes('youtu.be/')) {
-    const videoId = videoUrl.includes('youtu.be/') 
-      ? videoUrl.split('youtu.be/')[1]?.split('?')[0]
-      : videoUrl.split('v=')[1]?.split('&')[0];
-    if (videoId) {
-      return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-    }
-  }
-  
-  // Vimeo thumbnails (requires API call, but we can use a placeholder)
-  if (videoUrl.includes('vimeo.com/')) {
-    const videoId = videoUrl.split('vimeo.com/')[1]?.split('?')[0];
-    if (videoId) {
-      return `https://vumbnail.com/${videoId}.jpg`;
-    }
-  }
-  
-  return null;
-};
-
-// Utility function to check if video URL is from external platform
-const isExternalVideo = (videoUrl: string): boolean => {
-  return videoUrl.includes('youtube.com') || 
-         videoUrl.includes('youtu.be') || 
-         videoUrl.includes('vimeo.com') || 
-         videoUrl.includes('dailymotion.com');
-};
-
-// Component for embedded video players
-const EmbeddedVideoPlayer = ({ videoUrl, className }: { videoUrl: string; className?: string }) => {
-  if (videoUrl.includes('youtube.com/watch') || videoUrl.includes('youtu.be/')) {
-    const videoId = videoUrl.includes('youtu.be/') 
-      ? videoUrl.split('youtu.be/')[1]?.split('?')[0]
-      : videoUrl.split('v=')[1]?.split('&')[0];
-    
-    if (videoId) {
-      return (
-        <iframe
-          className={className}
-          src={`https://www.youtube.com/embed/${videoId}`}
-          title="YouTube video player"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      );
-    }
-  }
-  
-  if (videoUrl.includes('vimeo.com/')) {
-    const videoId = videoUrl.split('vimeo.com/')[1]?.split('?')[0];
-    if (videoId) {
-      return (
-        <iframe
-          className={className}
-          src={`https://player.vimeo.com/video/${videoId}`}
-          title="Vimeo video player"
-          frameBorder="0"
-          allow="autoplay; fullscreen; picture-in-picture"
-          allowFullScreen
-        />
-      );
-    }
-  }
-  
-  // Fallback to regular video element
-  return (
-    <video
-      src={videoUrl}
-      className={className}
-      controls
-      preload="metadata"
-      crossOrigin="anonymous"
-      playsInline
-      muted
-    />
-  );
-};
 
 // Simple themed Gallery page matching dashboard look-and-feel
 export default function Gallery() {
@@ -175,6 +94,34 @@ export default function Gallery() {
   const [category, setCategory] = useState<string>("General");
   const [tagsText, setTagsText] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
+
+  // Function to detect video type from URL
+  const detectVideoType = (url: string): "PHOTO" | "VIDEO" => {
+    if (!url) return "PHOTO";
+    
+    // Check for video platforms
+    const videoPatterns = [
+      /youtube\.com\/watch/,
+      /youtu\.be\//,
+      /vimeo\.com\//,
+      /dailymotion\.com\//,
+      /instagram\.com\/reel/,
+      /instagram\.com\/p\//,
+      /tiktok\.com\//,
+      /\.(mp4|webm|ogg|mov|avi|mkv)(\?.*)?$/i
+    ];
+    
+    return videoPatterns.some(pattern => pattern.test(url)) ? "VIDEO" : "PHOTO";
+  };
+
+  // Handle video URL change with auto-detection
+  const handleVideoUrlChange = (url: string) => {
+    setVideoUrl(url);
+    if (url.trim()) {
+      const detectedType = detectVideoType(url);
+      setType(detectedType);
+    }
+  };
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -309,17 +256,14 @@ export default function Gallery() {
                 placeholder="Enter tags (comma separated)"
               />
             </div>
-            {type === "VIDEO" ? (
-              <div className="space-y-2 md:col-span-2">
-                <Label>Video URL</Label>
-                <Input
-                  value={videoUrl}
-                  onChange={(e) => setVideoUrl(e.target.value)}
-                  placeholder="https://..."
-                  required={type === "VIDEO"}
-                />
-              </div>
-            ) : null}
+            <div className="space-y-2 md:col-span-2">
+              <VideoSelector
+                value={videoUrl}
+                onChange={handleVideoUrlChange}
+                onTypeDetected={(detectedType) => setType(detectedType)}
+                placeholder="Paste YouTube, Instagram, TikTok, or direct video URL..."
+              />
+            </div>
             <div className="space-y-2">
               <Label>
                 {type === "VIDEO" ? "Thumbnail (optional)" : "Image"}
@@ -492,61 +436,16 @@ export default function Gallery() {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          g.videoUrl ? (
-                            isExternalVideo(g.videoUrl) ? (
-                              <div className="relative w-full h-full">
-                                <EmbeddedVideoPlayer 
-                                  videoUrl={g.videoUrl}
-                                  className="w-full h-full object-cover"
-                                />
-                                {/* Video overlay with play button */}
-                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                                  <div className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
-                                    <svg className="w-4 h-4 text-gray-800 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                                      <path d="M8 5v14l11-7z"/>
-                                    </svg>
-                                  </div>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="relative w-full h-full">
-                                <video
-                                  src={g.videoUrl}
-                                  className="w-full h-full object-cover"
-                                  preload="metadata"
-                                  crossOrigin="anonymous"
-                                  playsInline
-                                  muted
-                                  poster={g.imageUrl || getVideoThumbnail(g.videoUrl) || undefined}
-                                  onError={(e) => {
-                                    console.error('Video load error in list:', e);
-                                    console.error('Video URL:', g.videoUrl);
-                                  }}
-                                  onLoadStart={() => {
-                                    console.log('Video loading started in list:', g.videoUrl);
-                                  }}
-                                  onCanPlay={() => {
-                                    console.log('Video can play in list:', g.videoUrl);
-                                  }}
-                                />
-                                {/* Video overlay with play button */}
-                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                                  <div className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
-                                    <svg className="w-4 h-4 text-gray-800 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                                      <path d="M8 5v14l11-7z"/>
-                                    </svg>
-                                  </div>
-                                </div>
-                              </div>
-                            )
-                          ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 text-white flex items-center justify-center text-xs rounded">
-                              <div className="text-center">
-                                <Video className="w-4 h-4 mx-auto mb-1 opacity-50" />
-                                <span>Video</span>
-                              </div>
-                            </div>
-                          )
+                          <VideoCard
+                            videoUrl={g.videoUrl || ''}
+                            title={g.title}
+                            className="w-full h-full"
+                            showPlatformInfo={true}
+                            isShortForm={g.isShortForm}
+                            videoPlatform={g.videoPlatform}
+                            videoType={g.videoType}
+                            onClick={() => setSelectedItem(g)}
+                          />
                         )}
                       </div>
                       <div className="flex-1">
@@ -605,61 +504,16 @@ export default function Gallery() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
-                      g.videoUrl ? (
-                        isExternalVideo(g.videoUrl) ? (
-                          <div className="relative w-full h-full">
-                            <EmbeddedVideoPlayer 
-                              videoUrl={g.videoUrl}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                            {/* Video overlay with play button */}
-                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                              <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
-                                <svg className="w-8 h-8 text-gray-800 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M8 5v14l11-7z"/>
-                                </svg>
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="relative w-full h-full">
-                            <video
-                              src={g.videoUrl}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                              preload="metadata"
-                              crossOrigin="anonymous"
-                              playsInline
-                              muted
-                              poster={g.imageUrl || getVideoThumbnail(g.videoUrl) || undefined}
-                              onError={(e) => {
-                                console.error('Video load error:', e);
-                                console.error('Video URL:', g.videoUrl);
-                              }}
-                              onLoadStart={() => {
-                                console.log('Video loading started:', g.videoUrl);
-                              }}
-                              onCanPlay={() => {
-                                console.log('Video can play:', g.videoUrl);
-                              }}
-                            />
-                            {/* Video overlay with play button */}
-                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                              <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
-                                <svg className="w-8 h-8 text-gray-800 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M8 5v14l11-7z"/>
-                                </svg>
-                              </div>
-                            </div>
-                          </div>
-                        )
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 text-white flex items-center justify-center text-sm">
-                          <div className="text-center">
-                            <Video className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                            <span>Video</span>
-                          </div>
-                        </div>
-                      )
+                      <VideoCard
+                        videoUrl={g.videoUrl || ''}
+                        title={g.title}
+                        className="w-full h-full group-hover:scale-105 transition-transform duration-300"
+                        showPlatformInfo={true}
+                        isShortForm={g.isShortForm}
+                        videoPlatform={g.videoPlatform}
+                        videoType={g.videoType}
+                        onClick={() => setSelectedItem(g)}
+                      />
                     )}
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
                     <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -808,44 +662,15 @@ function GalleryDetail({
               className="w-full h-full object-cover"
             />
           ) : (
-            item.videoUrl ? (
-              isExternalVideo(item.videoUrl) ? (
-                <EmbeddedVideoPlayer 
-                  videoUrl={item.videoUrl}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="relative w-full h-full">
-                  <video
-                    src={item.videoUrl}
-                    className="w-full h-full object-cover"
-                    controls
-                    preload="metadata"
-                    crossOrigin="anonymous"
-                    playsInline
-                    muted
-                    poster={item.imageUrl || getVideoThumbnail(item.videoUrl) || undefined}
-                    onError={(e) => {
-                      console.error('Video load error in detail:', e);
-                      console.error('Video URL:', item.videoUrl);
-                    }}
-                    onLoadStart={() => {
-                      console.log('Video loading started in detail:', item.videoUrl);
-                    }}
-                    onCanPlay={() => {
-                      console.log('Video can play in detail:', item.videoUrl);
-                    }}
-                  />
-                </div>
-              )
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 text-white flex items-center justify-center text-sm">
-                <div className="text-center">
-                  <Video className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                  <span>Video</span>
-                </div>
-              </div>
-            )
+            <VideoCard
+              videoUrl={item.videoUrl || ''}
+              title={item.title}
+              className="w-full h-full"
+              showPlatformInfo={true}
+              isShortForm={item.isShortForm}
+              videoPlatform={item.videoPlatform}
+              videoType={item.videoType}
+            />
           )}
         </div>
         <div className="flex gap-2">
