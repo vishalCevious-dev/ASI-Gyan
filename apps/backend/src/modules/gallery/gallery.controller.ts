@@ -11,6 +11,7 @@ import {
   type MultiMulterRequest,
 } from "src/middlewares/upload.middleware";
 import { buildFileUrl } from "src/utils/url";
+import { detectVideoInfo, isValidVideoUrl } from "src/utils/videoDetection";
 
 export const uploadGalleryMedia = makeMediaUploader({ folder: "gallery" });
 
@@ -34,6 +35,12 @@ export const listGallery = async (req: Request, res: Response) => {
         type: Gallery.type,
         imageUrl: Gallery.imageUrl,
         videoUrl: Gallery.videoUrl,
+        videoPlatform: Gallery.videoPlatform,
+        videoType: Gallery.videoType,
+        videoId: Gallery.videoId,
+        embedUrl: Gallery.embedUrl,
+        thumbnailUrl: Gallery.thumbnailUrl,
+        isShortForm: Gallery.isShortForm,
         status: Gallery.status,
         category: Gallery.category,
         tags: Gallery.tags,
@@ -154,19 +161,27 @@ export const createGalleryItem = async (req: Request, res: Response) => {
     } else if (type === "VIDEO") {
       if (videoFile) {
         data.videoUrl = buildFileUrl(`/uploads/gallery/${videoFile.filename}`);
+        // For uploaded video files, set as direct video
+        data.videoPlatform = "direct-video";
+        data.videoType = "video";
+        data.isShortForm = false;
       } else if (videoUrl) {
-        // Validate video URL format
-        if (!/^https?:\/\/.+\.(mp4|webm|ogg|mov|avi|mkv)(\?.*)?$/i.test(videoUrl) && 
-            !videoUrl.includes('youtube.com') && 
-            !videoUrl.includes('youtu.be') && 
-            !videoUrl.includes('vimeo.com') && 
-            !videoUrl.includes('dailymotion.com')) {
+        // Use new video detection system
+        if (!isValidVideoUrl(videoUrl)) {
           res.status(400).json(
-            ApiError(400, "Invalid video URL format. Please provide a valid video URL or upload a video file.", req)
+            ApiError(400, "Invalid video URL format. Please provide a valid video URL from supported platforms (YouTube, Vimeo, Instagram, TikTok, Twitter) or upload a video file.", req)
           );
           return;
         }
+        
+        const videoInfo = detectVideoInfo(videoUrl);
         data.videoUrl = buildFileUrl(videoUrl);
+        data.videoPlatform = videoInfo.platform;
+        data.videoType = videoInfo.type;
+        data.videoId = videoInfo.videoId;
+        data.embedUrl = videoInfo.embedUrl;
+        data.thumbnailUrl = videoInfo.thumbnailUrl;
+        data.isShortForm = videoInfo.isShortForm;
       } else {
         res
           .status(400)
@@ -181,6 +196,9 @@ export const createGalleryItem = async (req: Request, res: Response) => {
         data.imageUrl = buildFileUrl(`/uploads/gallery/${imageFile.filename}`);
       } else if (imageUrl) {
         data.imageUrl = buildFileUrl(imageUrl);
+      } else if (data.thumbnailUrl) {
+        // Use detected thumbnail if available
+        data.imageUrl = data.thumbnailUrl;
       } else {
         // Generate a default video thumbnail placeholder
         data.imageUrl = null; // Will be handled in frontend

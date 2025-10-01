@@ -5,70 +5,47 @@ import FeaturedContent from "@/components/sections/FeaturedContent";
 import ShareJourney from "@/components/sections/ShareJourney";
 import { usePublicGalleryList } from "@/hooks/usePublicQuery";
 import Footer from "@/components/ui/footer";
-import { Video, Play, Grid3X3, List, ChevronDown, Filter } from "lucide-react";
+import { Grid3X3, List, ChevronDown, Filter } from "lucide-react";
 import { useState, useMemo } from "react";
+import { VideoCard } from "@/components/ui/VideoCard";
 
-// Utility function to generate video thumbnails for external URLs
-const getVideoThumbnail = (videoUrl: string): string | null => {
-  if (!videoUrl) return null;
-  
-  // YouTube thumbnails
-  if (videoUrl.includes('youtube.com/watch') || videoUrl.includes('youtu.be/')) {
-    const videoId = videoUrl.includes('youtu.be/') 
-      ? videoUrl.split('youtu.be/')[1]?.split('?')[0]
-      : videoUrl.split('v=')[1]?.split('&')[0];
-    if (videoId) {
-      return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-    }
-  }
-  
-  // Vimeo thumbnails (requires API call, but we can use a placeholder)
-  if (videoUrl.includes('vimeo.com/')) {
-    const videoId = videoUrl.split('vimeo.com/')[1]?.split('?')[0];
-    if (videoId) {
-      return `https://vumbnail.com/${videoId}.jpg`;
-    }
-  }
-  
-  return null;
-};
-
-// Utility function to check if video URL is from external platform
-const isExternalVideo = (videoUrl: string): boolean => {
-  return videoUrl.includes('youtube.com') || 
-         videoUrl.includes('youtu.be') || 
-         videoUrl.includes('vimeo.com') || 
-         videoUrl.includes('dailymotion.com');
-};
 
 // Component for embedded video players
 const EmbeddedVideoPlayer = ({ videoUrl, className }: { videoUrl: string; className?: string }) => {
-  if (videoUrl.includes('youtube.com/watch') || videoUrl.includes('youtu.be/')) {
-    const videoId = videoUrl.includes('youtu.be/') 
-      ? videoUrl.split('youtu.be/')[1]?.split('?')[0]
-      : videoUrl.split('v=')[1]?.split('&')[0];
+  // YouTube videos (including Shorts)
+  if (videoUrl.includes('youtube.com/watch') || videoUrl.includes('youtu.be/') || videoUrl.includes('youtube.com/shorts/')) {
+    let videoId = '';
+    
+    if (videoUrl.includes('youtu.be/')) {
+      videoId = videoUrl.split('youtu.be/')[1]?.split('?')[0] || '';
+    } else if (videoUrl.includes('youtube.com/shorts/')) {
+      videoId = videoUrl.split('youtube.com/shorts/')[1]?.split('?')[0] || '';
+    } else if (videoUrl.includes('youtube.com/watch')) {
+      videoId = videoUrl.split('v=')[1]?.split('&')[0] || '';
+    }
     
     if (videoId) {
       return (
         <iframe
           className={className}
-          src={`https://www.youtube.com/embed/${videoId}`}
+          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
           title="YouTube video player"
           frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
         />
       );
     }
   }
   
+  // Vimeo videos
   if (videoUrl.includes('vimeo.com/')) {
     const videoId = videoUrl.split('vimeo.com/')[1]?.split('?')[0];
     if (videoId) {
       return (
         <iframe
           className={className}
-          src={`https://player.vimeo.com/video/${videoId}`}
+          src={`https://player.vimeo.com/video/${videoId}?autoplay=1&title=0&byline=0&portrait=0`}
           title="Vimeo video player"
           frameBorder="0"
           allow="autoplay; fullscreen; picture-in-picture"
@@ -76,6 +53,68 @@ const EmbeddedVideoPlayer = ({ videoUrl, className }: { videoUrl: string; classN
         />
       );
     }
+  }
+  
+  // Instagram Reels and Posts
+  if (videoUrl.includes('instagram.com/reel/') || videoUrl.includes('instagram.com/p/')) {
+    return (
+      <div className={`${className} bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white cursor-pointer relative overflow-hidden`}
+           onClick={() => window.open(videoUrl, '_blank')}>
+        {/* Instagram-style background pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-4 left-4 w-8 h-8 border-2 border-white rounded-full"></div>
+          <div className="absolute top-8 right-6 w-6 h-6 border-2 border-white rounded-full"></div>
+          <div className="absolute bottom-6 left-6 w-4 h-4 border-2 border-white rounded-full"></div>
+          <div className="absolute bottom-4 right-4 w-6 h-6 border-2 border-white rounded-full"></div>
+        </div>
+        
+        <div className="text-center relative z-10">
+          <div className="w-16 h-16 mx-auto mb-3 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+          </div>
+          <p className="text-lg font-bold mb-1">Instagram Reel</p>
+          <p className="text-sm opacity-90">Click to view</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // TikTok videos
+  if (videoUrl.includes('tiktok.com/')) {
+    return (
+      <div className={`${className} bg-gradient-to-br from-black to-gray-800 flex items-center justify-center text-white cursor-pointer`}
+           onClick={() => window.open(videoUrl, '_blank')}>
+        <div className="text-center">
+          <div className="w-12 h-12 mx-auto mb-2 bg-white/20 rounded-full flex items-center justify-center">
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+            </svg>
+          </div>
+          <p className="text-sm font-medium">TikTok Video</p>
+          <p className="text-xs opacity-75">Click to view</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // Twitter/X videos
+  if (videoUrl.includes('twitter.com/') || videoUrl.includes('x.com/')) {
+    return (
+      <div className={`${className} bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white cursor-pointer`}
+           onClick={() => window.open(videoUrl, '_blank')}>
+        <div className="text-center">
+          <div className="w-12 h-12 mx-auto mb-2 bg-white/20 rounded-full flex items-center justify-center">
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </div>
+          <p className="text-sm font-medium">Twitter Video</p>
+          <p className="text-xs opacity-75">Click to view</p>
+        </div>
+      </div>
+    );
   }
   
   // Fallback to regular video element
@@ -121,22 +160,10 @@ const VideoModal = ({
           </button>
           
           <div className="aspect-video">
-            {isExternalVideo(videoUrl) ? (
-              <EmbeddedVideoPlayer 
-                videoUrl={videoUrl}
-                className="w-full h-full"
-              />
-            ) : (
-              <video
-                src={videoUrl}
-                className="w-full h-full"
-                controls
-                autoPlay
-                preload="metadata"
-                crossOrigin="anonymous"
-                playsInline
-              />
-            )}
+            <EmbeddedVideoPlayer 
+              videoUrl={videoUrl} 
+              className="w-full h-full" 
+            />
           </div>
           <div className="p-4 text-white">
             <h3 className="text-lg font-medium">{title}</h3>
@@ -358,71 +385,24 @@ export default function PublicGallery() {
                       }`}
                     />
                   ) : (
-                    g.videoUrl ? (
-                      isExternalVideo(g.videoUrl) ? (
-                        <div 
-                          className={`relative cursor-pointer ${
-                            viewMode === "list" 
-                              ? "w-24 h-24 rounded-lg" 
-                              : "w-full h-48 sm:h-56"
-                          }`}
-                          onClick={() => setSelectedVideo({ url: g.videoUrl, title: g.title })}
-                        >
-                          <EmbeddedVideoPlayer 
-                            videoUrl={g.videoUrl}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                          {/* Video overlay with play button */}
-                          <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
-                              <Play className="w-6 h-6 text-gray-800 ml-0.5" />
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div 
-                          className={`relative cursor-pointer ${
-                            viewMode === "list" 
-                              ? "w-24 h-24 rounded-lg" 
-                              : "w-full h-48 sm:h-56"
-                          }`}
-                          onClick={() => setSelectedVideo({ url: g.videoUrl, title: g.title })}
-                        >
-                          <video
-                            src={g.videoUrl}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            preload="metadata"
-                            crossOrigin="anonymous"
-                            playsInline
-                            muted
-                            poster={g.imageUrl || getVideoThumbnail(g.videoUrl) || undefined}
-                            onError={(e) => {
-                              console.error('Video load error in public gallery:', e);
-                              console.error('Video URL:', g.videoUrl);
-                            }}
-                            onLoadStart={() => {
-                              console.log('Video loading started in public gallery:', g.videoUrl);
-                            }}
-                            onCanPlay={() => {
-                              console.log('Video can play in public gallery:', g.videoUrl);
-                            }}
-                          />
-                          {/* Video overlay with play button */}
-                          <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
-                              <Play className="w-6 h-6 text-gray-800 ml-0.5" />
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    ) : (
-                      <div className="w-full h-48 sm:h-56 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-white">
-                        <div className="text-center">
-                          <Video className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                          <span className="text-sm">Video</span>
-                        </div>
-                      </div>
-                    )
+                    <div 
+                      className={`relative cursor-pointer ${
+                        viewMode === "list" 
+                          ? "w-24 h-24 rounded-lg" 
+                          : "w-full h-48 sm:h-56"
+                      }`}
+                      onClick={() => setSelectedVideo({ url: g.videoUrl, title: g.title })}
+                    >
+                      <VideoCard
+                        videoUrl={g.videoUrl || ''}
+                        title={g.title}
+                        className="w-full h-full group-hover:scale-105 transition-transform duration-300"
+                        showPlatformInfo={true}
+                        isShortForm={g.isShortForm}
+                        videoPlatform={g.videoPlatform}
+                        videoType={g.videoType}
+                      />
+                    </div>
                   )}
                   <div className={`p-3 sm:p-4 ${viewMode === "list" ? "flex-1" : ""}`}>
                     <div className="font-medium text-sm sm:text-base mb-1">{g.title}</div>
