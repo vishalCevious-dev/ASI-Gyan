@@ -27,8 +27,8 @@ const Footer = () => {
     },
   ];
   return (
-    <footer id="contact" className="bg-space-blue border-t border-border">
-      <div className="container mx-auto px-6 py-16">
+    <footer id="contact" className="bg-background border-t border-border">
+      <div className="max-w-6xl mx-auto px-5 py-16">
         {/* Main Footer Content */}
         <div className="grid lg:grid-cols-6  gap-8 mb-12">
           {/* Brand Section */}

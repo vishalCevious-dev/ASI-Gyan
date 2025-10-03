@@ -64,7 +64,7 @@ const About = () => {
   ];
   return (
     <section id="about" className="py-20 bg-card">
-      <div className="container mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-5 py-16">
         {/* Section Header */}
         <div className="text-center mb-16">
           <div className="text-4xl mb-4">🎓</div>
