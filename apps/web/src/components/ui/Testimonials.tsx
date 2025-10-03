@@ -13,9 +13,9 @@ const TestimonialCard: React.FC<TestimonialProps> = ({
   hasIcon,
   iconSrc,
 }) => (
-  <div className="relative border border-[#666] rounded-2xl p-6 bg-[#0a0f1c] text-white">
+  <div className="relative border border-border rounded-2xl p-6 bg-card text-foreground">
     <h4 className="text-base font-semibold">{name}</h4>
-    <p className="text-sm text-gray-300 mt-3 leading-relaxed">{content}</p>
+    <p className="text-sm text-muted-foreground mt-3 leading-relaxed">{content}</p>
 
     {hasIcon && iconSrc && (
       <div className="absolute top-3 right-3 w-6 h-6">
@@ -60,17 +60,35 @@ const Testimonials: React.FC = () => {
   ];
 
   return (
-    <section className="w-full px-6 lg:px-32 py-16 bg-[#081121]">
-      {/* Heading */}
-      <div className="text-white">
-        <p className="uppercase tracking-wide text-sm">Hear it From Them</p>
-        <h2 className="text-[42px] font-medium mt-2 flex flex-wrap items-center">
-          Ambitious people <span className="ml-2">ASI Gyan</span>
-        </h2>
-      </div>
+    <section className="relative py-16 px-5 overflow-hidden bg-background">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/20 to-background"></div>
+      
+      {/* Decorative elements */}
+      <div className="absolute top-20 left-10 w-20 h-20 rounded-full opacity-30 blur-xl bg-primary/20"></div>
+      <div className="absolute bottom-20 right-10 w-32 h-32 rounded-full opacity-30 blur-xl bg-secondary/20"></div>
+      
+      <div className="relative max-w-6xl mx-auto">
+        {/* Header Section */}
+        <div className="text-center mb-12">
+          {/* Testimonials tag */}
+          <div className="inline-flex items-center px-4 py-2 rounded-full mb-6 bg-primary/10 border border-primary/20">
+            <span className="text-sm font-medium text-primary">Hear it From Them</span>
+          </div>
+          
+          {/* Main heading */}
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+            Ambitious people <span className="text-primary">ASI Gyan</span>
+          </h2>
+          
+          {/* Description */}
+          <p className="text-lg max-w-3xl mx-auto leading-relaxed text-muted-foreground">
+            Discover what our community members say about their transformative learning experiences with ASI Gyan.
+          </p>
+        </div>
 
-      {/* Grid Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+        {/* Grid Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Column 1 */}
         <div>
           <img
@@ -150,11 +168,12 @@ const Testimonials: React.FC = () => {
         </div>
       </div>
 
-      {/* See more button */}
-      <div className="flex justify-center mt-12">
-        <button className="px-8 py-3 border border-gray-600 text-white rounded-lg">
-          See more
-        </button>
+        {/* See more button */}
+        <div className="flex justify-center mt-12">
+          <button className="px-8 py-3 border border-border text-foreground rounded-lg bg-card hover:bg-card/80 transition-colors">
+            See more
+          </button>
+        </div>
       </div>
     </section>
   );
