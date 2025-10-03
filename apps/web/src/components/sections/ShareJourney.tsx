@@ -12,7 +12,7 @@ export default function ShareJourney() {
         }} />
       </div>
 
-      <div className="relative max-w-6xl mx-auto px-5 py-16">
+      <div className="relative max-w-6xl mx-auto px-5">
         {/* Main title */}
         <div className="text-center mb-8">
           <h2 className="text-4xl lg:text-5xl font-bold text-foreground leading-tight mb-4">
