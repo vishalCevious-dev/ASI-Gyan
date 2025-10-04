@@ -47,7 +47,7 @@ const Benefits: React.FC = () => {
           
           {/* Main heading */}
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-            Key Benefits of Courses
+            Key Benefits of <span className="text-primary">Courses</span>
           </h2>
           
           {/* Description */}
@@ -61,20 +61,37 @@ const Benefits: React.FC = () => {
           {benefits.map((benefit, index) => (
             <div
               key={index}
-              className="rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card border border-border backdrop-blur-sm"
+              className="group rounded-xl p-6 bg-card border border-primary/20 shadow-glow-green overflow-hidden 
+                       transition-all duration-500 ease-out cursor-pointer
+                       hover:scale-110 hover:shadow-2xl hover:shadow-primary/30 hover:border-primary/60
+                       hover:bg-gradient-to-br hover:from-card hover:to-card/90
+                       transform hover:-translate-y-2 hover:rotate-1
+                       relative before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-br 
+                       before:from-primary/5 before:to-transparent before:opacity-0 
+                       hover:before:opacity-100 before:transition-opacity before:duration-500"
             >
               {/* Icon */}
-              <div className="w-12 h-12 rounded-lg mb-4 flex items-center justify-center bg-muted">
-                <div className="w-6 h-6 rounded bg-primary/60"></div>
+              <div className="w-12 h-12 rounded-lg mb-4 flex items-center justify-center bg-muted
+                            transition-all duration-500 ease-out
+                            group-hover:bg-primary/20 group-hover:scale-125 group-hover:rotate-12
+                            group-hover:shadow-lg group-hover:shadow-primary/25">
+                <div className="w-6 h-6 rounded bg-primary/60 
+                              transition-all duration-500 ease-out
+                              group-hover:bg-primary group-hover:scale-125 group-hover:rotate-180
+                              group-hover:shadow-md group-hover:shadow-primary/50"></div>
               </div>
               
               {/* Title */}
-              <h3 className="text-xl font-bold mb-3 text-foreground">
+              <h3 className="text-xl font-bold mb-3 text-foreground
+                            transition-all duration-500 ease-out
+                            group-hover:text-primary group-hover:scale-105 group-hover:translate-x-1">
                 {benefit.title}
               </h3>
               
               {/* Description */}
-              <p className="leading-relaxed text-muted-foreground">
+              <p className="leading-relaxed text-muted-foreground
+                          transition-all duration-500 ease-out
+                          group-hover:text-foreground/90 group-hover:translate-x-1">
                 {benefit.description}
               </p>
             </div>

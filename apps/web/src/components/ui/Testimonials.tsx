@@ -1,10 +1,16 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 
 interface TestimonialProps {
   name: string;
   content: string;
   hasIcon?: boolean;
   iconSrc?: string;
+}
+
+interface VideoTestimonialProps {
+  name: string;
+  title?: string;
+  videoSrc: string;
 }
 
 const TestimonialCard: React.FC<TestimonialProps> = ({
@@ -28,6 +34,86 @@ const TestimonialCard: React.FC<TestimonialProps> = ({
     )}
   </div>
 );
+
+const VideoTestimonialCard: React.FC<VideoTestimonialProps> = ({
+  name,
+  title,
+  videoSrc,
+}) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handleVideoClick = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        videoRef.current.play();
+        setIsPlaying(true);
+      }
+    }
+  };
+
+  return (
+    <div className="relative border border-border rounded-2xl overflow-hidden bg-card group hover:scale-105 transition-transform duration-300">
+      <div className="relative">
+        {/* Video element */}
+        <video
+          ref={videoRef}
+          className="w-full aspect-[16/9] md:aspect-[4/3] object-cover rounded-t-2xl cursor-pointer"
+          muted
+          preload="metadata"
+          poster=""
+          onClick={handleVideoClick}
+        >
+          <source src={videoSrc} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        
+        {/* Play button overlay - only show when video is not playing */}
+        {!isPlaying && (
+          <div 
+            className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors cursor-pointer"
+            onClick={handleVideoClick}
+          >
+            <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center group-hover:bg-white transition-colors">
+              <svg 
+                className="w-8 h-8 text-gray-800 ml-1" 
+                fill="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </div>
+          </div>
+        )}
+
+        {/* Pause indicator - show when video is playing */}
+        {isPlaying && (
+          <div className="absolute top-3 right-3">
+            <div className="bg-black/70 rounded-full p-2">
+              <svg 
+                className="w-4 h-4 text-white" 
+                fill="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path d="M6 4h4v16H6zm8 0h4v16h-4z"/>
+              </svg>
+            </div>
+          </div>
+        )}
+      </div>
+      
+      <div className="p-6">
+        <h4 className="text-base font-semibold text-foreground">{name}</h4>
+        {title && (
+          <p className="text-sm text-muted-foreground mt-1">{title}</p>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const Testimonials: React.FC = () => {
   const testimonials = [
@@ -78,7 +164,7 @@ const Testimonials: React.FC = () => {
           
           {/* Main heading */}
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-            Ambitious people <span className="text-primary">ASI Gyan</span>
+            Ambitious People Love <span className="text-primary">ASI Gyan</span>
           </h2>
           
           {/* Description */}
@@ -89,90 +175,83 @@ const Testimonials: React.FC = () => {
 
         {/* Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Column 1 */}
-        <div>
-          <img
-            src="https://api.builder.io/api/v1/image/assets/TEMP/8b8d4846f79b0b1a9e5902781d972ddeebe09b68?placeholderIfAbsent=true"
-            alt="video placeholder"
-            className="rounded-xl w-full min-h-[250px] object-cover"
-          />
-          {testimonials.map((t, i) => (
-            <div key={i} className="mt-6">
-              <TestimonialCard {...t} />
+          {/* Column 1 */}
+          <div>
+            <VideoTestimonialCard
+              name="Nathalie Ramanathansoa-frat"
+              title="Entrepreneur & executive advisor"
+              videoSrc="/videos/Video-502.mp4"
+            />
+            {testimonials.map((t, i) => (
+              <div key={i} className="mt-6">
+                <TestimonialCard {...t} />
+              </div>
+            ))}
+          </div>
+
+          {/* Column 2 */}
+          <div>
+            <TestimonialCard
+              name="Ashwath BM"
+              content="Immense gratitude to the Outskill team, phenomenal mentors, and the powerhouse community..."
+            />
+            <div className="mt-6">
+              <TestimonialCard
+                name="Yasmin Niazi"
+                content="I had a fantastic experience at the two-day AI Mastermind event. It was an incredible opportunity..."
+                hasIcon
+                iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/ea4ec06768c3163b6b5e3346d658c81a3bd9e61b?placeholderIfAbsent=true"
+              />
             </div>
-          ))}
-        </div>
+            <VideoTestimonialCard
+              name="Neha Bapna"
+              title="Marketing Operation expert"
+              videoSrc="/videos/Video-604.mp4"
+            />
+            <div className="mt-6">
+              <TestimonialCard
+                name="Shashank Aeligala"
+                content="Thank you Outskill team. I've learnt a lot in these 2 days and looking forward to learn more about AI this year!"
+              />
+            </div>
+          </div>
 
-        {/* Column 2 */}
-        <div>
-          <TestimonialCard
-            name="Ashwath BM"
-            content="Immense gratitude to the Outskill team, phenomenal mentors, and the powerhouse community..."
-          />
-          <div className="mt-6">
+          {/* Column 3 */}
+          <div>
             <TestimonialCard
-              name="Yasmin Niazi"
-              content="I had a fantastic experience at the two-day AI Mastermind event. It was an incredible opportunity..."
+              name="Parin Patel"
+              content="A huge thank you to the entire Outskill Team and my fellow attendees for an incredible 2 Day AI Mastermind!"
               hasIcon
-              iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/ea4ec06768c3163b6b5e3346d658c81a3bd9e61b?placeholderIfAbsent=true"
+              iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/fe2137467fae4db3828da8fd9c3ce0986e1930b1?placeholderIfAbsent=true"
             />
-          </div>
-          <img
-            src="https://api.builder.io/api/v1/image/assets/TEMP/5b246e0afb3a7b2a0cebc4294b7c5f126d30f258?placeholderIfAbsent=true"
-            alt="testimonial img"
-            className="rounded-xl w-full min-h-[250px] object-cover mt-6"
-          />
-          <div className="mt-6">
-            <TestimonialCard
-              name="Shashank Aeligala"
-              content="Thank you Outskill team. I've learnt a lot in these 2 days and looking forward to learn more about AI this year!"
-            />
-          </div>
-        </div>
-
-        {/* Column 3 */}
-        <div>
-          <TestimonialCard
-            name="Parin Patel"
-            content="A huge thank you to the entire Outskill Team and my fellow attendees for an incredible 2 Day AI Mastermind!"
-            hasIcon
-            iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/fe2137467fae4db3828da8fd9c3ce0986e1930b1?placeholderIfAbsent=true"
-          />
-          <div className="mt-6">
-            <TestimonialCard
-              name="Bhawna Mehra"
-              content="First of all, I thank the entire Outskill and Outshine team and then to myself for keeping patience for this long..."
-              hasIcon
-              iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/80446e8cb44773744235d0bb8bc19b49fc8a1427?placeholderIfAbsent=true"
-            />
-          </div>
-          <div className="mt-6">
-            <TestimonialCard
-              name="Jay"
-              content="Hello Outskill team Thank you guys for a fantastic 1+2 days. This was a weekend very well spent with great learning..."
-            />
-          </div>
-          <div className="mt-6">
-            <TestimonialCard
+            <div className="mt-6">
+              <TestimonialCard
+                name="Bhawna Mehra"
+                content="First of all, I thank the entire Outskill and Outshine team and then to myself for keeping patience for this long..."
+                hasIcon
+                iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/80446e8cb44773744235d0bb8bc19b49fc8a1427?placeholderIfAbsent=true"
+              />
+            </div>
+            <div className="mt-6">
+              <TestimonialCard
+                name="Jay"
+                content="Hello Outskill team Thank you guys for a fantastic 1+2 days. This was a weekend very well spent with great learning..."
+              />
+            </div>
+            <div className="mt-6">
+              <TestimonialCard
+                name="Subhashini Nachimuthu"
+                content="Thank you, divij. It was really very insightful. Especially for a beginner like me, helped me understand basics of AI & prompting techniques!"
+                hasIcon
+                iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/f8643c0824cb50a555c34a717f1e9956891f438c?placeholderIfAbsent=true"
+              />
+            </div>
+            <VideoTestimonialCard
               name="Subhashini Nachimuthu"
-              content="Thank you, divij. It was really very insightful. Especially for a beginner like me, helped me understand basics of AI & prompting techniques!"
-              hasIcon
-              iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/f8643c0824cb50a555c34a717f1e9956891f438c?placeholderIfAbsent=true"
+              title="AI Enthusiast"
+              videoSrc="/videos/Video-746.mp4"
             />
           </div>
-          <img
-            src="https://api.builder.io/api/v1/image/assets/TEMP/4ad3dd476ca99eead404c26ed67720622d0f0c26?placeholderIfAbsent=true"
-            alt="testimonial img"
-            className="rounded-xl w-full min-h-[250px] object-cover mt-6"
-          />
-        </div>
-      </div>
-
-        {/* See more button */}
-        <div className="flex justify-center mt-12">
-          <button className="px-8 py-3 border border-border text-foreground rounded-lg bg-card hover:bg-card/80 transition-colors">
-            See more
-          </button>
         </div>
       </div>
     </section>

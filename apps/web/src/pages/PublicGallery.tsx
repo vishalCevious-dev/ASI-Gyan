@@ -5,7 +5,7 @@ import FeaturedContent from "@/components/sections/FeaturedContent";
 import ShareJourney from "@/components/sections/ShareJourney";
 import { usePublicGalleryList } from "@/hooks/usePublicQuery";
 import Footer from "@/components/ui/footer";
-import { Grid3X3, List, ChevronDown, Filter } from "lucide-react";
+import { Grid3X3, List, ChevronDown, Filter, Search } from "lucide-react";
 import { useState, useMemo } from "react";
 import { VideoCard } from "@/components/ui/VideoCard";
 
@@ -28,10 +28,10 @@ const EmbeddedVideoPlayer = ({ videoUrl, className }: { videoUrl: string; classN
       return (
         <iframe
           className={className}
-          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
+          src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`}
           title="YouTube video player"
           frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
         />
       );
@@ -45,10 +45,10 @@ const EmbeddedVideoPlayer = ({ videoUrl, className }: { videoUrl: string; classN
       return (
         <iframe
           className={className}
-          src={`https://player.vimeo.com/video/${videoId}?autoplay=1&title=0&byline=0&portrait=0`}
+          src={`https://player.vimeo.com/video/${videoId}?title=0&byline=0&portrait=0`}
           title="Vimeo video player"
           frameBorder="0"
-          allow="autoplay; fullscreen; picture-in-picture"
+          allow="fullscreen; picture-in-picture"
           allowFullScreen
         />
       );
@@ -188,6 +188,7 @@ export default function PublicGallery() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [sortBy, setSortBy] = useState<string>("Newest First");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Calculate category counts
   const categoryCounts = useMemo(() => {
@@ -201,25 +202,45 @@ export default function PublicGallery() {
     return { total, photos, videos, events, community, featured };
   }, [items]);
 
-  // Filter items based on selected category
+  // Filter items based on selected category and search query
   const filteredItems = useMemo(() => {
-    if (selectedCategory === "All") return items;
+    let filtered = items;
     
-    switch (selectedCategory) {
-      case "Photos":
-        return items.filter((item: any) => item.type === "PHOTO");
-      case "Videos":
-        return items.filter((item: any) => item.type === "VIDEO");
-      case "Events":
-        return items.filter((item: any) => item.category === "Events");
-      case "Community":
-        return items.filter((item: any) => item.category === "Community");
-      case "Featured":
-        return items.filter((item: any) => item.category === "Featured");
-      default:
-        return items;
+    // Apply category filter
+    if (selectedCategory !== "All") {
+      switch (selectedCategory) {
+        case "Photos":
+          filtered = filtered.filter((item: any) => item.type === "PHOTO");
+          break;
+        case "Videos":
+          filtered = filtered.filter((item: any) => item.type === "VIDEO");
+          break;
+        case "Events":
+          filtered = filtered.filter((item: any) => item.category === "Events");
+          break;
+        case "Community":
+          filtered = filtered.filter((item: any) => item.category === "Community");
+          break;
+        case "Featured":
+          filtered = filtered.filter((item: any) => item.category === "Featured");
+          break;
+      }
     }
-  }, [items, selectedCategory]);
+    
+    // Apply search query filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((item: any) => 
+        (item.title || "").toLowerCase().includes(query) ||
+        (item.category || "").toLowerCase().includes(query) ||
+        (Array.isArray(item.tags) && item.tags.some((tag: string) => 
+          tag.toLowerCase().includes(query)
+        ))
+      );
+    }
+    
+    return filtered;
+  }, [items, selectedCategory, searchQuery]);
 
   // Sort items based on selected sort option
   const sortedItems = useMemo(() => {
@@ -254,8 +275,9 @@ export default function PublicGallery() {
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
           {/* Filter Bar */}
           <div className="mb-8">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-4 bg-card/50 border border-border rounded-xl py-4 sm:py-6 px-4 sm:px-6">
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div className="bg-card/50 border border-border rounded-xl py-4 sm:py-6 px-4 sm:px-6">
+              {/* Top row with category filters */}
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4">
                 {/* All button - highlighted */}
                 <button
                   onClick={() => setSelectedCategory("All")}
@@ -296,54 +318,81 @@ export default function PublicGallery() {
                 ))}
               </div>
 
-              {/* Right side controls */}
-              <div className="flex items-center gap-3">
-                {/* Sort dropdown */}
-                <div className="relative">
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="appearance-none bg-card border border-border rounded-[10px] px-3 py-2 pr-8 text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  >
-                    <option value="Newest First">Newest First</option>
-                    <option value="Oldest First">Oldest First</option>
-                    <option value="A-Z">A-Z</option>
-                    <option value="Z-A">Z-A</option>
-                  </select>
-                  <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground pointer-events-none" />
+              {/* Bottom row with search and controls */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                {/* Search input - more prominent */}
+                <div className="flex-1 max-w-md w-full relative">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search by title, category, or tags..."
+                      className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-[10px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all duration-200 hover:border-primary/30"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery("")}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                {/* View toggle buttons */}
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setViewMode("grid")}
-                    className={`p-2 rounded-[10px] transition-all duration-200 ${
-                      viewMode === "grid"
-                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
-                        : "bg-card text-foreground hover:bg-accent border border-border"
-                    }`}
-                    aria-label="Grid view"
-                  >
-                    <Grid3X3 className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode("list")}
-                    className={`p-2 rounded-[10px] transition-all duration-200 ${
-                      viewMode === "list"
-                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
-                        : "bg-card text-foreground hover:bg-accent border border-border"
-                    }`}
-                    aria-label="List view"
-                  >
-                    <List className="w-4 h-4" />
+                {/* Right side controls */}
+                <div className="flex items-center gap-3">
+                  {/* Sort dropdown */}
+                  <div className="relative">
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="appearance-none bg-card border border-border rounded-[10px] px-3 py-2 pr-8 text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 hover:border-primary/30 transition-all duration-200"
+                    >
+                      <option value="Newest First">Newest First</option>
+                      <option value="Oldest First">Oldest First</option>
+                      <option value="A-Z">A-Z</option>
+                      <option value="Z-A">Z-A</option>
+                    </select>
+                    <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground pointer-events-none" />
+                  </div>
+
+                  {/* View toggle buttons */}
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setViewMode("grid")}
+                      className={`p-2 rounded-[10px] transition-all duration-200 ${
+                        viewMode === "grid"
+                          ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                          : "bg-card text-foreground hover:bg-accent border border-border"
+                      }`}
+                      aria-label="Grid view"
+                    >
+                      <Grid3X3 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setViewMode("list")}
+                      className={`p-2 rounded-[10px] transition-all duration-200 ${
+                        viewMode === "list"
+                          ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                          : "bg-card text-foreground hover:bg-accent border border-border"
+                      }`}
+                      aria-label="List view"
+                    >
+                      <List className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Filters button */}
+                  <button className="flex items-center gap-2 bg-card text-foreground hover:bg-accent border border-border rounded-[10px] px-3 py-2 transition-all duration-200 hover:border-primary/30">
+                    <Filter className="w-4 h-4" />
+                    <span className="text-sm font-bold">Filters</span>
                   </button>
                 </div>
-
-                {/* Filters button */}
-                <button className="flex items-center gap-2 bg-card text-foreground hover:bg-accent border border-border rounded-[10px] px-3 py-2 transition-all duration-200">
-                  <Filter className="w-4 h-4" />
-                  <span className="text-sm font-bold">Filters</span>
-                </button>
               </div>
             </div>
           </div>
@@ -361,6 +410,12 @@ export default function PublicGallery() {
           ) : isError ? (
             <div className="text-center py-12">
               <div className="text-destructive">Failed to load gallery.</div>
+            </div>
+          ) : sortedItems.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-muted-foreground">
+                {searchQuery.trim() ? "No items found matching your search." : "No items found."}
+              </div>
             </div>
           ) : (
             <div className={

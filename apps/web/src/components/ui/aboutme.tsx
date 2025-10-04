@@ -85,7 +85,7 @@ const AboutUs: React.FC = () => {
             </div>
 
             {/* Additional Stats */}
-            <div className="grid grid-cols-3 gap-6 pt-8 border-t border-border/50">
+            {/* <div className="grid grid-cols-3 gap-6 pt-8 border-t border-border/50">
               <div className="text-center">
                 <div className="text-3xl font-bold text-primary mb-2">10K+</div>
                 <div className="text-sm text-muted-foreground">Students</div>
@@ -98,7 +98,7 @@ const AboutUs: React.FC = () => {
                 <div className="text-3xl font-bold text-primary mb-2">98%</div>
                 <div className="text-sm text-muted-foreground">Satisfaction</div>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Enhanced Right Column (Instructor Card) */}

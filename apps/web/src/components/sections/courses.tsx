@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 const Courses = () => {
   // const courses = [{
   //   title: "AI Fundamentals Program",
@@ -99,8 +100,8 @@ const Courses = () => {
               Discover our comprehensive AI learning programs designed for every
               skill level.
             </p>
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-              Browse Courses
+            <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Link to="/courses">Browse Courses</Link>
             </Button>
           </div>
 
@@ -135,7 +136,7 @@ const Courses = () => {
         </div>
 
         {/* Additional Programs Section */}
-        <div className="mt-20 text-center">
+        {/* <div className="mt-20 text-center">
           <div className="bg-card border border-border rounded-lg p-8 max-w-4xl mx-auto">
             <h3 className="text-3xl font-bold mb-4">
               Custom Enterprise Programs
@@ -156,7 +157,7 @@ const Courses = () => {
               </Button>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );

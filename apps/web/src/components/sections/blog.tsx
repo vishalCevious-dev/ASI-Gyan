@@ -41,7 +41,7 @@ const Blog = () => {
             <span className="text-sm font-medium text-primary">AI Learning Blog</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            AI Learning Blog
+            AI Learning <span className="text-primary">Blog</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Discover the latest insights, tutorials, and thought leadership in
