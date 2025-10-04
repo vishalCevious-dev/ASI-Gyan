@@ -31,12 +31,15 @@ const Blog = () => {
       <div className="max-w-6xl mx-auto px-5">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <Badge
+          {/* <Badge
             variant="outline"
             className="border-secondary text-secondary bg-secondary/10 mb-4"
           >
             AI Knowledge Hub
-          </Badge>
+          </Badge> */}
+          <div className="inline-flex items-center px-4 py-2 rounded-full mb-6 bg-primary/10 border border-primary/20">
+            <span className="text-sm font-medium text-primary">AI Learning Blog</span>
+          </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             AI Learning Blog
           </h2>

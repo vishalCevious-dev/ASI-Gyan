@@ -19,8 +19,8 @@ const GlobalCommunity: React.FC = () => {
           </div>
           
           {/* Main heading */}
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-            Join a Global Community Shaping the Future of AI
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground" style={{ lineHeight: '1.2' }}>
+            Join a Global Community Shaping <br />the Future of  AI
           </h2>
           
           {/* Description */}

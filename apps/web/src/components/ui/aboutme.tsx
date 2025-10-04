@@ -5,35 +5,35 @@ const AboutUs: React.FC = () => {
   const benefits = [
     {
       title: "Certificate of Completion",
-      description: "Receive a recognized credential that significantly boosts your resume.",
+      description: "Earn a recognized certificate that adds value to your resume and showcases your expertise.",
       icon: <FaAward className="w-6 h-6" />
     },
     {
       title: "Networking Opportunities",
-      description: "Connect with peers and valuable industry professionals for growth.",
+      description: "Connect with learners, industry professionals, and mentors to expand your professional network.",
       icon: <FaUsers className="w-6 h-6" />
     },
     {
       title: "Comprehensive Curriculum",
-      description: "Master essential topics and practical skills effectively and thoroughly.",
+      description: "Learn practical, job-ready skills through a well-structured and detailed curriculum.",
       icon: <FaBook className="w-6 h-6" />
     },
     {
       title: "Expert Guidance",
-      description: "Learn from experienced instructors for personalized and effective support.",
+      description: "Get mentorship and support from experienced instructors who guide you every step of the way.",
       icon: <FaChalkboardTeacher className="w-6 h-6" />
     },
   ];
 
   return (
-    <section className="relative py-16 px-14 overflow-hidden bg-background">
+    <section className="relative py-16 px-5 overflow-hidden bg-background">
       {/* Enhanced Background with animated gradients */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/10 to-background"></div>
       <div className="absolute top-0 left-0 w-72 h-72 bg-primary/5 rounded-full blur-3xl animate-pulse"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-secondary/5 rounded-full blur-3xl animate-pulse"></div>
       
       {/* Decorative elements */}
-      <div className="absolute top-20 left-10 w-20 h-20 rounded-full opacity-40 blur-xl bg-primary/20 animate-bounce"></div>
+      <div className="absolute top-0 left-10 w-20 h-20 rounded-full opacity-40 blur-xl bg-primary/20 animate-bounce"></div>
       <div className="absolute bottom-20 right-10 w-32 h-32 rounded-full opacity-40 blur-xl bg-secondary/20 animate-bounce delay-1000"></div>
       
       <div className="relative max-w-7xl mx-auto">
@@ -47,12 +47,12 @@ const AboutUs: React.FC = () => {
           
           {/* Main heading */}
           <h2 className="text-5xl md:text-6xl font-bold mb-8 text-foreground bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-            But Why <span className="text-primary">CourseSite?</span>
+             Why <span className="text-primary">ASI-Gyan?</span>
           </h2>
           
           {/* Description */}
           <p className="text-xl max-w-4xl mx-auto leading-relaxed text-muted-foreground font-light">
-            Explore the incredible advantages of enrolling in our courses and enhancing your skills for the ultimate career success.
+          Discover the incredible benefits of learning with ASI-Gyan, where every course is designed to level up your skills and accelerate your career growth.
           </p>
         </div>
 

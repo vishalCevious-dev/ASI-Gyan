@@ -45,7 +45,7 @@ const About: React.FC = () => {
           <div className="flex items-center justify-center mb-6">
             <div className="w-4 h-4 bg-purple-300 rounded-full mr-4"></div>
             <h2 className="text-4xl md:text-5xl font-bold text-black">
-              But Why CourseSite ?
+               Why ASI-Gyan?
             </h2>
             <div className="w-4 h-4 bg-purple-300 rounded-full ml-4"></div>
           </div>
