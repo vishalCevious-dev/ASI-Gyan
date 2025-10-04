@@ -1,0 +1,1 @@
+ALTER TABLE "gallery" ALTER COLUMN "title" SET DEFAULT 'Untitled';
