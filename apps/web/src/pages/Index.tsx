@@ -24,7 +24,7 @@ const Index = () => {
       <Benefits/>
       <Blog/>
       <AboutMe/>
-      {/* <Courses /> */}
+      <Courses />
       <About />
       <Newsletter />
       <Footer />

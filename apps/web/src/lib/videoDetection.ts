@@ -47,7 +47,7 @@ export function detectVideoInfo(url: string): VideoInfo {
       platform: isShorts ? 'youtube-shorts' : 'youtube',
       type: isShorts ? 'short' : 'video',
       videoId,
-      embedUrl: videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1` : undefined,
+      embedUrl: videoId ? `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1` : undefined,
       thumbnailUrl: videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : undefined,
       isExternal: true,
       isShortForm: isShorts
@@ -84,7 +84,7 @@ export function detectVideoInfo(url: string): VideoInfo {
       platform: 'vimeo',
       type: 'video',
       videoId,
-      embedUrl: videoId ? `https://player.vimeo.com/video/${videoId}?autoplay=1&title=0&byline=0&portrait=0` : undefined,
+      embedUrl: videoId ? `https://player.vimeo.com/video/${videoId}?title=0&byline=0&portrait=0` : undefined,
       thumbnailUrl: videoId ? `https://vumbnail.com/${videoId}.jpg` : undefined,
       isExternal: true,
       isShortForm: false

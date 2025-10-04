@@ -76,7 +76,7 @@ export function VideoCard({
               className="w-full h-full"
               title="Vimeo video player"
               frameBorder="0"
-              allow="autoplay; fullscreen; picture-in-picture"
+              allow="fullscreen; picture-in-picture"
               allowFullScreen
             />
           ) : (

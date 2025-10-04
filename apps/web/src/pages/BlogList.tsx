@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/ui/header";
+import Footer from "@/components/ui/footer";
 
 const pageSize = 9;
 
@@ -117,6 +118,7 @@ export default function BlogList() {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 }

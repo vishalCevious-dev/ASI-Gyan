@@ -87,6 +87,7 @@ export default function Gallery() {
   const published = items.filter((i: any) => i.status === "PUBLISHED").length;
 
   // Description removed per request
+  const [title, setTitle] = useState<string>("");
   const [type, setType] = useState<"PHOTO" | "VIDEO">("PHOTO");
   const [status, setStatus] = useState<"PUBLISHED" | "DRAFT">("PUBLISHED");
   const [image, setImage] = useState<File | null>(null);
@@ -127,7 +128,7 @@ export default function Gallery() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const autoTitle = `${type === "VIDEO" ? "Video" : "Photo"} ${category} ${new Date()
+      const finalTitle = title.trim() || `${type === "VIDEO" ? "Video" : "Photo"} ${category} ${new Date()
         .toISOString()
         .slice(0, 10)}`;
       const tags = tagsText
@@ -135,7 +136,7 @@ export default function Gallery() {
         .map((t) => t.trim())
         .filter(Boolean);
       await galleryApi.add({
-        title: autoTitle,
+        title: finalTitle,
         type,
         image: image || undefined,
         videoUrl: type === "VIDEO" ? videoUrl || undefined : undefined,
@@ -144,6 +145,7 @@ export default function Gallery() {
         tags,
       });
       toast({ title: "Gallery item created" });
+      setTitle("");
       setImage(null);
       setVideoUrl("");
       setCategory("General");
@@ -210,7 +212,16 @@ export default function Gallery() {
             onSubmit={handleCreate}
             className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6"
           >
-            {/* Description field removed */}
+            {/* Title field */}
+            <div className="space-y-2 md:col-span-2">
+              <Label>Title</Label>
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Enter a title for this item"
+                required
+              />
+            </div>
             <div className="space-y-2">
               <Label>Type</Label>
               <Select value={type} onValueChange={(v) => setType(v as any)}>

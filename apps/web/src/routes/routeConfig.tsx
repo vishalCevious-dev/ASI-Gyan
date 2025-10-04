@@ -2,11 +2,13 @@ import Index from "@/pages/Index";
 import BlogList from "@/pages/BlogList";
 import BlogPost from "@/pages/BlogPost";
 import PublicGallery from "@/pages/PublicGallery";
+import Courses from "@/pages/Courses";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 
 export const PUBLIC_ROUTES = [
   { path: "/", element: <Index /> },
+  { path: "/courses/*", element: <Courses /> },
   { path: "/blog", element: <BlogList /> },
   { path: "/blog/:slug", element: <BlogPost /> },
   { path: "/gallery", element: <PublicGallery /> },

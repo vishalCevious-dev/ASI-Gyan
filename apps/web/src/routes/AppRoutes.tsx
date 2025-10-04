@@ -5,6 +5,7 @@ import {
   useLocation,
   matchPath,
 } from "react-router-dom";
+import { useEffect } from "react";
 import NotFound from "@/pages/NotFound";
 import Admin from "@/pages/Admin";
 import { PUBLIC_ROUTES, GUEST_ROUTES } from "@/routes/routeConfig";
@@ -16,6 +17,11 @@ export default function AppRoutes() {
   const onGuestPath = GUEST_ROUTES.some(
     (r) => !!matchPath(r.path, location.pathname),
   );
+
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   if (isLoading && !onGuestPath) {
     return (

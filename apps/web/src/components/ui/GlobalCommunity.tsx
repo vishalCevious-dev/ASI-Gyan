@@ -20,7 +20,7 @@ const GlobalCommunity: React.FC = () => {
           
           {/* Main heading */}
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground" style={{ lineHeight: '1.2' }}>
-            Join a Global Community Shaping <br />the Future of  AI
+            Join a Global Community Shaping <br />The Future of  AI
           </h2>
           
           {/* Description */}
@@ -38,11 +38,7 @@ const GlobalCommunity: React.FC = () => {
             alt="Global community background"
             className="absolute inset-0 w-full h-full object-cover"
           />
-          <img
-            src="https://api.builder.io/api/v1/image/assets/TEMP/b123eb30e329f7e03bad627cbbed6c860c6edca5?placeholderIfAbsent=true"
-            alt="Community visualization"
-            className="relative w-full max-w-md mx-auto object-contain"
-          />
+         
         </div>
 
         {/* Right Column */}

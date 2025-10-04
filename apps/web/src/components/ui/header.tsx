@@ -53,7 +53,7 @@ const Header = () => {
                 src={logo}
                 alt="ASI Gyan Logo"
                 className={cn(
-                  "h-20 w-auto transition-all duration-300 hover:scale-110 cursor-pointer",
+                  "h-12 w-auto transition-all duration-300 hover:scale-110 cursor-pointer",
                   !prefersReducedMotion && "animate-logo-glow"
                 )}
               />
@@ -63,34 +63,64 @@ const Header = () => {
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
             <Link
-              to="/#courses"
-              className="text-muted-foreground hover:text-primary transition-colors"
+              to="/courses"
+              className={cn(
+                "relative text-muted-foreground hover:text-primary transition-colors pb-1",
+                location.pathname === "/courses" && "text-primary"
+              )}
             >
               Courses
+              {location.pathname === "/courses" && (
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
+              )}
             </Link>
             <Link
               to="/#about"
-              className="text-muted-foreground hover:text-primary transition-colors"
+              className={cn(
+                "relative text-muted-foreground hover:text-primary transition-colors pb-1",
+                location.pathname === "/" && location.hash === "#about" && "text-primary"
+              )}
             >
               About
+              {location.pathname === "/" && location.hash === "#about" && (
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
+              )}
             </Link>
             <Link
               to="/#newsletter"
-              className="text-muted-foreground hover:text-primary transition-colors"
+              className={cn(
+                "relative text-muted-foreground hover:text-primary transition-colors pb-1",
+                location.pathname === "/" && location.hash === "#newsletter" && "text-primary"
+              )}
             >
               Newsletter
+              {location.pathname === "/" && location.hash === "#newsletter" && (
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
+              )}
             </Link>
             <Link
-              to="/#blog"
-              className="text-muted-foreground hover:text-primary transition-colors"
+              to="/blog"
+              className={cn(
+                "relative text-muted-foreground hover:text-primary transition-colors pb-1",
+                location.pathname === "/blog" && "text-primary"
+              )}
             >
               Blog
+              {location.pathname === "/blog" && (
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
+              )}
             </Link>
             <Link
               to="/#contact"
-              className="text-muted-foreground hover:text-primary transition-colors"
+              className={cn(
+                "relative text-muted-foreground hover:text-primary transition-colors pb-1",
+                location.pathname === "/" && location.hash === "#contact" && "text-primary"
+              )}
             >
               Contact
+              {location.pathname === "/" && location.hash === "#contact" && (
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
+              )}
             </Link>
           </div>
 
@@ -121,7 +151,7 @@ const Header = () => {
                 !prefersReducedMotion && "animate-glow-pulse"
               )}
             >
-              <Link to="/#courses">Explore Courses</Link>
+              <Link to="/courses">Explore Courses</Link>
             </Button>
           </div>
         </nav>

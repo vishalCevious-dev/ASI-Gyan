@@ -32,6 +32,7 @@ export const listGallery = async (req: Request, res: Response) => {
     const items = await db
       .select({
         id: Gallery.id,
+        title: Gallery.title,
         type: Gallery.type,
         imageUrl: Gallery.imageUrl,
         videoUrl: Gallery.videoUrl,
@@ -117,8 +118,9 @@ export const createGalleryItem = async (req: Request, res: Response) => {
   const imageFile = files["image"]?.[0];
   const videoFile = files["video"]?.[0];
   try {
-    const { type, imageUrl, videoUrl, status, category, tags } =
+    const { title, type, imageUrl, videoUrl, status, category, tags } =
       req.body as {
+        title: string;
         type: "PHOTO" | "VIDEO";
         imageUrl?: string;
         videoUrl?: string;
@@ -128,6 +130,7 @@ export const createGalleryItem = async (req: Request, res: Response) => {
       };
 
     const data: any = {
+      title,
       type,
       status: status ?? "PUBLISHED",
       category: category ?? null,
@@ -233,6 +236,7 @@ export const updateGalleryItem = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const {
+      title,
       type,
       imageUrl,
       videoUrl,
@@ -241,6 +245,7 @@ export const updateGalleryItem = async (req: Request, res: Response) => {
       category,
       tags,
     } = req.body as {
+      title?: string;
       type?: "PHOTO" | "VIDEO";
       imageUrl?: string;
       videoUrl?: string;
@@ -251,6 +256,7 @@ export const updateGalleryItem = async (req: Request, res: Response) => {
     };
 
     const updates: any = { updatedAt: new Date() };
+    if (title !== undefined) updates.title = title;
     if (type !== undefined) updates.type = type;
     if (status !== undefined) updates.status = status;
     if (category !== undefined) updates.category = category;

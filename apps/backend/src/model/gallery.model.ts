@@ -34,6 +34,7 @@ export const videoTypeEnum = pgEnum("video_type", [
 
 export const Gallery = pgTable("gallery", {
   id: uuid("id").primaryKey().defaultRandom(),
+  title: varchar("title", { length: 255 }).notNull().default("Untitled"),
   type: galleryTypeEnum("type").notNull().default("PHOTO"),
   imageUrl: varchar("image_url", { length: 512 }),
   videoUrl: varchar("video_url", { length: 512 }),

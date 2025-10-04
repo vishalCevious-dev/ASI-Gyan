@@ -74,13 +74,13 @@ const Login = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             {/* Left side: brand / copy (hidden on small screens for focus) */}
             <div className="hidden lg:block">
-              <div className="mb-6">
+              {/* <div className="mb-6">
                 <img
                   src={logo}
                   alt="ASI Gyan"
                   className="h-16 w-auto animate-logo-glow"
                 />
-              </div>
+              </div> */}
               <h1 className="text-4xl font-bold tracking-tight mb-4">
                 Welcome back
               </h1>
