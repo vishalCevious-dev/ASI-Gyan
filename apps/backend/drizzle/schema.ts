@@ -91,3 +91,16 @@ export const gallery = pgTable("gallery", {
 	thumbnailUrl: varchar("thumbnail_url", { length: 512 }),
 	isShortForm: boolean("is_short_form").default(false),
 });
+
+export const newsletterSubscribers = pgTable("newsletter_subscribers", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	email: varchar({ length: 255 }).notNull(),
+	name: varchar({ length: 255 }),
+	isActive: boolean("is_active").default(true).notNull(),
+	subscribedAt: timestamp("subscribed_at", { mode: 'string' }).defaultNow(),
+	unsubscribedAt: timestamp("unsubscribed_at", { mode: 'string' }),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow(),
+}, (table) => [
+	unique("newsletter_subscribers_email_unique").on(table.email),
+]);

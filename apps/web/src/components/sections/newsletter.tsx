@@ -2,8 +2,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const Newsletter = () => {
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const benefits = [
     "🚀 Latest AI breakthroughs and research",
     "💡 Industry insights and career tips",
@@ -12,6 +17,45 @@ const Newsletter = () => {
     "🔬 Expert interviews and thought leadership",
     "💼 Job opportunities in AI field",
   ];
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email) {
+      toast.error("Please enter your email address");
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/v1/newsletter/subscribe`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          name: name || undefined,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success("Successfully subscribed to newsletter!");
+        setEmail("");
+        setName("");
+      } else {
+        toast.error(data.message || "Failed to subscribe to newsletter");
+      }
+    } catch (error) {
+      console.error("Newsletter subscription error:", error);
+      toast.error("Failed to subscribe to newsletter. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <section id="newsletter" className=" bg-card">
@@ -64,22 +108,31 @@ const Newsletter = () => {
                   </p>
                 </div>
 
-                <div className="space-y-4">
+                <form onSubmit={handleSubscribe} className="space-y-4">
                   <Input
                     type="email"
                     placeholder="Enter your email address"
                     className="bg-background/50 border-border focus:border-primary"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
                   />
                   <Input
                     type="text"
                     placeholder="Your name (optional)"
                     className="bg-background/50 border-border focus:border-primary"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                   />
 
-                  <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow-green">
-                    Subscribe to Newsletter
+                  <Button 
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow-green disabled:opacity-50"
+                  >
+                    {isLoading ? "Subscribing..." : "Subscribe to Newsletter"}
                   </Button>
-                </div>
+                </form>
 
                 <div className="mt-6 text-center">
                   <p className="text-xs text-muted-foreground">

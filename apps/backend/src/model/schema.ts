@@ -6,3 +6,4 @@ export {
   galleryTypeEnum,
   galleryStatusEnum,
 } from "src/model/gallery.model";
+export { NewsletterSubscribers } from "src/model/newsletter.model";

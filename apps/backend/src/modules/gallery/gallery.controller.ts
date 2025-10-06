@@ -12,6 +12,8 @@ import {
 } from "src/middlewares/upload.middleware";
 import { buildFileUrl } from "src/utils/url";
 import { detectVideoInfo, isValidVideoUrl } from "src/utils/videoDetection";
+import { sendNewsletterNotificationForNewContent } from "src/services/newsletter.service";
+import EnvSecret from "src/constants/envVariables";
 
 export const uploadGalleryMedia = makeMediaUploader({ folder: "gallery" });
 
@@ -217,6 +219,23 @@ export const createGalleryItem = async (req: Request, res: Response) => {
       if (videoFile) deleteFile(videoFile.path);
       res.status(500).json(ApiError(500, "Failed to create item", req));
       return;
+    }
+
+    // Send newsletter notification if gallery item is published
+    if (status === "PUBLISHED") {
+      try {
+        const galleryUrl = `${EnvSecret.BASE_URL}/gallery`;
+        const description = `New ${type.toLowerCase()} added to our gallery${category ? ` in ${category} category` : ''}`;
+        await sendNewsletterNotificationForNewContent(
+          "gallery",
+          title,
+          description,
+          galleryUrl
+        );
+      } catch (error) {
+        console.error("Error sending newsletter notification:", error);
+        // Don't fail the gallery creation if newsletter notification fails
+      }
     }
 
     res.status(201).json(ApiResponse(201, inserted, "Item created"));

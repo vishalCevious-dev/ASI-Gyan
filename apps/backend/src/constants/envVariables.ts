@@ -27,6 +27,17 @@ class EnvSecret {
   public static readonly OPENAI_API_KEY: string =
     process.env.OPENAI_API_KEY || this.throwMissingEnv("OPENAI_API_KEY");
 
+  // Email configuration
+  public static readonly MAIL_HOST: string =
+    process.env.MAIL_HOST || "smtp.gmail.com";
+  public static readonly MAIL_PORT: number = process.env.MAIL_PORT
+    ? Number(process.env.MAIL_PORT)
+    : 587;
+  public static readonly MAIL_USER: string =
+    process.env.MAIL_USER || this.throwMissingEnv("MAIL_USER");
+  public static readonly MAIL_PASS: string =
+    process.env.MAIL_PASS || this.throwMissingEnv("MAIL_PASS");
+
   // Method to handle missing env variables
   private static throwMissingEnv(name: string): never {
     throw new Error(`Environment variable ${name} is missing`);
