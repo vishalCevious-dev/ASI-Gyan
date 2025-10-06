@@ -8,7 +8,7 @@ export enum EApplicationEnviroment {
 class EnvSecret {
   public static readonly PORT: number = process.env.PORT
     ? Number(process.env.PORT)
-    : 3001;
+    : 3000;
   public static readonly JWT_SECRET: string =
     process.env.JWT_SECRET || this.throwMissingEnv("JWT_SECRET");
 
