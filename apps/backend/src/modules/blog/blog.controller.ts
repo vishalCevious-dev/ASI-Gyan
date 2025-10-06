@@ -11,6 +11,8 @@ import {
   type MulterRequest,
 } from "src/middlewares/upload.middleware";
 import { buildFileUrl } from "src/utils/url";
+import { sendNewsletterNotificationForNewContent } from "src/services/newsletter.service";
+import EnvSecret from "src/constants/envVariables";
 
 const slugify = (input: string) =>
   input
@@ -197,6 +199,22 @@ export const createPost = async (req: Request, res: Response) => {
       if (file) deleteFile(file.path); // cleanup new file
       res.status(404).json(ApiError(404, "Failed to create post", req));
       return;
+    }
+
+    // Send newsletter notification if blog is published
+    if (status === "PUBLISHED") {
+      try {
+        const blogUrl = `${EnvSecret.BASE_URL}/blog/${inserted.slug}`;
+        await sendNewsletterNotificationForNewContent(
+          "blog",
+          title,
+          excerpt || content.substring(0, 200) + "...",
+          blogUrl
+        );
+      } catch (error) {
+        console.error("Error sending newsletter notification:", error);
+        // Don't fail the blog creation if newsletter notification fails
+      }
     }
 
     res.status(201).json(ApiResponse(201, inserted, "Post created"));

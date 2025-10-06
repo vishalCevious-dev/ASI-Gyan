@@ -50,6 +50,13 @@
       "when": 1759571818308,
       "tag": "0006_numerous_nick_fury",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1759734449177,
+      "tag": "0007_smart_maginty",
+      "breakpoints": true
     }
   ]
 }

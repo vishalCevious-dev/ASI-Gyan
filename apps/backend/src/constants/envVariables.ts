@@ -8,7 +8,7 @@ export enum EApplicationEnviroment {
 class EnvSecret {
   public static readonly PORT: number = process.env.PORT
     ? Number(process.env.PORT)
-    : 3001;
+    : 3000;
   public static readonly JWT_SECRET: string =
     process.env.JWT_SECRET || this.throwMissingEnv("JWT_SECRET");
 
@@ -26,6 +26,17 @@ class EnvSecret {
 
   public static readonly OPENAI_API_KEY: string =
     process.env.OPENAI_API_KEY || this.throwMissingEnv("OPENAI_API_KEY");
+
+  // Email configuration
+  public static readonly MAIL_HOST: string =
+    process.env.MAIL_HOST || "smtp.gmail.com";
+  public static readonly MAIL_PORT: number = process.env.MAIL_PORT
+    ? Number(process.env.MAIL_PORT)
+    : 587;
+  public static readonly MAIL_USER: string =
+    process.env.MAIL_USER || this.throwMissingEnv("MAIL_USER");
+  public static readonly MAIL_PASS: string =
+    process.env.MAIL_PASS || this.throwMissingEnv("MAIL_PASS");
 
   // Method to handle missing env variables
   private static throwMissingEnv(name: string): never {
