@@ -39,7 +39,7 @@ const Header = () => {
   const ThemeIcon = isDark ? Sun : Moon;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border shadow-sm">
       <div className="max-w-6xl mx-auto px-6 py-0">
         <nav className="flex items-center justify-between">
           {/* Logo */}
@@ -65,61 +65,61 @@ const Header = () => {
             <Link
               to="/courses"
               className={cn(
-                "relative text-muted-foreground hover:text-primary transition-colors pb-1",
-                location.pathname === "/courses" && "text-primary"
+                "relative text-foreground/70 hover:text-blue-600 dark:hover:text-blue-400 transition-colors pb-1",
+                location.pathname === "/courses" && "text-blue-600 dark:text-blue-400"
               )}
             >
               Courses
               {location.pathname === "/courses" && (
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 dark:bg-blue-400"></span>
               )}
             </Link>
             <Link
               to="/#about"
               className={cn(
-                "relative text-muted-foreground hover:text-primary transition-colors pb-1",
-                location.pathname === "/" && location.hash === "#about" && "text-primary"
+                "relative text-foreground/70 hover:text-blue-600 dark:hover:text-blue-400 transition-colors pb-1",
+                location.pathname === "/" && location.hash === "#about" && "text-blue-600 dark:text-blue-400"
               )}
             >
               About
               {location.pathname === "/" && location.hash === "#about" && (
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 dark:bg-blue-400"></span>
               )}
             </Link>
             <Link
               to="/#newsletter"
               className={cn(
-                "relative text-muted-foreground hover:text-primary transition-colors pb-1",
-                location.pathname === "/" && location.hash === "#newsletter" && "text-primary"
+                "relative text-foreground/70 hover:text-blue-600 dark:hover:text-blue-400 transition-colors pb-1",
+                location.pathname === "/" && location.hash === "#newsletter" && "text-blue-600 dark:text-blue-400"
               )}
             >
               Newsletter
               {location.pathname === "/" && location.hash === "#newsletter" && (
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 dark:bg-blue-400"></span>
               )}
             </Link>
             <Link
               to="/blog"
               className={cn(
-                "relative text-muted-foreground hover:text-primary transition-colors pb-1",
-                location.pathname === "/blog" && "text-primary"
+                "relative text-foreground/70 hover:text-blue-600 dark:hover:text-blue-400 transition-colors pb-1",
+                location.pathname === "/blog" && "text-blue-600 dark:text-blue-400"
               )}
             >
               Blog
               {location.pathname === "/blog" && (
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 dark:bg-blue-400"></span>
               )}
             </Link>
             <Link
               to="/#contact"
               className={cn(
-                "relative text-muted-foreground hover:text-primary transition-colors pb-1",
-                location.pathname === "/" && location.hash === "#contact" && "text-primary"
+                "relative text-foreground/70 hover:text-blue-600 dark:hover:text-blue-400 transition-colors pb-1",
+                location.pathname === "/" && location.hash === "#contact" && "text-blue-600 dark:text-blue-400"
               )}
             >
               Contact
               {location.pathname === "/" && location.hash === "#contact" && (
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 dark:bg-blue-400"></span>
               )}
             </Link>
           </div>
@@ -132,24 +132,21 @@ const Header = () => {
               size="icon"
               onClick={toggleTheme}
               aria-label={`Switch to ${isDark ? "light" : "dark"} theme`}
-              className="text-muted-foreground hover:text-primary"
+              className="text-foreground/70 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-accent/50"
             >
               <ThemeIcon className="h-5 w-5" />
             </Button>
             <Button
               asChild
               variant="outline"
-              className="border-secondary text-secondary hover:bg-secondary/10"
+              className="border-border text-foreground hover:bg-accent/50"
             >
               <Link to="/login">Login</Link>
             </Button>
             <Button
               asChild
               variant="default"
-              className={cn(
-                "bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow-green",
-                !prefersReducedMotion && "animate-glow-pulse"
-              )}
+              className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
             >
               <Link to="/courses">Explore Courses</Link>
             </Button>
