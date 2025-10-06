@@ -16,5 +16,6 @@ router.use("/blog", BlogRouter);
 router.use("/ai", AiRouter);
 router.use("/gallery", GalleryRouter);
 router.use("/newsletter", NewsletterRouter);
+router.use("/letter", NewsletterRouter);
 
 export default router;

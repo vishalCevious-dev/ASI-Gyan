@@ -4,8 +4,6 @@ import { sql } from "drizzle-orm"
 export const blogStatus = pgEnum("blog_status", ['DRAFT', 'PUBLISHED'])
 export const galleryStatus = pgEnum("gallery_status", ['DRAFT', 'PUBLISHED'])
 export const galleryType = pgEnum("gallery_type", ['PHOTO', 'VIDEO'])
-export const urlPostPlatform = pgEnum("url_post_platform", ['INSTAGRAM_REELS', 'YOUTUBE_SHORTS', 'TIKTOK', 'FACEBOOK', 'TWITTER'])
-export const urlPostStatus = pgEnum("url_post_status", ['DRAFT', 'PUBLISHED', 'SCHEDULED'])
 export const userRole = pgEnum("user_role", ['ADMIN', 'USER'])
 export const videoPlatform = pgEnum("video_platform", ['youtube', 'youtube-shorts', 'instagram-reel', 'instagram-post', 'tiktok', 'vimeo', 'twitter', 'dailymotion', 'direct-video', 'unknown'])
 export const videoType = pgEnum("video_type", ['reel', 'short', 'video', 'post'])
@@ -47,32 +45,6 @@ export const blog = pgTable("blog", {
 	unique("blog_slug_unique").on(table.slug),
 ]);
 
-export const urlPost = pgTable("url_post", {
-	id: uuid().defaultRandom().primaryKey().notNull(),
-	title: varchar({ length: 255 }).notNull(),
-	description: text(),
-	originalUrl: varchar("original_url", { length: 512 }).notNull(),
-	thumbnailUrl: varchar("thumbnail_url", { length: 512 }),
-	platform: urlPostPlatform().notNull(),
-	status: urlPostStatus().default('DRAFT').notNull(),
-	scheduledAt: timestamp("scheduled_at", { mode: 'string' }),
-	postedAt: timestamp("posted_at", { mode: 'string' }),
-	externalPostId: varchar("external_post_id", { length: 255 }),
-	externalPostUrl: varchar("external_post_url", { length: 512 }),
-	tags: text().array(),
-	category: varchar({ length: 128 }),
-	authorId: uuid("author_id"),
-	isDeleted: boolean("is_deleted").default(false).notNull(),
-	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow(),
-	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow(),
-}, (table) => [
-	foreignKey({
-			columns: [table.authorId],
-			foreignColumns: [users.id],
-			name: "url_post_author_id_users_id_fk"
-		}),
-]);
-
 export const gallery = pgTable("gallery", {
 	id: uuid().defaultRandom().primaryKey().notNull(),
 	type: galleryType().default('PHOTO').notNull(),
@@ -90,6 +62,7 @@ export const gallery = pgTable("gallery", {
 	embedUrl: varchar("embed_url", { length: 512 }),
 	thumbnailUrl: varchar("thumbnail_url", { length: 512 }),
 	isShortForm: boolean("is_short_form").default(false),
+	title: varchar({ length: 255 }).default('Untitled').notNull(),
 });
 
 export const newsletterSubscribers = pgTable("newsletter_subscribers", {
