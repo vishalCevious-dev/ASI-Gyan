@@ -5,7 +5,7 @@ WORKDIR /repo
 RUN corepack enable
 
 # Build args for Vite envs
-ARG VITE_API_URL=http://localhost:3000
+ARG VITE_API_URL=http://localhost:3001
 ENV VITE_API_URL=$VITE_API_URL
 
 # Copy workspace manifests
