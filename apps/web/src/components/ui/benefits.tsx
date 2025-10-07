@@ -57,41 +57,32 @@ const Benefits: React.FC = () => {
         </div>
 
         {/* Benefits Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {benefits.map((benefit, index) => (
             <div
               key={index}
-              className="group rounded-xl p-6 bg-card border border-primary/20 shadow-glow-green overflow-hidden 
-                       transition-all duration-500 ease-out cursor-pointer
-                       hover:scale-110 hover:shadow-2xl hover:shadow-primary/30 hover:border-primary/60
-                       hover:bg-gradient-to-br hover:from-card hover:to-card/90
-                       transform hover:-translate-y-2 hover:rotate-1
-                       relative before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-br 
-                       before:from-primary/5 before:to-transparent before:opacity-0 
-                       hover:before:opacity-100 before:transition-opacity before:duration-500"
+              className="group relative border border-border rounded-2xl p-6 bg-card text-foreground hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
             >
               {/* Icon */}
               <div className="w-12 h-12 rounded-lg mb-4 flex items-center justify-center bg-muted
-                            transition-all duration-500 ease-out
-                            group-hover:bg-primary/20 group-hover:scale-125 group-hover:rotate-12
-                            group-hover:shadow-lg group-hover:shadow-primary/25">
+                            transition-all duration-300 ease-out
+                            group-hover:bg-primary/20 group-hover:scale-110">
                 <div className="w-6 h-6 rounded bg-primary/60 
-                              transition-all duration-500 ease-out
-                              group-hover:bg-primary group-hover:scale-125 group-hover:rotate-180
-                              group-hover:shadow-md group-hover:shadow-primary/50"></div>
+                              transition-all duration-300 ease-out
+                              group-hover:bg-primary group-hover:scale-110"></div>
               </div>
               
               {/* Title */}
               <h3 className="text-xl font-bold mb-3 text-foreground
-                            transition-all duration-500 ease-out
-                            group-hover:text-primary group-hover:scale-105 group-hover:translate-x-1">
+                            transition-colors duration-300 ease-out
+                            group-hover:text-primary">
                 {benefit.title}
               </h3>
               
               {/* Description */}
-              <p className="leading-relaxed text-muted-foreground
-                          transition-all duration-500 ease-out
-                          group-hover:text-foreground/90 group-hover:translate-x-1">
+              <p className="text-sm  leading-relaxed text-muted-foreground
+                          transition-colors duration-300 ease-out
+                          group-hover:text-foreground/90">
                 {benefit.description}
               </p>
             </div>

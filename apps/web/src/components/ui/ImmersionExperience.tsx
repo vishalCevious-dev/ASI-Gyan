@@ -10,8 +10,8 @@ const ImmersionExperience: React.FC = () => {
         </div>
 
         {/* Heading */}
-        <h2 className="text-2xl sm:text-3xl md:text-[39px] font-medium leading-[50px] text-center max-w-3xl text-foreground">
-          Here&apos;s a Sneak Peek at Our Offline Immersion Experience
+        <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground text-center" style={{ lineHeight: '1.2' }}>
+          Here&apos;s a Sneak Peek at <br />  Our Offline  Immersion Experience
         </h2>
 
         {/* Image with adjusted spacing */}

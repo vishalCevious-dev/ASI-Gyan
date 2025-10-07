@@ -19,8 +19,8 @@ const TestimonialCard: React.FC<TestimonialProps> = ({
   hasIcon,
   iconSrc,
 }) => (
-  <div className="relative border border-border rounded-2xl p-6 bg-card text-foreground">
-    <h4 className="text-base font-semibold">{name}</h4>
+  <div className="group relative border border-border rounded-2xl p-6 bg-card text-foreground hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+    <h4 className="text-base font-semibold group-hover:text-primary transition-colors duration-300">{name}</h4>
     <p className="text-sm text-muted-foreground mt-3 leading-relaxed">{content}</p>
 
     {hasIcon && iconSrc && (
@@ -56,7 +56,7 @@ const VideoTestimonialCard: React.FC<VideoTestimonialProps> = ({
   };
 
   return (
-    <div className="relative border border-border rounded-2xl overflow-hidden bg-card group hover:scale-105 transition-transform duration-300">
+    <div className="group relative border border-border rounded-2xl overflow-hidden bg-card hover:shadow-2xl transition-transform duration-500 hover:scale-105">
       <div className="relative">
         {/* Video element */}
         <video
@@ -106,7 +106,7 @@ const VideoTestimonialCard: React.FC<VideoTestimonialProps> = ({
       </div>
       
       <div className="p-6">
-        <h4 className="text-base font-semibold text-foreground">{name}</h4>
+        <h4 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors duration-300">{name}</h4>
         {title && (
           <p className="text-sm text-muted-foreground mt-1">{title}</p>
         )}
@@ -173,79 +173,71 @@ const Testimonials: React.FC = () => {
           </p>
         </div>
 
-        {/* Grid Layout */}
+        {/* Grid Layout with equal spacing */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Column 1 */}
-          <div>
+          {/* Column 1 - Using space-y-6 for consistent gaps */}
+          <div className="space-y-6">
             <VideoTestimonialCard
               name="Nathalie Ramanathansoa-frat"
               title="Entrepreneur & executive advisor"
               videoSrc="/videos/Video-502.mp4"
             />
             {testimonials.map((t, i) => (
-              <div key={i} className="mt-6">
-                <TestimonialCard {...t} />
-              </div>
+              <TestimonialCard key={i} {...t} />
             ))}
           </div>
 
-          {/* Column 2 */}
-          <div>
+          {/* Column 2 - Using space-y-6 for consistent gaps */}
+          <div className="space-y-6">
             <TestimonialCard
               name="Ashwath BM"
               content="Immense gratitude to the Outskill team, phenomenal mentors, and the powerhouse community..."
             />
-            <div className="mt-6">
-              <TestimonialCard
-                name="Yasmin Niazi"
-                content="I had a fantastic experience at the two-day AI Mastermind event. It was an incredible opportunity..."
-                hasIcon
-                iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/ea4ec06768c3163b6b5e3346d658c81a3bd9e61b?placeholderIfAbsent=true"
-              />
-            </div>
+            <TestimonialCard
+              name="Yasmin Niazi"
+              content="I had a fantastic experience at the two-day AI Mastermind event. It was an incredible opportunity..."
+              hasIcon
+              iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/ea4ec06768c3163b6b5e3346d658c81a3bd9e61b?placeholderIfAbsent=true"
+            />
+            <TestimonialCard
+              name="Priya Sharma"
+              content="The AI Mastermind session was absolutely transformative! The practical insights and hands-on approach made complex concepts so much clearer."
+            />
             <VideoTestimonialCard
               name="Neha Bapna"
               title="Marketing Operation expert"
               videoSrc="/videos/Video-604.mp4"
             />
-            <div className="mt-6">
-              <TestimonialCard
-                name="Shashank Aeligala"
-                content="Thank you Outskill team. I've learnt a lot in these 2 days and looking forward to learn more about AI this year!"
-              />
-            </div>
+            <TestimonialCard
+              name="Shashank Aeligala"
+              content="Thank you Outskill team. I've learnt a lot in these 2 days and looking forward to learn more about AI this year!"
+            />
           </div>
 
-          {/* Column 3 */}
-          <div>
+          {/* Column 3 - Using space-y-6 for consistent gaps */}
+          <div className="space-y-6">
             <TestimonialCard
               name="Parin Patel"
               content="A huge thank you to the entire Outskill Team and my fellow attendees for an incredible 2 Day AI Mastermind!"
               hasIcon
               iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/fe2137467fae4db3828da8fd9c3ce0986e1930b1?placeholderIfAbsent=true"
             />
-            <div className="mt-6">
-              <TestimonialCard
-                name="Bhawna Mehra"
-                content="First of all, I thank the entire Outskill and Outshine team and then to myself for keeping patience for this long..."
-                hasIcon
-                iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/80446e8cb44773744235d0bb8bc19b49fc8a1427?placeholderIfAbsent=true"
-              />
-            </div>
-            <div className="mt-6">
-              <TestimonialCard
-                name="Jay"
-                content="Hello Outskill team Thank you guys for a fantastic 1+2 days. This was a weekend very well spent with great learning..."
-              />
-            </div>
-            <div className="mt-6">
-              <TestimonialCard
-                name="Subhashini Nachimuthu"
-                content="Thank you, divij. It was really very insightful. Especially for a beginner like me, helped me understand basics of AI & prompting techniques!"
-                hasIcon
-                iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/f8643c0824cb50a555c34a717f1e9956891f438c?placeholderIfAbsent=true"
-              />
-            </div>
+            <TestimonialCard
+              name="Bhawna Mehra"
+              content="First of all, I thank the entire Outskill and Outshine team and then to myself for keeping patience for this long..."
+              hasIcon
+              iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/80446e8cb44773744235d0bb8bc19b49fc8a1427?placeholderIfAbsent=true"
+            />
+            <TestimonialCard
+              name="Jay"
+              content="Hello Outskill team Thank you guys for a fantastic 1+2 days. This was a weekend very well spent with great learning..."
+            />
+            <TestimonialCard
+              name="Subhashini Nachimuthu"
+              content="Thank you, divij. It was really very insightful. Especially for a beginner like me, helped me understand basics of AI & prompting techniques!"
+              hasIcon
+              iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/f8643c0824cb50a555c34a717f1e9956891f438c?placeholderIfAbsent=true"
+            />
             <VideoTestimonialCard
               name="Subhashini Nachimuthu"
               title="AI Enthusiast"

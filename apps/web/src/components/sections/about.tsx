@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
+
 const About = () => {
   const values = [
     {
@@ -62,8 +63,9 @@ const About = () => {
       gradient: "from-accent to-primary",
     },
   ];
+
   return (
-    <section id="about" className="py-20 bg-card">
+    <section id="about" className="py-20 bg-background">
       <div className="max-w-6xl mx-auto px-5 py-16">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -79,22 +81,22 @@ const About = () => {
         </div>
 
         {/* Values Grid */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {values.map((value, index) => (
             <Card
               key={index}
-              className="bg-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-glow-green group"
+              className="group relative border border-border rounded-2xl bg-card text-foreground hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
             >
               <CardContent className="p-8 text-center">
-                <div className="mb-6 group-hover:animate-float flex justify-center text-primary">
+                <div className="mb-6 flex justify-center text-primary group-hover:scale-110 transition-transform duration-300">
                   {value.icon}
                 </div>
                 <h3
-                  className={`text-2xl font-bold mb-4 bg-gradient-to-r ${value.gradient} bg-clip-text text-transparent`}
+                  className={`text-2xl font-bold mb-4 bg-gradient-to-r ${value.gradient} bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300`}
                 >
                   {value.title}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed group-hover:text-foreground/90 transition-colors duration-300">
                   {value.description}
                 </p>
               </CardContent>
@@ -107,4 +109,5 @@ const About = () => {
     </section>
   );
 };
+
 export default About;

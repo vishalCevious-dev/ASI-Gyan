@@ -64,7 +64,7 @@ const AboutUs: React.FC = () => {
               {benefits.map((benefit, i) => (
                 <div
                   key={i}
-                  className="group relative rounded-2xl p-8 bg-card border border-border/50 hover:border-primary/30 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
+                  className="group relative rounded-2xl p-8 bg-card border border-border/50 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
                 >
                   {/* Background glow effect */}
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -77,28 +77,12 @@ const AboutUs: React.FC = () => {
                   <h3 className="relative z-10 text-xl font-bold mb-4 text-foreground group-hover:text-primary transition-colors duration-300">
                     {benefit.title}
                   </h3>
-                  <p className="relative z-10 text-muted-foreground leading-relaxed">
+                  <p className="text-sm relative z-10 text-muted-foreground leading-relaxed">
                     {benefit.description}
                   </p>
                 </div>
               ))}
             </div>
-
-            {/* Additional Stats */}
-            {/* <div className="grid grid-cols-3 gap-6 pt-8 border-t border-border/50">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">10K+</div>
-                <div className="text-sm text-muted-foreground">Students</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">50+</div>
-                <div className="text-sm text-muted-foreground">Courses</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">98%</div>
-                <div className="text-sm text-muted-foreground">Satisfaction</div>
-              </div>
-            </div> */}
           </div>
 
           {/* Enhanced Right Column (Instructor Card) */}
@@ -122,7 +106,7 @@ const AboutUs: React.FC = () => {
               <div className="p-8">
                 {/* Journey */}
                 <div className="mb-6">
-                  <p className="text-muted-foreground leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     <span className="font-semibold text-foreground">
                       I started my journey:
                     </span>{" "}
@@ -133,7 +117,7 @@ const AboutUs: React.FC = () => {
 
                 {/* Hands-on */}
                 <div className="mb-8">
-                  <p className="text-muted-foreground leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     <span className="font-semibold text-foreground">
                       Through hands-on:
                     </span>{" "}

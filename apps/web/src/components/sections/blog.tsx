@@ -31,12 +31,6 @@ const Blog = () => {
       <div className="max-w-6xl mx-auto px-5">
         {/* Section Header */}
         <div className="text-center mb-16">
-          {/* <Badge
-            variant="outline"
-            className="border-secondary text-secondary bg-secondary/10 mb-4"
-          >
-            AI Knowledge Hub
-          </Badge> */}
           <div className="inline-flex items-center px-4 py-2 rounded-full mb-6 bg-primary/10 border border-primary/20">
             <span className="text-sm font-medium text-primary">AI Learning Blog</span>
           </div>
@@ -52,10 +46,10 @@ const Blog = () => {
         {/* Featured Post */}
         {featured && (
           <div className="mb-12">
-            <Card className="bg-card border-primary/20 shadow-glow-green overflow-hidden">
+            <Card className="bg-card border-border hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 group">
               <CardContent className="p-0">
                 <div className="grid lg:grid-cols-2 gap-0">
-                  <div className="bg-space-depth p-8 lg:p-12 flex items-center">
+                  <div className="p-8 lg:p-12 flex items-center">
                     <div>
                       <Badge
                         variant="outline"
@@ -63,11 +57,11 @@ const Blog = () => {
                       >
                         Featured Article
                       </Badge>
-                      <h3 className="text-3xl font-bold mb-4 leading-tight">
+                      <h3 className="text-3xl font-bold mb-4 leading-tight group-hover:text-primary transition-colors duration-300">
                         {featured.title}
                       </h3>
                       {featured.excerpt && (
-                        <p className="text-muted-foreground mb-6 text-lg leading-relaxed">
+                        <p className="text-muted-foreground mb-6 text-lg leading-relaxed group-hover:text-foreground/90 transition-colors duration-300">
                           {featured.excerpt}
                         </p>
                       )}
@@ -96,8 +90,7 @@ const Blog = () => {
                       backgroundImage: `url(${featured.coverImageUrl || blogHeroImage})`,
                     }}
                   >
-                    <div className="absolute inset-0 bg-neon-core opacity-20" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-space-depth/80 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-transparent" />
                   </div>
                 </div>
               </CardContent>
@@ -106,7 +99,7 @@ const Blog = () => {
         )}
 
         {/* Blog Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {isLoading && (
             <div className="text-muted-foreground">Loading posts…</div>
           )}
@@ -114,9 +107,9 @@ const Blog = () => {
             rest.map((post, index) => (
               <Card
                 key={index}
-                className="bg-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-glow-green group"
+                className="group relative border border-border rounded-2xl bg-card text-foreground hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
               >
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <div className="flex items-start justify-between mb-2">
                     <Badge
                       variant="outline"
@@ -125,13 +118,13 @@ const Blog = () => {
                       {post.status}
                     </Badge>
                   </div>
-                  <CardTitle className="text-xl font-bold group-hover:text-primary transition-colors leading-tight">
+                  <CardTitle className="text-xl font-bold group-hover:text-primary transition-colors duration-300 leading-tight">
                     {post.title}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 pt-0">
                   {post.excerpt && (
-                    <p className="text-muted-foreground leading-relaxed text-sm">
+                    <p className="text-muted-foreground leading-relaxed text-sm group-hover:text-foreground/90 transition-colors duration-300">
                       {post.excerpt}
                     </p>
                   )}
@@ -151,7 +144,7 @@ const Blog = () => {
                       asChild
                       variant="ghost"
                       size="sm"
-                      className="text-primary hover:text-primary/80 h-auto p-0"
+                      className="text-primary hover:text-primary/80 h-auto p-0 group-hover:translate-x-1 transition-transform duration-300"
                     >
                       <Link to={`/blog/${post.slug}`}>Read More →</Link>
                     </Button>
@@ -162,11 +155,12 @@ const Blog = () => {
         </div>
 
         {/* Pagination + View All */}
-        <div className="mt-8 flex items-center justify-center gap-3">
+        <div className="mt-12 flex items-center justify-center gap-3">
           <Button
             variant="outline"
             disabled={!pagination || page <= 1}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
+            className="border-border hover:border-primary/50 transition-colors duration-300"
           >
             Previous
           </Button>
@@ -181,6 +175,7 @@ const Blog = () => {
                 pagination ? Math.min(pagination.pages, p + 1) : p + 1,
               )
             }
+            className="border-border hover:border-primary/50 transition-colors duration-300"
           >
             Next
           </Button>
@@ -188,7 +183,7 @@ const Blog = () => {
             asChild
             variant="outline"
             size="sm"
-            className="ml-4 border-secondary text-secondary hover:bg-secondary/10"
+            className="ml-4 border-primary text-primary hover:bg-primary/10 transition-colors duration-300"
           >
             <Link to="/blog">View All</Link>
           </Button>

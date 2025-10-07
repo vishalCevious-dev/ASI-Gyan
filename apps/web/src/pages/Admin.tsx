@@ -17,8 +17,9 @@ import {
 } from "lucide-react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import React from "react";
+import { Courses } from "@/components/courses/CoursesPost";
 
-function Courses() {
+function CoursesPlaceholder() {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-foreground bg-clip-text text-transparent">
