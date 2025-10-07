@@ -71,16 +71,21 @@ export const subscribeNewsletter = asyncHandler(
       </div>
     `;
 
-    try {
-      await sendNewsletterNotification(
-        email,
-        name,
-        "Welcome to AI Intelligence Newsletter!",
-        welcomeHtml
-      );
-    } catch (error) {
-      console.error("Error sending welcome email:", error);
-      // Don't fail the subscription if email fails
+    // Only send email if email configuration is available
+    if (process.env.MAIL_USER && process.env.MAIL_PASS) {
+      try {
+        await sendNewsletterNotification(
+          email,
+          name,
+          "Welcome to AI Intelligence Newsletter!",
+          welcomeHtml
+        );
+      } catch (error) {
+        console.error("Error sending welcome email:", error);
+        // Don't fail the subscription if email fails
+      }
+    } else {
+      console.log("Email configuration not available, skipping welcome email");
     }
 
     return res

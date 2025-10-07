@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm/relations";
-import { users, blog, urlPost } from "./schema";
+import { users, blog } from "./schema";
 
 export const blogRelations = relations(blog, ({one}) => ({
 	user: one(users, {
@@ -10,12 +10,4 @@ export const blogRelations = relations(blog, ({one}) => ({
 
 export const usersRelations = relations(users, ({many}) => ({
 	blogs: many(blog),
-	urlPosts: many(urlPost),
-}));
-
-export const urlPostRelations = relations(urlPost, ({one}) => ({
-	user: one(users, {
-		fields: [urlPost.authorId],
-		references: [users.id]
-	}),
 }));

@@ -1,15 +1,22 @@
 import nodemailer from "nodemailer";
 import EnvSecret from "src/constants/envVariables";
 
-const transporter = nodemailer.createTransport({
-  host: EnvSecret.MAIL_HOST,
-  port: EnvSecret.MAIL_PORT,
-  secure: EnvSecret.MAIL_PORT === 465, // true for 465, false for 2525/587
-  auth: {
-    user: EnvSecret.MAIL_USER,
-    pass: EnvSecret.MAIL_PASS,
-  },
-});
+// Create transporter only if email credentials are available
+const createTransporter = () => {
+  if (!EnvSecret.MAIL_USER || !EnvSecret.MAIL_PASS) {
+    return null;
+  }
+  
+  return nodemailer.createTransport({
+    host: EnvSecret.MAIL_HOST,
+    port: EnvSecret.MAIL_PORT,
+    secure: EnvSecret.MAIL_PORT === 465, // true for 465, false for 2525/587
+    auth: {
+      user: EnvSecret.MAIL_USER,
+      pass: EnvSecret.MAIL_PASS,
+    },
+  });
+};
 
 const sendOrderConfirmationEmail = async (
   email: string,
@@ -21,6 +28,18 @@ const sendOrderConfirmationEmail = async (
       throw new Error("User email not found");
     }
 
+    // Check if email configuration is available
+    if (!EnvSecret.MAIL_USER || !EnvSecret.MAIL_PASS) {
+      console.log("Email configuration not available, skipping email send");
+      return;
+    }
+
+    const transporter = createTransporter();
+    if (!transporter) {
+      console.log("Email transporter not available, skipping email send");
+      return;
+    }
+
     const mailOptions = {
       from: EnvSecret.MAIL_USER,
       to: email,
@@ -29,6 +48,7 @@ const sendOrderConfirmationEmail = async (
     };
 
     await transporter.sendMail(mailOptions);
+    console.log(`Order confirmation email sent to ${email}`);
   } catch (error) {
     console.error("Error sending email:", error);
   }
@@ -43,6 +63,18 @@ const sendNewsletterNotification = async (
   try {
     if (!email) {
       throw new Error("Subscriber email not found");
+    }
+
+    // Check if email configuration is available
+    if (!EnvSecret.MAIL_USER || !EnvSecret.MAIL_PASS) {
+      console.log("Email configuration not available, skipping email send");
+      return;
+    }
+
+    const transporter = createTransporter();
+    if (!transporter) {
+      console.log("Email transporter not available, skipping email send");
+      return;
     }
 
     const mailOptions = {

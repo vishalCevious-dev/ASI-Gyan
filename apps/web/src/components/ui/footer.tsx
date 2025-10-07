@@ -75,7 +75,7 @@ const Footer = () => {
         </div>
 
         {/* Quick Newsletter Signup */}
-        <div className="space-y-3 mb-6">
+        {/* <div className="space-y-3 mb-6">
           <h4 className="font-semibold text-foreground">Stay Updated</h4>
           <div className="flex gap-2">
             <Input
@@ -89,7 +89,7 @@ const Footer = () => {
               Subscribe
             </Button>
           </div>
-        </div>
+        </div> */}
 
         {/* Contact Section */}
         <div className="border-t border-border pt-12 mb-12">
