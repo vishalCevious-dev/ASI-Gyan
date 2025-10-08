@@ -1,3 +1,6 @@
+// Import warning suppression first
+import "./config/warningSuppression";
+
 import app from "src/app";
 import EnvSecret from "src/constants/envVariables";
 

@@ -42,7 +42,7 @@ const createCourseController = async (req: Request, res: Response) => {
     console.error('Create course error:', error);
     res.status(500).json({ success: false, message: 'Failed to create course', error: error instanceof Error ? error.message : 'Unknown error' });
   }
-};
+}; 
 
 const getAllCoursesController = async (_req: Request, res: Response) => {
   try {
