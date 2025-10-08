@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Routes, Route, useNavigate, useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,178 +6,42 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import Header from "@/components/ui/header";
 import Footer from "@/components/ui/footer";
+import { coursesApi } from "@/lib/api";
+import { getMediaUrl } from "@/lib/utils";
+import { slugify } from "@/lib/slug";
+import { toast } from "sonner";
 
-// Course data structure
-const coursesData = [
-  {
-    id: "ai-fundamentals",
-    title: "AI Fundamentals Program",
-    description: "Master the core concepts of Artificial Intelligence through hands-on projects and real-world applications.",
-    longDescription: "This comprehensive 8-week program is designed for beginners who want to enter the exciting world of AI. You'll learn the fundamental concepts, algorithms, and tools that power modern AI systems. Through hands-on projects and real-world case studies, you'll build a solid foundation in machine learning, neural networks, and Python programming.",
-    duration: "8 Weeks",
-    mode: "Online",
-    level: "Beginner",
-    price: "$899",
-    rating: 4.8,
-    students: 2847,
-    instructor: "Dr. Sarah Chen",
-    category: "fundamentals",
-    image: "/api/placeholder/600/400",
-    highlights: ["Machine Learning Basics", "Neural Networks", "Python for AI", "Project Portfolio"],
-    curriculum: [
-      { week: 1, title: "Introduction to AI & ML", topics: ["AI History", "Types of ML", "Python Setup"] },
-      { week: 2, title: "Data Preprocessing", topics: ["Data Cleaning", "Feature Engineering", "Visualization"] },
-      { week: 3, title: "Supervised Learning", topics: ["Linear Regression", "Classification", "Model Evaluation"] },
-      { week: 4, title: "Unsupervised Learning", topics: ["Clustering", "Dimensionality Reduction", "Anomaly Detection"] },
-      { week: 5, title: "Neural Networks", topics: ["Perceptrons", "Backpropagation", "Deep Learning Basics"] },
-      { week: 6, title: "Computer Vision", topics: ["Image Processing", "CNNs", "Object Detection"] },
-      { week: 7, title: "Natural Language Processing", topics: ["Text Processing", "Sentiment Analysis", "Chatbots"] },
-      { week: 8, title: "Final Project", topics: ["Project Planning", "Implementation", "Presentation"] }
-    ],
-    prerequisites: ["Basic programming knowledge", "High school mathematics"],
-    skills: ["Python Programming", "Machine Learning", "Data Analysis", "AI Model Development"]
-  },
-  {
-    id: "advanced-ai",
-    title: "Advanced AI Specialization",
-    description: "Deep dive into advanced AI topics including deep learning, computer vision, and natural language processing.",
-    longDescription: "Take your AI skills to the next level with this intensive 12-week specialization program. Designed for practitioners with foundational AI knowledge, this course covers cutting-edge techniques in deep learning, advanced computer vision, and sophisticated NLP applications.",
-    duration: "12 Weeks",
-    mode: "Hybrid",
-    level: "Advanced",
-    price: "$1,499",
-    rating: 4.9,
-    students: 1256,
-    instructor: "Prof. Michael Rodriguez",
-    category: "specialization",
-    image: "/api/placeholder/600/400",
-    highlights: ["Deep Learning", "Computer Vision", "NLP", "AI Ethics"],
-    curriculum: [
-      { week: 1, title: "Advanced Deep Learning", topics: ["Advanced Architectures", "Optimization Techniques", "Regularization"] },
-      { week: 2, title: "Generative AI", topics: ["GANs", "VAEs", "Diffusion Models"] },
-      { week: 3, title: "Computer Vision Advanced", topics: ["Object Detection", "Semantic Segmentation", "Face Recognition"] },
-      { week: 4, title: "NLP Deep Dive", topics: ["Transformers", "BERT", "GPT Models"] },
-      { week: 5, title: "Reinforcement Learning", topics: ["Q-Learning", "Policy Gradients", "Deep RL"] },
-      { week: 6, title: "MLOps & Deployment", topics: ["Model Serving", "Monitoring", "CI/CD for ML"] },
-      { week: 7, title: "AI Ethics & Bias", topics: ["Fairness", "Explainability", "Responsible AI"] },
-      { week: 8, title: "Edge AI", topics: ["Model Optimization", "Mobile Deployment", "IoT Integration"] }
-    ],
-    prerequisites: ["AI Fundamentals completion", "Python proficiency", "Statistics knowledge"],
-    skills: ["Advanced Deep Learning", "Computer Vision", "NLP", "MLOps", "AI Ethics"]
-  },
-  {
-    id: "ai-leadership",
-    title: "AI Leadership Track",
-    description: "Strategic AI implementation for executives and team leaders driving organizational transformation.",
-    longDescription: "This executive-level program is designed for leaders who need to understand AI's strategic implications and guide their organizations through AI transformation. Learn how to identify AI opportunities, manage AI teams, and implement AI solutions at scale.",
-    duration: "6 Weeks",
-    mode: "Executive",
-    level: "Leadership",
-    price: "$2,999",
-    rating: 4.7,
-    students: 589,
-    instructor: "Dr. Emily Watson",
-    category: "leadership",
-    image: "/api/placeholder/600/400",
-    highlights: ["AI Strategy", "Team Management", "ROI Analysis", "Implementation"],
-    curriculum: [
-      { week: 1, title: "AI Strategy & Vision", topics: ["AI Landscape", "Strategic Planning", "Vision Setting"] },
-      { week: 2, title: "AI Team Building", topics: ["Talent Acquisition", "Team Structure", "Culture Building"] },
-      { week: 3, title: "AI Project Management", topics: ["Project Planning", "Risk Management", "Agile for AI"] },
-      { week: 4, title: "ROI & Business Value", topics: ["Metrics", "KPIs", "Business Cases"] },
-      { week: 5, title: "Implementation & Change", topics: ["Change Management", "Stakeholder Buy-in", "Scaling"] },
-      { week: 6, title: "Future of AI", topics: ["Emerging Trends", "Long-term Planning", "Continuous Learning"] }
-    ],
-    prerequisites: ["Leadership experience", "Basic business acumen"],
-    skills: ["AI Strategy", "Team Leadership", "Project Management", "Change Management"]
-  },
-  {
-    id: "data-science-ai",
-    title: "Data Science for AI",
-    description: "Comprehensive data science skills specifically tailored for AI and machine learning applications.",
-    longDescription: "Bridge the gap between data science and AI with this specialized program. Learn advanced data manipulation, statistical analysis, and visualization techniques essential for AI projects.",
-    duration: "10 Weeks",
-    mode: "Online",
-    level: "Intermediate",
-    price: "$1,199",
-    rating: 4.6,
-    students: 1834,
-    instructor: "Dr. James Park",
-    category: "data-science",
-    image: "/api/placeholder/600/400",
-    highlights: ["Statistical Analysis", "Data Visualization", "Feature Engineering", "Model Validation"],
-    curriculum: [
-      { week: 1, title: "Data Science Foundations", topics: ["Statistics Review", "Probability", "Hypothesis Testing"] },
-      { week: 2, title: "Advanced Data Manipulation", topics: ["Pandas", "NumPy", "Data Cleaning"] },
-      { week: 3, title: "Exploratory Data Analysis", topics: ["Visualization", "Pattern Recognition", "Outlier Detection"] },
-      { week: 4, title: "Feature Engineering", topics: ["Feature Selection", "Transformation", "Creation"] },
-      { week: 5, title: "Statistical Modeling", topics: ["Regression", "Time Series", "Bayesian Methods"] },
-      { week: 6, title: "ML Model Selection", topics: ["Cross-validation", "Hyperparameter Tuning", "Model Comparison"] }
-    ],
-    prerequisites: ["Basic statistics", "Python programming"],
-    skills: ["Statistical Analysis", "Data Visualization", "Feature Engineering", "Model Validation"]
-  },
-  {
-    id: "ai-ethics-governance",
-    title: "AI Ethics & Governance",
-    description: "Navigate the complex landscape of AI ethics, bias, and governance in modern AI systems.",
-    longDescription: "As AI becomes more prevalent, understanding its ethical implications is crucial. This course covers fairness, accountability, transparency, and governance frameworks for responsible AI development.",
-    duration: "6 Weeks",
-    mode: "Online",
-    level: "Intermediate",
-    price: "$799",
-    rating: 4.5,
-    students: 967,
-    instructor: "Dr. Aisha Patel",
-    category: "ethics",
-    image: "/api/placeholder/600/400",
-    highlights: ["AI Ethics", "Bias Detection", "Governance Frameworks", "Responsible AI"],
-    curriculum: [
-      { week: 1, title: "Ethics Foundations", topics: ["Ethical Frameworks", "AI Impact", "Stakeholder Analysis"] },
-      { week: 2, title: "Bias & Fairness", topics: ["Types of Bias", "Detection Methods", "Mitigation Strategies"] },
-      { week: 3, title: "Transparency & Explainability", topics: ["XAI Methods", "Model Interpretation", "Communication"] },
-      { week: 4, title: "Privacy & Security", topics: ["Data Privacy", "Federated Learning", "Adversarial Attacks"] },
-      { week: 5, title: "Governance Frameworks", topics: ["Policy Development", "Compliance", "Risk Management"] },
-      { week: 6, title: "Future Considerations", topics: ["AGI Ethics", "Global Perspectives", "Emerging Challenges"] }
-    ],
-    prerequisites: ["Basic AI knowledge"],
-    skills: ["AI Ethics", "Bias Detection", "Policy Development", "Risk Assessment"]
-  },
-  {
-    id: "computer-vision-mastery",
-    title: "Computer Vision Mastery",
-    description: "Comprehensive computer vision course covering image processing, object detection, and advanced CV applications.",
-    longDescription: "Master computer vision with this hands-on course covering everything from basic image processing to advanced applications like autonomous vehicles and medical imaging.",
-    duration: "14 Weeks",
-    mode: "Hybrid",
-    level: "Advanced",
-    price: "$1,799",
-    rating: 4.8,
-    students: 743,
-    instructor: "Prof. Lisa Zhang",
-    category: "specialization",
-    image: "/api/placeholder/600/400",
-    highlights: ["Image Processing", "Object Detection", "Facial Recognition", "Medical Imaging"],
-    curriculum: [
-      { week: 1, title: "Image Fundamentals", topics: ["Digital Images", "Color Spaces", "Basic Operations"] },
-      { week: 2, title: "Feature Detection", topics: ["Edge Detection", "Corner Detection", "SIFT/SURF"] },
-      { week: 3, title: "Convolutional Networks", topics: ["CNN Architecture", "Training", "Optimization"] },
-      { week: 4, title: "Object Detection", topics: ["YOLO", "R-CNN", "SSD"] },
-      { week: 5, title: "Semantic Segmentation", topics: ["U-Net", "DeepLab", "Mask R-CNN"] },
-      { week: 6, title: "Face Recognition", topics: ["Face Detection", "Recognition", "Verification"] }
-    ],
-    prerequisites: ["Deep learning knowledge", "Python proficiency"],
-    skills: ["Computer Vision", "Image Processing", "Object Detection", "Neural Networks"]
+// Helper function to find course by slug
+const findCourseBySlug = (courses: any[], slug: string) => {
+  if (!courses || !slug) return null;
+  
+  // First try exact match
+  let foundCourse = courses.find(course => slugify(course.title) === slug);
+  
+  // If not found, try case-insensitive match
+  if (!foundCourse) {
+    foundCourse = courses.find(course => 
+      slugify(course.title).toLowerCase() === slug.toLowerCase()
+    );
   }
-];
+  
+  // If still not found, try partial match (in case of typos)
+  if (!foundCourse) {
+    foundCourse = courses.find(course => {
+      const courseSlug = slugify(course.title);
+      return courseSlug.includes(slug) || slug.includes(courseSlug);
+    });
+  }
+  
+  return foundCourse;
+};
 
 const categories = [
-  { id: "all", name: "All Courses", count: coursesData.length },
-  { id: "fundamentals", name: "Fundamentals", count: coursesData.filter(c => c.category === "fundamentals").length },
-  { id: "specialization", name: "Specialization", count: coursesData.filter(c => c.category === "specialization").length },
-  { id: "leadership", name: "Leadership", count: coursesData.filter(c => c.category === "leadership").length },
-  { id: "data-science", name: "Data Science", count: coursesData.filter(c => c.category === "data-science").length },
-  { id: "ethics", name: "Ethics", count: coursesData.filter(c => c.category === "ethics").length }
+  { id: "all", name: "All Courses" },
+  { id: "AI & ML", name: "AI & Machine Learning" },
+  { id: "Web Development", name: "Web Development" },
+  { id: "Data Science", name: "Data Science" },
+  { id: "Mobile Development", name: "Mobile Development" }
 ];
 
 const levels = ["All Levels", "Beginner", "Intermediate", "Advanced", "Leadership"];
@@ -191,32 +55,55 @@ function CoursesListPage() {
   const [selectedLevel, setSelectedLevel] = useState("All Levels");
   const [selectedMode, setSelectedMode] = useState("All Modes");
   const [sortBy, setSortBy] = useState("popular");
+  const [courses, setCourses] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Load courses on component mount
+  useEffect(() => {
+    loadCourses();
+  }, []);
+
+  const loadCourses = async () => {
+    try {
+      setLoading(true);
+      const response = await coursesApi.list();
+      setCourses(response.data.data);
+    } catch (error) {
+      console.error("Failed to load courses:", error);
+      toast.error("Failed to load courses");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredCourses = useMemo(() => {
-    let filtered = coursesData.filter(course => {
+    if (!courses || courses.length === 0) {
+      return [];
+    }
+    
+    let filtered = courses.filter(course => {
       const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            course.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = selectedCategory === "all" || course.category === selectedCategory;
       const matchesLevel = selectedLevel === "All Levels" || course.level === selectedLevel;
-      const matchesMode = selectedMode === "All Modes" || course.mode === selectedMode;
       
-      return matchesSearch && matchesCategory && matchesLevel && matchesMode;
+      return matchesSearch && matchesCategory && matchesLevel;
     });
 
     // Sort courses
     switch (sortBy) {
       case "popular":
-        return filtered.sort((a, b) => b.students - a.students);
+        return filtered.sort((a, b) => b.duration - a.duration);
       case "rating":
-        return filtered.sort((a, b) => b.rating - a.rating);
+        return filtered.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
       case "price-low":
-        return filtered.sort((a, b) => parseInt(a.price.replace(/[$,]/g, "")) - parseInt(b.price.replace(/[$,]/g, "")));
+        return filtered.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
       case "price-high":
-        return filtered.sort((a, b) => parseInt(b.price.replace(/[$,]/g, "")) - parseInt(a.price.replace(/[$,]/g, "")));
+        return filtered.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
       default:
         return filtered;
     }
-  }, [searchQuery, selectedCategory, selectedLevel, selectedMode, sortBy]);
+  }, [courses, searchQuery, selectedCategory, selectedLevel, sortBy]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -255,22 +142,28 @@ function CoursesListPage() {
                 <div>
                   <h4 className="font-semibold mb-3">Categories</h4>
                   <div className="space-y-2">
-                    {categories.map(category => (
-                      <button
-                        key={category.id}
-                        onClick={() => setSelectedCategory(category.id)}
-                        className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                          selectedCategory === category.id 
-                            ? "bg-primary text-primary-foreground" 
-                            : "hover:bg-muted"
-                        }`}
-                      >
-                        <div className="flex justify-between items-center">
-                          <span>{category.name}</span>
-                          <Badge variant="secondary">{category.count}</Badge>
-                        </div>
-                      </button>
-                    ))}
+                    {categories.map(category => {
+                      const count = category.id === "all" 
+                        ? (courses?.length || 0)
+                        : (courses?.filter(c => c.category === category.id).length || 0);
+                      
+                      return (
+                        <button
+                          key={category.id}
+                          onClick={() => setSelectedCategory(category.id)}
+                          className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                            selectedCategory === category.id 
+                              ? "bg-primary text-primary-foreground" 
+                              : "hover:bg-muted"
+                          }`}
+                        >
+                          <div className="flex justify-between items-center">
+                            <span>{category.name}</span>
+                            <Badge variant="secondary">{count}</Badge>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -325,65 +218,117 @@ function CoursesListPage() {
             </div>
 
             {/* Courses Grid */}
-            <div className="grid md:grid-cols-2 gap-8">
-              {filteredCourses.map(course => (
-                <Card key={course.id} className="group hover:shadow-glow-green transition-all duration-300 cursor-pointer">
-                  <div className="aspect-video bg-muted rounded-t-lg mb-4 overflow-hidden">
-                    <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                      <span className="text-2xl font-bold opacity-50">{course.title.charAt(0)}</span>
-                    </div>
-                  </div>
+            {loading ? (
+              <div className="grid md:grid-cols-2 gap-8">
+                {[1, 2, 3, 4].map((i) => (
+                  <Card key={i} className="animate-pulse">
+                    <div className="aspect-video bg-muted rounded-t-lg mb-4"></div>
+                    <CardContent className="space-y-4">
+                      <div className="h-4 bg-muted rounded"></div>
+                      <div className="h-6 bg-muted rounded"></div>
+                      <div className="h-4 bg-muted rounded"></div>
+                      <div className="h-4 bg-muted rounded w-3/4"></div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-8">
+                {filteredCourses.map(course => {
+                  // Get the first image if available
+                  const firstImage = course.images && course.images.length > 0 ? course.images[0] : null;
                   
-                  <CardContent className="space-y-4">
-                    <div className="flex justify-between items-start">
-                      <Badge variant="secondary">{course.level}</Badge>
-                      <div className="text-right">
-                        <div className="font-bold text-lg text-primary">{course.price}</div>
-                        <div className="text-sm text-muted-foreground">{course.mode}</div>
+                  return (
+                    <Card key={course.id} className="group hover:shadow-glow-green transition-all duration-300 cursor-pointer overflow-hidden border border-border/50 hover:border-primary/50">
+                      <div className="aspect-video bg-muted rounded-t-lg mb-4 overflow-hidden relative">
+                        {firstImage ? (
+                          <img 
+                            src={getMediaUrl(firstImage)} 
+                            alt={course.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                            onError={(e) => {
+                              // Fallback to placeholder if image fails to load
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = `
+                                  <div class="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                                    <span class="text-2xl font-bold opacity-50">${course.title.charAt(0)}</span>
+                                  </div>
+                                `;
+                              }
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                            <span className="text-2xl font-bold opacity-50">{course.title.charAt(0)}</span>
+                          </div>
+                        )}
+                        {/* Overlay gradient for better text readability */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       </div>
-                    </div>
-
-                    <h3 className="text-xl font-bold group-hover:text-primary transition-colors">
-                      {course.title}
-                    </h3>
                     
-                    <p className="text-muted-foreground line-clamp-2">
-                      {course.description}
-                    </p>
-
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>⭐ {course.rating}</span>
-                      <span>👥 {course.students.toLocaleString()} students</span>
-                      <span>⏱️ {course.duration}</span>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {course.highlights.slice(0, 3).map(highlight => (
-                        <Badge key={highlight} variant="outline" className="text-xs">
-                          {highlight}
-                        </Badge>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                          {course.instructor.charAt(0)}
+                    <CardContent className="space-y-4">
+                      <div className="flex justify-between items-start">
+                        <Badge variant="secondary">{course.level}</Badge>
+                        <div className="text-right">
+                          <div className="font-bold text-lg text-primary">${course.price}</div>
+                          <div className="text-sm text-muted-foreground">{course.duration} weeks</div>
                         </div>
-                        <span className="text-sm">{course.instructor}</span>
                       </div>
+
+                      <h3 className="text-xl font-bold group-hover:text-primary transition-colors">
+                        {course.title}
+                      </h3>
                       
-                      <Button 
-                        onClick={() => navigate(`/courses/${course.id}`)}
-                        className="group-hover:shadow-glow-green"
-                      >
-                        View Details
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                      <p className="text-muted-foreground line-clamp-2">
+                        {course.description}
+                      </p>
+
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <span>⭐ 4.5</span>
+                        <span>👥 {course.duration} weeks</span>
+                        <span>📚 {course.category}</span>
+                        {course.images && course.images.length > 1 && (
+                          <span className="text-primary">📷 {course.images.length} images</span>
+                        )}
+                        {course.videos && course.videos.length > 0 && (
+                          <span className="text-primary">🎥 {course.videos.length} videos</span>
+                        )}
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        <Badge variant="outline" className="text-xs">
+                          {course.category}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          {course.level}
+                        </Badge>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                            {course.title.charAt(0)}
+                          </div>
+                          <span className="text-sm">Instructor</span>
+                        </div>
+                        
+                        <Button 
+                          onClick={() => navigate(`/courses/${slugify(course.title)}`)}
+                          className="group-hover:shadow-glow-green"
+                        >
+                          View Details
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+              </div>
+            )}
 
             {filteredCourses.length === 0 && (
               <div className="text-center py-12">
@@ -403,16 +348,72 @@ function CoursesListPage() {
 
 // Course Details Page Component
 function CourseDetailsPage() {
-  const { courseId } = useParams();
+  const { courseSlug } = useParams();
   const navigate = useNavigate();
-  const course = coursesData.find(c => c.id === courseId);
+  const [course, setCourse] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (courseSlug) {
+      loadAllCourses();
+    }
+  }, [courseSlug]);
+
+  const loadAllCourses = async () => {
+    try {
+      setLoading(true);
+      const response = await coursesApi.list();
+      const courses = response.data.data;
+      
+      // Debug logging
+      console.log("All courses:", courses);
+      console.log("Looking for slug:", courseSlug);
+      console.log("Course slugs:", courses.map(c => ({ title: c.title, slug: slugify(c.title) })));
+      
+      // Find course by slug
+      const foundCourse = findCourseBySlug(courses, courseSlug!);
+      if (foundCourse) {
+        setCourse(foundCourse);
+      } else {
+        console.error("Course not found for slug:", courseSlug);
+        console.log("Available courses and their slugs:");
+        courses.forEach(c => {
+          console.log(`- "${c.title}" -> "${slugify(c.title)}"`);
+        });
+        toast.error(`Course "${courseSlug}" not found`);
+        // Don't navigate away immediately, let the user see the error page
+      }
+    } catch (error) {
+      console.error("Failed to load courses:", error);
+      toast.error("Failed to load course");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+          <p className="mt-4 text-muted-foreground">Loading course...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!course) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Course Not Found</h1>
-          <Button onClick={() => navigate("/courses")}>Back to Courses</Button>
+          <p className="text-muted-foreground mb-6">
+            The course "{courseSlug}" could not be found. Please check the URL or browse our available courses.
+          </p>
+          <div className="flex gap-4 justify-center">
+            <Button onClick={() => navigate("/courses")}>Back to Courses</Button>
+            <Button variant="outline" onClick={() => window.location.reload()}>Try Again</Button>
+          </div>
         </div>
       </div>
     );
@@ -431,12 +432,12 @@ function CourseDetailsPage() {
                 <Badge variant="secondary" className="text-sm">
                   {course.level}
                 </Badge>
-                <Badge variant="outline">{course.mode}</Badge>
+                <Badge variant="outline">{course.category}</Badge>
                 <div className="flex items-center gap-1">
                   <span className="text-yellow-400">⭐</span>
-                  <span>{course.rating}</span>
+                  <span>4.5</span>
                   <span className="text-muted-foreground">
-                    ({course.students.toLocaleString()} students)
+                    (Rating)
                   </span>
                 </div>
               </div>
@@ -446,23 +447,23 @@ function CourseDetailsPage() {
               </h1>
               
               <p className="text-xl text-muted-foreground mb-8">
-                {course.longDescription}
+                {course.description}
               </p>
 
               <div className="flex items-center gap-6 mb-8">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                    {course.instructor.charAt(0)}
+                    {course.title.charAt(0)}
                   </div>
                   <div>
-                    <div className="font-semibold">{course.instructor}</div>
-                    <div className="text-sm text-muted-foreground">Instructor</div>
+                    <div className="font-semibold">Instructor</div>
+                    <div className="text-sm text-muted-foreground">Course Instructor</div>
                   </div>
                 </div>
                 
                 <div className="border-l border-border pl-6">
-                  <div className="font-semibold text-2xl text-primary">{course.price}</div>
-                  <div className="text-sm text-muted-foreground">{course.duration}</div>
+                  <div className="font-semibold text-2xl text-primary">${course.price}</div>
+                  <div className="text-sm text-muted-foreground">{course.duration} weeks</div>
                 </div>
               </div>
 
@@ -477,11 +478,28 @@ function CourseDetailsPage() {
             </div>
 
             <div className="aspect-video bg-card rounded-xl border border-border overflow-hidden">
-              <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                <Button variant="ghost" size="lg" className="w-20 h-20 rounded-full bg-primary/20">
-                  <span className="text-3xl">▶</span>
-                </Button>
-              </div>
+              {course.videos && course.videos.length > 0 ? (
+                <video 
+                  className="w-full h-full object-cover"
+                  controls
+                  poster={course.images && course.images.length > 0 ? 
+                    getMediaUrl(course.images[0]) : 
+                    undefined
+                  }
+                >
+                  <source 
+                    src={getMediaUrl(course.videos[0])} 
+                    type="video/mp4" 
+                  />
+                  Your browser does not support the video tag.
+                </video>
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                  <Button variant="ghost" size="lg" className="w-20 h-20 rounded-full bg-primary/20">
+                    <span className="text-3xl">▶</span>
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -498,12 +516,22 @@ function CourseDetailsPage() {
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-4">
-                  {course.skills.map(skill => (
-                    <div key={skill} className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-primary"></div>
-                      <span>{skill}</span>
-                    </div>
-                  ))}
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-primary"></div>
+                    <span>{course.category} Skills</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-primary"></div>
+                    <span>Hands-on Projects</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-primary"></div>
+                    <span>Real-world Applications</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-primary"></div>
+                    <span>Industry Best Practices</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -515,21 +543,39 @@ function CourseDetailsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {course.curriculum.map(week => (
-                    <div key={week.week} className="border border-border rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-semibold">Week {week.week}: {week.title}</h4>
-                        <Badge variant="outline">{week.topics.length} topics</Badge>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {week.topics.map(topic => (
-                          <Badge key={topic} variant="secondary" className="text-xs">
-                            {topic}
-                          </Badge>
-                        ))}
-                      </div>
+                  <div className="border border-border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-semibold">Week 1: Introduction to {course.category}</h4>
+                      <Badge variant="outline">3 topics</Badge>
                     </div>
-                  ))}
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="secondary" className="text-xs">Fundamentals</Badge>
+                      <Badge variant="secondary" className="text-xs">Setup & Tools</Badge>
+                      <Badge variant="secondary" className="text-xs">First Project</Badge>
+                    </div>
+                  </div>
+                  <div className="border border-border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-semibold">Week 2-{course.duration-1}: Core Concepts</h4>
+                      <Badge variant="outline">Multiple topics</Badge>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="secondary" className="text-xs">Advanced Topics</Badge>
+                      <Badge variant="secondary" className="text-xs">Practical Exercises</Badge>
+                      <Badge variant="secondary" className="text-xs">Case Studies</Badge>
+                    </div>
+                  </div>
+                  <div className="border border-border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-semibold">Week {course.duration}: Final Project</h4>
+                      <Badge variant="outline">1 project</Badge>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="secondary" className="text-xs">Project Planning</Badge>
+                      <Badge variant="secondary" className="text-xs">Implementation</Badge>
+                      <Badge variant="secondary" className="text-xs">Presentation</Badge>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -541,12 +587,18 @@ function CourseDetailsPage() {
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2">
-                  {course.prerequisites.map(prereq => (
-                    <li key={prereq} className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-secondary"></div>
-                      <span>{prereq}</span>
-                    </li>
-                  ))}
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-secondary"></div>
+                    <span>Basic programming knowledge</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-secondary"></div>
+                    <span>High school mathematics</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-secondary"></div>
+                    <span>Enthusiasm to learn {course.category}</span>
+                  </li>
                 </ul>
               </CardContent>
             </Card>
@@ -555,55 +607,65 @@ function CourseDetailsPage() {
           {/* Sidebar */}
           <aside className="space-y-6">
             {/* Enrollment Card */}
-            <Card className="sticky top-24">
+            <Card className="sticky top-24 border border-border/50 hover:border-primary/50 transition-colors duration-300">
               <CardContent className="p-6">
                 <div className="text-center mb-6">
-                  <div className="text-3xl font-bold text-primary mb-2">{course.price}</div>
-                  <div className="text-muted-foreground">{course.duration} program</div>
+                  <div className="text-3xl font-bold text-primary mb-2">${course.price}</div>
+                  <div className="text-muted-foreground">{course.duration} weeks program</div>
                 </div>
 
                 <div className="space-y-4 mb-6">
-                  <div className="flex justify-between">
-                    <span>Level:</span>
-                    <Badge variant="secondary">{course.level}</Badge>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-muted-foreground">Level:</span>
+                    <Badge variant="secondary" className="text-xs">{course.level}</Badge>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Mode:</span>
-                    <span>{course.mode}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-muted-foreground">Category:</span>
+                    <span className="text-sm">{course.category}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Duration:</span>
-                    <span>{course.duration}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-muted-foreground">Duration:</span>
+                    <span className="text-sm">{course.duration} weeks</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Students:</span>
-                    <span>{course.students.toLocaleString()}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-muted-foreground">Price:</span>
+                    <span className="text-sm font-semibold text-primary">${course.price}</span>
                   </div>
                 </div>
 
-                <Button className="w-full mb-4 shadow-glow-green">
+                <Button className="w-full mb-4 shadow-glow-green hover:shadow-glow-green/80 transition-all duration-300">
                   Enroll Now
                 </Button>
                 
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full hover:bg-muted/50 transition-colors duration-300">
                   Add to Wishlist
                 </Button>
               </CardContent>
             </Card>
 
             {/* Course Highlights */}
-            <Card>
+            <Card className="border border-border/50 hover:border-primary/50 transition-colors duration-300">
               <CardHeader>
-                <CardTitle>Course Highlights</CardTitle>
+                <CardTitle className="text-lg">Course Highlights</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {course.highlights.map(highlight => (
-                    <div key={highlight} className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-primary"></div>
-                      <span className="text-sm">{highlight}</span>
-                    </div>
-                  ))}
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-primary"></div>
+                    <span className="text-sm">{course.category} Course</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-primary"></div>
+                    <span className="text-sm">{course.level} Level</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-primary"></div>
+                    <span className="text-sm">{course.duration} weeks duration</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-primary"></div>
+                    <span className="text-sm">Hands-on projects</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -615,16 +677,20 @@ function CourseDetailsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {coursesData.filter(c => c.id !== course.id && c.category === course.category).slice(0, 2).map(relatedCourse => (
-                    <div key={relatedCourse.id} className="p-3 border border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-                         onClick={() => navigate(`/courses/${relatedCourse.id}`)}>
-                      <h4 className="font-semibold text-sm mb-1">{relatedCourse.title}</h4>
-                      <div className="flex justify-between items-center text-xs text-muted-foreground">
-                        <span>{relatedCourse.duration}</span>
-                        <span className="font-semibold text-primary">{relatedCourse.price}</span>
-                      </div>
+                  <div className="p-3 border border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                    <h4 className="font-semibold text-sm mb-1">More {course.category} Courses</h4>
+                    <div className="flex justify-between items-center text-xs text-muted-foreground">
+                      <span>Coming Soon</span>
+                      <span className="font-semibold text-primary">$199</span>
                     </div>
-                  ))}
+                  </div>
+                  <div className="p-3 border border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                    <h4 className="font-semibold text-sm mb-1">Advanced {course.category}</h4>
+                    <div className="flex justify-between items-center text-xs text-muted-foreground">
+                      <span>Coming Soon</span>
+                      <span className="font-semibold text-primary">$299</span>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -642,7 +708,7 @@ export default function Courses() {
   return (
     <Routes>
       <Route index element={<CoursesListPage />} />
-      <Route path=":courseId" element={<CourseDetailsPage />} />
+      <Route path=":courseSlug" element={<CourseDetailsPage />} />
     </Routes>
   );
 }

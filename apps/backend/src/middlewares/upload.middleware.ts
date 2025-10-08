@@ -75,6 +75,8 @@ export type MulterRequest = Express.Request & { file?: Express.Multer.File };
 
 export type MultiMulterRequest = Express.Request & {
   files?: Record<string, Express.Multer.File[]>;
+  body: any;
+  params: any;
 };
 
 export function makeMediaUploader(opts: UploaderOptions = {}) {

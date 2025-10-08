@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import blogHeroImage from "@/assets/blog-hero.jpg";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { blogApi } from "@/lib/api";
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -14,14 +14,11 @@ const Blog = () => {
     queryKey: ["home-blog", page, limit],
     queryFn: () => blogApi.list(page, limit),
     staleTime: 60_000,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const posts = (data?.data?.data as any[]) || [];
-  const pagination = data?.data?.pagination as
-    | { page: number; pages: number; total: number; limit: number }
-    | undefined;
+  const posts = data?.data?.data || [];
+  const pagination = data?.data?.pagination;
   const isFirstPage = page === 1;
   const featured = isFirstPage ? posts[0] : undefined;
   const rest = isFirstPage ? posts.slice(1) : posts;

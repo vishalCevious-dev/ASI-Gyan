@@ -1,8 +1,8 @@
-import { pgTable, unique, uuid, varchar, timestamp, foreignKey, text, boolean, jsonb, pgEnum } from "drizzle-orm/pg-core"
-import { sql } from "drizzle-orm"
+import { pgTable, unique, uuid, varchar, timestamp, foreignKey, text, boolean, jsonb, pgEnum, serial, integer, decimal } from "drizzle-orm/pg-core"
 
 export const blogStatus = pgEnum("blog_status", ['DRAFT', 'PUBLISHED'])
 export const galleryStatus = pgEnum("gallery_status", ['DRAFT', 'PUBLISHED'])
+export const courseStatus = pgEnum("course_status", ['DRAFT', 'PUBLISHED'])
 export const galleryType = pgEnum("gallery_type", ['PHOTO', 'VIDEO'])
 export const userRole = pgEnum("user_role", ['ADMIN', 'USER'])
 export const videoPlatform = pgEnum("video_platform", ['youtube', 'youtube-shorts', 'instagram-reel', 'instagram-post', 'tiktok', 'vimeo', 'twitter', 'dailymotion', 'direct-video', 'unknown'])
@@ -77,3 +77,20 @@ export const newsletterSubscribers = pgTable("newsletter_subscribers", {
 }, (table) => [
 	unique("newsletter_subscribers_email_unique").on(table.email),
 ]);
+
+export const courses = pgTable("courses", {
+	id: serial("id").primaryKey(),
+	title: varchar("title", { length: 256 }).notNull(),
+	description: text("description").notNull(),
+	category: varchar("category", { length: 100 }).notNull(),
+	level: varchar("level", { length: 50 }).notNull(),
+	duration: integer("duration").notNull(),
+	price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+	images: text("images").array(),
+	videos: text("videos").array(),
+	status: courseStatus().default('DRAFT').notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
+});
+
+export type Course = typeof courses.$inferSelect;

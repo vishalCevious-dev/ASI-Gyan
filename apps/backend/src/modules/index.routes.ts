@@ -4,6 +4,7 @@ import { BlogRouter } from "src/modules/blog/blog.routes";
 import { AiRouter } from "src/modules/ai/openai.routes";
 import { GalleryRouter } from "src/modules/gallery/gallery.routes";
 import { NewsletterRouter } from "src/modules/newsletter/newsletter.routes";
+import { CourseRoutes } from "src/modules/courses/courses.route";
 
 const router = Router();
 
@@ -17,5 +18,6 @@ router.use("/ai", AiRouter);
 router.use("/gallery", GalleryRouter);
 router.use("/newsletter", NewsletterRouter);
 router.use("/letter", NewsletterRouter);
+router.use("/courses", CourseRoutes);
 
 export default router;
