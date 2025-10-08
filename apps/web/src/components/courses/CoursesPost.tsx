@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -11,7 +11,6 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Badge } from "../ui/badge";
-import { Progress } from "../ui/progress";
 import {
   Dialog,
   DialogContent,
@@ -41,6 +40,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { coursesApi } from "../../lib/api";
+import { toast } from "sonner";
 import {
   BookOpen,
   Plus,
@@ -113,73 +114,6 @@ const categoryData = [
   { name: "Mobile Development", value: 15, color: "#FF6B9D" },
 ];
 
-const recentCourses = [
-  {
-    id: 1,
-    title: "Advanced React & TypeScript",
-    category: "Web Development",
-    instructor: "Sarah Chen",
-    students: 234,
-    rating: 4.8,
-    status: "active",
-    progress: 85,
-    revenue: 12560,
-    createdAt: "2024-01-15",
-    duration: "8 weeks",
-  },
-  {
-    id: 2,
-    title: "Machine Learning Fundamentals",
-    category: "AI & ML",
-    instructor: "Dr. Alex Kumar",
-    students: 456,
-    rating: 4.9,
-    status: "active",
-    progress: 92,
-    revenue: 23400,
-    createdAt: "2024-01-10",
-    duration: "12 weeks",
-  },
-  {
-    id: 3,
-    title: "Data Visualization with D3.js",
-    category: "Data Science",
-    instructor: "Maya Rodriguez",
-    students: 189,
-    rating: 4.7,
-    status: "draft",
-    progress: 45,
-    revenue: 8900,
-    createdAt: "2024-01-20",
-    duration: "6 weeks",
-  },
-  {
-    id: 4,
-    title: "Flutter Mobile Development",
-    category: "Mobile Development",
-    instructor: "James Wilson",
-    students: 312,
-    rating: 4.6,
-    status: "active",
-    progress: 78,
-    revenue: 15600,
-    createdAt: "2024-01-05",
-    duration: "10 weeks",
-  },
-  {
-    id: 5,
-    title: "Python for Data Science",
-    category: "Data Science",
-    instructor: "Lisa Park",
-    students: 567,
-    rating: 4.8,
-    status: "active",
-    progress: 88,
-    revenue: 28350,
-    createdAt: "2023-12-28",
-    duration: "14 weeks",
-  },
-];
 
 const categories = [
   "All",
@@ -218,57 +152,171 @@ export function Courses() {
     url: string;
     name: string;
   }>>([]);
+  
+  // API state management
+  const [courses, setCourses] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  
+  // Form state for creating/editing courses
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    category: "",
+    level: "",
+    duration: "",
+    price: "",
+  });
 
-  const filteredCourses = recentCourses.filter((course) => {
+  // Load courses on component mount
+  useEffect(() => {
+    loadCourses();
+  }, []);
+
+  const loadCourses = async () => {
+    try {
+      setLoading(true);
+      const response = await coursesApi.list();
+      setCourses(response.data.data);
+    } catch (error) {
+      console.error("Failed to load courses:", error);
+      toast.error("Failed to load courses");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateCourse = async () => {
+    try {
+      setCreating(true);
+      const imageFiles = uploadedImages.map(img => img.file);
+      const videoFiles = uploadedVideos.map(vid => vid.file);
+      
+      console.log('Creating course with data:', {
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        level: formData.level,
+        duration: parseInt(formData.duration),
+        price: parseFloat(formData.price),
+        images: imageFiles,
+        videos: videoFiles,
+      });
+      
+      await coursesApi.create({
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        level: formData.level,
+        duration: parseInt(formData.duration),
+        price: parseFloat(formData.price),
+        images: imageFiles.length > 0 ? imageFiles : undefined,
+        videos: videoFiles.length > 0 ? videoFiles : undefined,
+        status: "PUBLISHED",
+      });
+      
+      toast.success("Course created successfully!");
+      setIsCreateDialogOpen(false);
+      setFormData({
+        title: "",
+        description: "",
+        category: "",
+        level: "",
+        duration: "",
+        price: "",
+      });
+      setUploadedImages([]);
+      setUploadedVideos([]);
+      loadCourses(); // Refresh the list
+    } catch (error) {
+      console.error("Failed to create course:", error);
+      toast.error("Failed to create course");
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleUpdateCourse = async () => {
+    if (!editingCourse) return;
+    
+    try {
+      setUpdating(true);
+      const imageFiles = uploadedImages.map(img => img.file);
+      const videoFiles = uploadedVideos.map(vid => vid.file);
+      
+      await coursesApi.update(editingCourse.id, {
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        level: formData.level,
+        duration: parseInt(formData.duration),
+        price: parseFloat(formData.price),
+        images: imageFiles.length > 0 ? imageFiles : undefined,
+        videos: videoFiles.length > 0 ? videoFiles : undefined,
+        status: "PUBLISHED",
+      });
+      
+      toast.success("Course updated successfully!");
+      setIsEditDialogOpen(false);
+      setEditingCourse(null);
+      setFormData({
+        title: "",
+        description: "",
+        category: "",
+        level: "",
+        duration: "",
+        price: "",
+      });
+      setUploadedImages([]);
+      setUploadedVideos([]);
+      loadCourses(); // Refresh the list
+    } catch (error) {
+      console.error("Failed to update course:", error);
+      toast.error("Failed to update course");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleDeleteCourse = async (courseId: number) => {
+    if (!confirm("Are you sure you want to delete this course?")) return;
+    
+    try {
+      await coursesApi.remove(courseId);
+      toast.success("Course deleted successfully!");
+      loadCourses(); // Refresh the list
+    } catch (error) {
+      console.error("Failed to delete course:", error);
+      toast.error("Failed to delete course");
+    }
+  };
+
+  const filteredCourses = (courses || []).filter((course) => {
     const matchesSearch =
       course.title
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
-      course.instructor
+      course.description
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
     const matchesCategory =
       selectedCategory === "All" ||
       course.category === selectedCategory;
-    const matchesStatus =
-      selectedStatus === "All" ||
-      course.status === selectedStatus;
-    return matchesSearch && matchesCategory && matchesStatus;
+    return matchesSearch && matchesCategory;
   });
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "active":
-        return (
-          <Badge className="bg-accent-foreground/20 text-accent-foreground border-accent-foreground/30">
-            Active
-          </Badge>
-        );
-      case "draft":
-        return (
-          <Badge
-            variant="secondary"
-            className="bg-muted text-muted-foreground"
-          >
-            Draft
-          </Badge>
-        );
-      case "archived":
-        return (
-          <Badge
-            variant="outline"
-            className="border-muted-foreground/50 text-muted-foreground"
-          >
-            Archived
-          </Badge>
-        );
-      default:
-        return <Badge variant="outline">Unknown</Badge>;
-    }
-  };
 
   const handleEditCourse = (course: any) => {
     setEditingCourse(course);
+    setFormData({
+      title: course.title,
+      description: course.description,
+      category: course.category,
+      level: course.level,
+      duration: course.duration.toString(),
+      price: course.price.toString(),
+    });
     setIsEditDialogOpen(true);
   };
 
@@ -807,26 +855,28 @@ export function Courses() {
                     <Input
                       id="title"
                       placeholder="Enter course title"
+                      value={formData.title}
+                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                       className="bg-input-background border-border"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="category">Category</Label>
-                    <Select>
+                    <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
                       <SelectTrigger className="bg-input-background border-border">
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent className="glassmorphism border-primary/20">
-                        <SelectItem value="ai-ml">
+                        <SelectItem value="AI & ML">
                           AI & Machine Learning
                         </SelectItem>
-                        <SelectItem value="web-dev">
+                        <SelectItem value="Web Development">
                           Web Development
                         </SelectItem>
-                        <SelectItem value="data-science">
+                        <SelectItem value="Data Science">
                           Data Science
                         </SelectItem>
-                        <SelectItem value="mobile-dev">
+                        <SelectItem value="Mobile Development">
                           Mobile Development
                         </SelectItem>
                       </SelectContent>
@@ -840,6 +890,8 @@ export function Courses() {
                   <Textarea
                     id="description"
                     placeholder="Course description"
+                    value={formData.description}
+                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     className="bg-input-background border-border min-h-[100px]"
                   />
                 </div>
@@ -852,6 +904,8 @@ export function Courses() {
                       id="duration"
                       type="number"
                       placeholder="8"
+                      value={formData.duration}
+                      onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
                       className="bg-input-background border-border"
                     />
                   </div>
@@ -861,23 +915,25 @@ export function Courses() {
                       id="price"
                       type="number"
                       placeholder="199"
+                      value={formData.price}
+                      onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
                       className="bg-input-background border-border"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="level">Level</Label>
-                    <Select>
+                    <Select value={formData.level} onValueChange={(value) => setFormData(prev => ({ ...prev, level: value }))}>
                       <SelectTrigger className="bg-input-background border-border">
                         <SelectValue placeholder="Select level" />
                       </SelectTrigger>
                       <SelectContent className="glassmorphism border-primary/20">
-                        <SelectItem value="beginner">
+                        <SelectItem value="Beginner">
                           Beginner
                         </SelectItem>
-                        <SelectItem value="intermediate">
+                        <SelectItem value="Intermediate">
                           Intermediate
                         </SelectItem>
-                        <SelectItem value="advanced">
+                        <SelectItem value="Advanced">
                           Advanced
                         </SelectItem>
                       </SelectContent>
@@ -1013,8 +1069,12 @@ export function Courses() {
                 >
                   Cancel
                 </Button>
-                <Button className="bg-gradient-to-r from-primary to-accent-foreground text-background">
-                  Create Course
+                <Button 
+                  onClick={handleCreateCourse}
+                  disabled={creating}
+                  className="bg-gradient-to-r from-primary to-accent-foreground text-background"
+                >
+                  {creating ? "Creating..." : "Create Course"}
                 </Button>
               </div>
             </DialogContent>
@@ -1282,89 +1342,105 @@ export function Courses() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredCourses.map((course) => (
-                <TableRow
-                  key={course.id}
-                  className="border-border hover:bg-muted/50"
-                >
-                  <TableCell>
-                    <div>
-                      <div className="font-medium text-foreground">
-                        {course.title}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {course.category}
-                      </div>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8">
+                    <div className="flex items-center justify-center gap-2">
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      Loading courses...
                     </div>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {course.instructor}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Users className="w-4 h-4 text-muted-foreground" />
-                      <span>{course.students}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <Progress
-                        value={course.progress}
-                        className="w-16"
-                      />
-                      <span className="text-xs text-muted-foreground">
-                        {course.progress}%
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span>{course.rating}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-primary">
-                    ${course.revenue.toLocaleString()}
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(course.status)}
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0"
-                        >
-                          <MoreVertical className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align="end"
-                        className="glassmorphism border-primary/20"
-                      >
-                        <DropdownMenuItem
-                          onClick={() =>
-                            handleEditCourse(course)
-                          }
-                        >
-                          <Edit className="w-4 h-4 mr-2" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Eye className="w-4 h-4 mr-2" />
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : filteredCourses.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8">
+                    No courses found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredCourses.map((course) => (
+                  <TableRow
+                    key={course.id}
+                    className="border-border hover:bg-muted/50"
+                  >
+                    <TableCell>
+                      <div>
+                        <div className="font-medium text-foreground">
+                          {course.title}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {course.category}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {course.level}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Users className="w-4 h-4 text-muted-foreground" />
+                        <span>{course.duration} weeks</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <div className="text-sm text-muted-foreground">
+                          {course.duration} weeks
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                        <span>4.5</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-primary">
+                      ${course.price}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">Active</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                          >
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          className="glassmorphism border-primary/20"
+                        >
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleEditCourse(course)
+                            }
+                          >
+                            <Edit className="w-4 h-4 mr-2" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="text-destructive"
+                            onClick={() => handleDeleteCourse(course.id)}
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>
@@ -1393,7 +1469,8 @@ export function Courses() {
                   </Label>
                   <Input
                     id="edit-title"
-                    defaultValue={editingCourse.title}
+                    value={formData.title}
+                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                     className="bg-input-background border-border"
                   />
                 </div>
@@ -1401,7 +1478,7 @@ export function Courses() {
                   <Label htmlFor="edit-category">
                     Category
                   </Label>
-                  <Select defaultValue={editingCourse.category}>
+                  <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
                     <SelectTrigger className="bg-input-background border-border">
                       <SelectValue />
                     </SelectTrigger>
@@ -1422,44 +1499,59 @@ export function Courses() {
                   </Select>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="edit-instructor">
-                    Instructor
-                  </Label>
-                  <Input
-                    id="edit-instructor"
-                    defaultValue={editingCourse.instructor}
-                    className="bg-input-background border-border"
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-description">
+                  Description
+                </Label>
+                <Textarea
+                  id="edit-description"
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  className="bg-input-background border-border min-h-[100px]"
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="edit-duration">
-                    Duration
+                    Duration (weeks)
                   </Label>
                   <Input
                     id="edit-duration"
-                    defaultValue={editingCourse.duration}
+                    type="number"
+                    value={formData.duration}
+                    onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
                     className="bg-input-background border-border"
                   />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-status">Status</Label>
-                <Select defaultValue={editingCourse.status}>
-                  <SelectTrigger className="bg-input-background border-border">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="glassmorphism border-primary/20">
-                    <SelectItem value="active">
-                      Active
-                    </SelectItem>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="archived">
-                      Archived
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-price">Price ($)</Label>
+                  <Input
+                    id="edit-price"
+                    type="number"
+                    value={formData.price}
+                    onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
+                    className="bg-input-background border-border"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-level">Level</Label>
+                  <Select value={formData.level} onValueChange={(value) => setFormData(prev => ({ ...prev, level: value }))}>
+                    <SelectTrigger className="bg-input-background border-border">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="glassmorphism border-primary/20">
+                      <SelectItem value="Beginner">
+                        Beginner
+                      </SelectItem>
+                      <SelectItem value="Intermediate">
+                        Intermediate
+                      </SelectItem>
+                      <SelectItem value="Advanced">
+                        Advanced
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
           )}
@@ -1471,8 +1563,12 @@ export function Courses() {
             >
               Cancel
             </Button>
-            <Button className="bg-gradient-to-r from-primary to-accent-foreground text-background">
-              Save Changes
+            <Button 
+              onClick={handleUpdateCourse}
+              disabled={updating}
+              className="bg-gradient-to-r from-primary to-accent-foreground text-background"
+            >
+              {updating ? "Updating..." : "Save Changes"}
             </Button>
           </div>
         </DialogContent>

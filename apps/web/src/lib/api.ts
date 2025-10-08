@@ -374,4 +374,140 @@ export const galleryApi = {
   },
 };
 
+// Courses API
+type Course = {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  level: string;
+  duration: number;
+  price: string;
+  images?: string[] | null;
+  videos?: string[] | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export const coursesApi = {
+  async list(page = 1, limit = 12) {
+    return apiFetch<
+      ApiResponse<{
+        data: Course[];
+        pagination: {
+          page: number;
+          limit: number;
+          total: number;
+          pages: number;
+        };
+      }>
+    >("/v1/courses", { method: "GET", params: { page, limit } });
+  },
+  async get(id: number) {
+    return apiFetch<ApiResponse<Course>>(
+      `/v1/courses/${id}`,
+      { method: "GET" },
+    );
+  },
+  async create(input: {
+    title: string;
+    description: string;
+    category: string;
+    level: string;
+    duration: number;
+    price: number;
+    images?: File[];
+    videos?: File[];
+    status?: "DRAFT" | "PUBLISHED";
+  }) {
+    const fd = new FormData();
+    fd.append("title", input.title);
+    fd.append("description", input.description);
+    fd.append("category", input.category);
+    fd.append("level", input.level);
+    fd.append("duration", input.duration.toString());
+    fd.append("price", input.price.toString());
+    fd.append("status", input.status || "PUBLISHED");
+    
+    if (input.images && input.images.length > 0) {
+      input.images.forEach((image) => {
+        fd.append('images', image);
+      });
+    }
+    
+    if (input.videos && input.videos.length > 0) {
+      input.videos.forEach((video) => {
+        fd.append('videos', video);
+      });
+    }
+    
+    // Debug: Log FormData contents
+    console.log('FormData contents:');
+    for (const [key, value] of fd.entries()) {
+      console.log(`${key}:`, value);
+    }
+    
+    return apiFetch<ApiResponse<{ id: number }>>("/v1/courses", {
+      method: "POST",
+      body: fd,
+      headers: undefined,
+    });
+  },
+  async update(
+    id: number,
+    input: {
+      title?: string;
+      description?: string;
+      category?: string;
+      level?: string;
+      duration?: number;
+      price?: number;
+      images?: File[];
+      videos?: File[];
+      removeImages?: boolean;
+      removeVideos?: boolean;
+      status?: "DRAFT" | "PUBLISHED";
+    },
+  ) {
+    const fd = new FormData();
+    if (input.title !== undefined) fd.append("title", input.title);
+    if (input.description !== undefined) fd.append("description", input.description);
+    if (input.category !== undefined) fd.append("category", input.category);
+    if (input.level !== undefined) fd.append("level", input.level);
+    if (input.duration !== undefined) fd.append("duration", input.duration.toString());
+    if (input.price !== undefined) fd.append("price", input.price.toString());
+    if (input.status !== undefined) fd.append("status", input.status);
+    
+    if (input.images && input.images.length > 0) {
+      input.images.forEach((image) => {
+        fd.append('images', image);
+      });
+    }
+    
+    if (input.videos && input.videos.length > 0) {
+      input.videos.forEach((video) => {
+        fd.append('videos', video);
+      });
+    }
+    
+    if (input.removeImages !== undefined) fd.append("removeImages", String(input.removeImages));
+    if (input.removeVideos !== undefined) fd.append("removeVideos", String(input.removeVideos));
+    
+    return apiFetch<ApiResponse<{ id: number }>>(
+      `/v1/courses/${id}`,
+      {
+        method: "PATCH",
+        body: fd,
+        headers: undefined,
+      },
+    );
+  },
+  async remove(id: number) {
+    return apiFetch<ApiResponse<{ id: number }>>(
+      `/v1/courses/${id}`,
+      { method: "DELETE" },
+    );
+  },
+};
+
 export { apiFetch };
