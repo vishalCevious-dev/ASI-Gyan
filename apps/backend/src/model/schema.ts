@@ -8,7 +8,7 @@ export {
   galleryTypeEnum,
   galleryStatusEnum,
 } from "src/model/gallery.model";
-export { courses } from "src/model/courses.schema";
+export { courses, courseStatusEnum } from "src/model/courses.schema";
 export type { Course, NewCourse } from "src/model/courses.schema";
 
 // Newsletter subscribers table

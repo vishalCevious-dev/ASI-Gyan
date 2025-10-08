@@ -1,4 +1,7 @@
-import { pgTable, serial, varchar, text, integer, decimal, timestamp, text as textArray } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, text, integer, decimal, timestamp, text as textArray, pgEnum } from 'drizzle-orm/pg-core';
+
+// Course status enum
+export const courseStatusEnum = pgEnum('course_status', ['DRAFT', 'PUBLISHED']);
 
 // Drizzle schema for the 'courses' table
 export const courses = pgTable('courses', {
@@ -11,6 +14,7 @@ export const courses = pgTable('courses', {
   price: decimal('price', { precision: 10, scale: 2 }).notNull(),
   images: textArray('images').array(),
   videos: textArray('videos').array(),
+  status: courseStatusEnum('status').default('DRAFT').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

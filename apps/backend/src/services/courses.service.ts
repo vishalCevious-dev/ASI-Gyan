@@ -6,8 +6,13 @@ import type { Course } from '../../drizzle/schema';
 type NewCourse = Omit<Course, 'id' | 'createdAt' | 'updatedAt'>;
 
 const createCourse = async (courseData: NewCourse): Promise<Course> => {
-  const result = await db.insert(courses).values(courseData).returning();
-  return result[0];
+  try {
+    const result = await db.insert(courses).values(courseData).returning();
+    return result[0];
+  } catch (error) {
+    console.error('Database error in createCourse:', error);
+    throw error;
+  }
 };
 
 const getAllCourses = async (): Promise<Course[]> => {

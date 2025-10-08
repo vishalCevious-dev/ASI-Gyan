@@ -7,8 +7,8 @@ export const createCourseSchema = z.object({
   level: z.enum(['Beginner', 'Intermediate', 'Advanced']),
   duration: z.number({ message: 'Duration is required' }).positive(),
   price: z.number({ message: 'Price is required' }).positive(),
-  images: z.array(z.string().url()).optional(),
-  videos: z.array(z.string().url()).optional(),
+  images: z.array(z.string()).optional(),
+  videos: z.array(z.string()).optional(),
 });
 
 export const updateCourseSchema = z.object({
@@ -18,6 +18,8 @@ export const updateCourseSchema = z.object({
   level: z.enum(['Beginner', 'Intermediate', 'Advanced']).optional(),
   duration: z.number().positive().optional(),
   price: z.number().positive().optional(),
-  images: z.array(z.string().url()).optional(),
-  videos: z.array(z.string().url()).optional(),
+  images: z.array(z.string()).optional(),
+  videos: z.array(z.string()).optional(),
+  removeImages: z.boolean().optional(),
+  removeVideos: z.boolean().optional(),
 });
