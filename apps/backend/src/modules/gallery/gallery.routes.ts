@@ -1,13 +1,13 @@
 import { Router } from "express";
-import asyncHandler from "src/utils/asyncHandler";
-import { authMiddleware } from "src/middlewares/auth.middleware";
-import { rbac } from "src/middlewares/rbac.middleware";
-import { UserRole } from "src/constants";
-import { validateBody } from "src/middlewares/validateBody.middleware";
+import asyncHandler from "../../utils/asyncHandler";
+import { authMiddleware } from "../../middlewares/auth.middleware";
+import { rbac } from "../../middlewares/rbac.middleware";
+import { UserRole } from "../../constants";
+import { validateBody } from "../../middlewares/validateBody.middleware";
 import {
   galleryCreateSchema,
   galleryUpdateSchema,
-} from "src/validation/gallery.validation";
+} from "../../validation/gallery.validation";
 import {
   createGalleryItem,
   deleteGalleryItem,

@@ -4,11 +4,11 @@ import {
   login,
   logout,
   register,
-} from "src/modules/auth/auth.controller";
-import { authMiddleware } from "src/middlewares/auth.middleware";
-import asyncHandler from "src/utils/asyncHandler";
-import { validateBody } from "src/middlewares/validateBody.middleware";
-import { loginSchema, registerSchema } from "src/validation/auth.validation";
+} from "./auth.controller";
+import { authMiddleware } from "../../middlewares/auth.middleware";
+import asyncHandler from "../../utils/asyncHandler";
+import { validateBody } from "../../middlewares/validateBody.middleware";
+import { loginSchema, registerSchema } from "../../validation/auth.validation";
 
 const router = Router();
 

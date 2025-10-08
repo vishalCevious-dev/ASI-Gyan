@@ -2,12 +2,12 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
-import { db } from "src/config/db";
-import EnvSecret, { EApplicationEnviroment } from "src/constants/envVariables";
-import { Users } from "src/model/user.model";
-import { ApiResponse } from "src/utils/ApiResponse";
-import { ApiError } from "src/utils/ApiError";
-import { UserRole } from "src/constants";
+import { db } from "../../config/db";
+import EnvSecret, { EApplicationEnviroment } from "../../constants/envVariables";
+import { Users } from "../../model/user.model";
+import { ApiResponse } from "../../utils/ApiResponse";
+import { ApiError } from "../../utils/ApiError";
+import { UserRole } from "../../constants";
 
 const register = async (req: Request, res: Response) => {
   try {

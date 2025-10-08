@@ -1,5 +1,5 @@
 import { Router } from "express";
-import asyncHandler from "src/utils/asyncHandler";
+import asyncHandler from "../../utils/asyncHandler";
 import { chat, chatStream, imageGenerate } from "./ai.controller";
 
 const AiRouter = Router();

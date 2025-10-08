@@ -1,3 +1,3 @@
-import { NewsletterSubscribers } from "src/model/schema";
+import { NewsletterSubscribers } from "./schema";
 
 export { NewsletterSubscribers };

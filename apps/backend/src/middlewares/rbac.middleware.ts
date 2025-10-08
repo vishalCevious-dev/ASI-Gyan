@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { ApiError } from "src/utils/ApiError";
-import { UserRole } from "src/constants";
+import { ApiError } from "../utils/ApiError";
+import { UserRole } from "../constants";
 
 const rbac = (requiredRole: UserRole) => {
   return async (req: Request, res: Response, next: NextFunction) => {

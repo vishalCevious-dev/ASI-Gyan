@@ -1,5 +1,5 @@
-import app from "src/app";
-import EnvSecret from "src/constants/envVariables";
+import app from "./app";
+import EnvSecret from "./constants/envVariables";
 
 const port = EnvSecret.PORT || 3000;
 

@@ -1,15 +1,15 @@
 import { pgTable, unique, uuid, varchar, timestamp, boolean } from "drizzle-orm/pg-core";
 
-export { userRoleEnum } from "src/model/user.model";
-export { Users } from "src/model/user.model";
-export { Blog, blogStatusEnum } from "src/model/blog.model";
+export { userRoleEnum } from "./user.model";
+export { Users } from "./user.model";
+export { Blog, blogStatusEnum } from "./blog.model";
 export {
   Gallery,
   galleryTypeEnum,
   galleryStatusEnum,
-} from "src/model/gallery.model";
-export { courses, courseStatusEnum } from "src/model/courses.schema";
-export type { Course, NewCourse } from "src/model/courses.schema";
+} from "./gallery.model";
+export { courses, courseStatusEnum } from "./courses.schema";
+export type { Course, NewCourse } from "./courses.schema";
 
 // Newsletter subscribers table
 export const NewsletterSubscribers = pgTable("newsletter_subscribers", {

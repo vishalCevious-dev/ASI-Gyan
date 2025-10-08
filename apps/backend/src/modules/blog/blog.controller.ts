@@ -1,18 +1,18 @@
 import { Request, Response } from "express";
-import { db } from "src/config/db";
-import { Blog } from "src/model/blog.model";
-import { Users } from "src/model/user.model";
+import { db } from "../../config/db";
+import { Blog } from "../../model/blog.model";
+import { Users } from "../../model/user.model";
 import { and, desc, eq, ne, sql } from "drizzle-orm";
-import { ApiError } from "src/utils/ApiError";
-import { ApiResponse } from "src/utils/ApiResponse";
+import { ApiError } from "../../utils/ApiError";
+import { ApiResponse } from "../../utils/ApiResponse";
 import {
   deleteFile,
   resolvePublicFilePath,
   type MulterRequest,
-} from "src/middlewares/upload.middleware";
-import { buildFileUrl } from "src/utils/url";
-import { sendNewsletterNotificationForNewContent } from "src/services/newsletter.service";
-import EnvSecret from "src/constants/envVariables";
+} from "../../middlewares/upload.middleware";
+import { buildFileUrl } from "../../utils/url";
+import { sendNewsletterNotificationForNewContent } from "../../services/newsletter.service";
+import EnvSecret from "../../constants/envVariables";
 
 const slugify = (input: string) =>
   input

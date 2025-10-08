@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { db } from "src/config/db";
-import { NewsletterSubscribers } from "src/model/newsletter.model";
+import { db } from "../../config/db";
+import { NewsletterSubscribers } from "../../model/newsletter.model";
 import { eq } from "drizzle-orm";
-import { ApiResponse } from "src/utils/ApiResponse";
-import asyncHandler from "src/utils/asyncHandler";
-import { sendNewsletterNotification } from "src/utils/sendMail";
+import { ApiResponse } from "../../utils/ApiResponse";
+import asyncHandler from "../../utils/asyncHandler";
+import { sendNewsletterNotification } from "../../utils/sendMail";
 
 // Subscribe to newsletter
 export const subscribeNewsletter = asyncHandler(

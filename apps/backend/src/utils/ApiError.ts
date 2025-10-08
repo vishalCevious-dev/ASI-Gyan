@@ -1,5 +1,5 @@
 import type { Request } from "express";
-import EnvSecret, { EApplicationEnviroment } from "src/constants/envVariables";
+import EnvSecret, { EApplicationEnviroment } from "../constants/envVariables";
 
 class ApiErrorHandler extends Error {
   public statusCode: number;

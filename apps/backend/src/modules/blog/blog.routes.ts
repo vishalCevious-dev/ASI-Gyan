@@ -1,21 +1,21 @@
 import { Router } from "express";
-import asyncHandler from "src/utils/asyncHandler";
-import { authMiddleware } from "src/middlewares/auth.middleware";
-import { rbac } from "src/middlewares/rbac.middleware";
-import { validateBody } from "src/middlewares/validateBody.middleware";
+import asyncHandler from "../../utils/asyncHandler";
+import { authMiddleware } from "../../middlewares/auth.middleware";
+import { rbac } from "../../middlewares/rbac.middleware";
+import { validateBody } from "../../middlewares/validateBody.middleware";
 import {
   blogCreateSchema,
   blogUpdateSchema,
-} from "src/validation/blog.validation";
+} from "../../validation/blog.validation";
 import {
   createPost,
   deletePost,
   getPostBySlug,
   listPosts,
   updatePost,
-} from "src/modules/blog/blog.controller";
-import { uploadBlogImage } from "src/middlewares/upload.middleware";
-import { UserRole } from "src/constants";
+} from "./blog.controller";
+import { uploadBlogImage } from "../../middlewares/upload.middleware";
+import { UserRole } from "../../constants";
 
 const router = Router();
 
