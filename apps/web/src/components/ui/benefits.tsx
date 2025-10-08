@@ -29,7 +29,7 @@ const Benefits: React.FC = () => {
   ];
 
   return (
-    <section className="relative py-16 px-5 overflow-hidden bg-background">
+    <section className="relative py-10 px-5 overflow-hidden bg-background">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/20 to-background"></div>
       
@@ -51,8 +51,8 @@ const Benefits: React.FC = () => {
           </h2>
           
           {/* Description */}
-          <p className="text-lg max-w-3xl mx-auto leading-relaxed text-muted-foreground">
-            Explore the incredible advantages of enrolling in our courses and enhancing your skills for the ultimate career success.
+          <p className="text-sl max-w-3xl mx-auto leading-relaxed text-muted-foreground">
+            Explore the incredible advantages of enrolling in our courses and  <br/> enhancing your skills for the ultimate career success.
           </p>
         </div>
 

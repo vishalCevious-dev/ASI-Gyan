@@ -141,7 +141,7 @@ const Testimonials: React.FC = () => {
     {
       name: "Twinkle Soni",
       content:
-        "Thank you. The last two days have been incredible and today towards the end the things did become overwhelming. The sessions were great and valuable.",
+        "“Thank you! The past two days were amazing — today got a bit overwhelming, but the sessions were truly valuable."
     },
   ];
 
@@ -168,8 +168,8 @@ const Testimonials: React.FC = () => {
           </h2>
           
           {/* Description */}
-          <p className="text-lg max-w-3xl mx-auto leading-relaxed text-muted-foreground">
-            Discover what our community members say about their transformative learning experiences with ASI Gyan.
+          <p className="text-sl max-w-3xl mx-auto leading-relaxed text-muted-foreground">
+            Discover what our community members say about their transformative <br/> learning experiences with ASI Gyan.
           </p>
         </div>
 

@@ -29,10 +29,10 @@ export default function BlogList() {
       <main className="container mx-auto px-6 pt-24 pb-16">
         <div className="text-center mb-12">
           <div className="inline-flex items-center px-4 py-2 rounded-full mb-6 bg-primary/10 border border-primary/20">
-            <span className="text-sm font-medium text-primary">AI Learning Blog</span>
+            <span className="text-sm font-medium text-primary">AI Blog</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-6">AI Learning Blog</h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-sl text-muted-foreground max-w-3xl mx-auto">
             Insights, tutorials, and stories from ASI Gyan
           </p>
         </div>
