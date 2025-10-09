@@ -71,11 +71,11 @@ const About = () => {
         <div className="text-center mb-16">
           <div className="text-4xl mb-4">🎓</div>
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            ASI Gyan - AI School of Entrepreneur
+            <span className="text-primary">ASI Gyan </span> AI School of Entrepreneur
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-sl text-muted-foreground max-w-2xl mx-auto">
             Preparing the next generation of AI leaders through innovative
-            education, practical skills, and transformative learning
+            education, practical skills, <br/> and transformative learning
             experiences.
           </p>
         </div>

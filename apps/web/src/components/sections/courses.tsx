@@ -1,84 +1,25 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+
 const Courses = () => {
-  // const courses = [{
-  //   title: "AI Fundamentals Program",
-  //   description: "Master the core concepts of Artificial Intelligence through hands-on projects and real-world applications.",
-  //   duration: "8 Weeks",
-  //   mode: "Online",
-  //   level: "Beginner",
-  //   highlights: ["Machine Learning Basics", "Neural Networks", "Python for AI", "Project Portfolio"]
-  // }, {
-  //   title: "Advanced AI Specialization",
-  //   description: "Deep dive into advanced AI topics including deep learning, computer vision, and natural language processing.",
-  //   duration: "12 Weeks",
-  //   mode: "Hybrid",
-  //   level: "Advanced",
-  //   highlights: ["Deep Learning", "Computer Vision", "NLP", "AI Ethics"]
-  // }, {
-  //   title: "AI Leadership Track",
-  //   description: "Strategic AI implementation for executives and team leaders driving organizational transformation.",
-  //   duration: "6 Weeks",
-  //   mode: "Executive",
-  //   level: "Leadership",
-  //   highlights: ["AI Strategy", "Team Management", "ROI Analysis", "Implementation"]
-  // }];
   return (
-    <section id="courses" className="py-20 bg-background">
+    <section id="courses" className="py-20 bg-background relative max-w-6xl mx-auto">
       <div className="container mx-auto px-6">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Explore Courses
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-sl text-muted-foreground max-w-3xl mx-auto">
             Choose from our comprehensive range of AI courses designed to
-            elevate your skills and accelerate your career in artificial
+            elevate <br /> your skills and accelerate your career in artificial
             intelligence.
           </p>
         </div>
 
-        {/* Courses Grid */}
-        {/* <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-          {courses.map((course, idx) => (
-            <Card key={idx} className="bg-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-glow-green h-full flex flex-col">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl font-bold">{course.title}</CardTitle>
-                  <Badge variant="outline" className="border-secondary text-secondary bg-secondary/10">
-                    {course.level}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4 flex-1">
-                <p className="text-muted-foreground leading-relaxed">{course.description}</p>
-
-                <div className="flex flex-wrap gap-2 text-sm">
-                  <Badge variant="outline" className="border-border">⏱ {course.duration}</Badge>
-                  <Badge variant="outline" className="border-border">🎯 {course.mode}</Badge>
-                </div>
-
-                <div>
-                  <div className="text-sm font-medium mb-2 text-foreground">Highlights</div>
-                  <div className="flex flex-wrap gap-2">
-                    {course.highlights.map((h) => (
-                      <Badge key={h} variant="outline" className="border-muted text-muted-foreground">
-                        {h}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="pt-2">
-                  <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Enroll Now</Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div> */}
-
         {/* CTA Section */}
         <div className="grid md:grid-cols-2 gap-6 mb-12">
+          {/* Explore Courses Card */}
           <div className="bg-card border border-border rounded-lg p-8 text-center hover:shadow-lg transition-all duration-300">
             <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
@@ -95,20 +36,22 @@ const Courses = () => {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold mb-3">Explore Courses</h3>
-            <p className="text-muted-foreground mb-4">
-              Discover our comprehensive AI learning programs designed for every
-              skill level.
+            <h3 className="text-xl font-semibold mb-3"> Explore <span class="text-primary" > Courses </span></h3>
+            <p className=" text-sm text-muted-foreground mb-4">
+              Discover our comprehensive AI learning programs <br /> designed
+              for every skill level.
             </p>
             <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
               <Link to="/courses">Browse Courses</Link>
             </Button>
           </div>
 
+          {/* Coming Soon Card */}
           <div className="bg-card border border-border rounded-lg p-8 text-center hover:shadow-lg transition-all duration-300">
-            <div className="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            {/* Clock Icon in green */}
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
-                className="w-8 h-8 text-secondary"
+                className="w-8 h-8 text-green-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -122,44 +65,27 @@ const Courses = () => {
               </svg>
             </div>
             <h3 className="text-xl font-semibold mb-3">Coming Soon</h3>
-            <p className="text-muted-foreground mb-4">
-              Stay tuned for exciting new features and advanced AI
+            <p className="text-sm text-muted-foreground mb-4">
+              Stay tuned for exciting new features and advanced <br /> AI
               specialization courses.
             </p>
+
+            {/* Get Notified Button in green with hover */}
             <Button
               variant="outline"
-              className="border-secondary text-secondary hover:bg-secondary/10"
+              className="border-2 border-green-400 text-green-400 
+                         bg-white/50 backdrop-blur-sm
+                         hover:bg-green-400 hover:text-white hover:backdrop-blur-md
+                         hover:shadow-[0_0_20px_rgba(40,167,69,0.6)]
+                         transition-all duration-300 font-medium"
             >
               Get Notified
             </Button>
           </div>
         </div>
-
-        {/* Additional Programs Section */}
-        {/* <div className="mt-20 text-center">
-          <div className="bg-card border border-border rounded-lg p-8 max-w-4xl mx-auto">
-            <h3 className="text-3xl font-bold mb-4">
-              Custom Enterprise Programs
-            </h3>
-            <p className="text-muted-foreground mb-6 text-lg">
-              Tailored AI training solutions for organizations looking to
-              upskill their teams and drive digital transformation at scale.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                variant="outline"
-                className="border-secondary text-secondary hover:bg-secondary/10"
-              >
-                For Business
-              </Button>
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-                Schedule Consultation
-              </Button>
-            </div>
-          </div>
-        </div> */}
       </div>
     </section>
   );
 };
+
 export default Courses;

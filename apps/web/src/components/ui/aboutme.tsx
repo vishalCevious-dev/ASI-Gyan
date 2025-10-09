@@ -51,8 +51,8 @@ const AboutUs: React.FC = () => {
           </h2>
           
           {/* Description */}
-          <p className="text-xl max-w-4xl mx-auto leading-relaxed text-muted-foreground font-light">
-          Discover the incredible benefits of learning with ASI-Gyan, where every course is designed to level up your skills and accelerate your career growth.
+          <p className="text-sl max-w-4xl mx-auto leading-relaxed text-muted-foreground font-light">
+          Discover the incredible benefits of learning with ASI-Gyan, where every  course is designed <br/> to level up your skills and accelerate your career growth.
           </p>
         </div>
 
@@ -87,17 +87,17 @@ const AboutUs: React.FC = () => {
 
           {/* Enhanced Right Column (Instructor Card) */}
           <div className="sticky top-8">
-            <div className="bg-card rounded-3xl shadow-2xl border border-border/50 overflow-hidden group hover:shadow-3xl transition-all duration-500">
+            <div className="bg-card rounded-3xl shadow-2xl border border-border/50 overflow-hidden group hover:shadow-2xl transition-all duration-500">
               {/* Instructor Image with overlay */}
               <div className="relative overflow-hidden">
                 <img
                   src="https://media.licdn.com/dms/image/v2/D5603AQHYRbkjdXKbbA/profile-displayphoto-crop_800_800/B56ZlSHNhHHAAI-/0/1758019246994?e=1762387200&v=beta&t=IjdZnUvjSMzM0dOw_RBlvSGP_g0wsKFtJqS9d8aeXbY"
                   alt="Instructor Hemant"
-                  className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-700"
+                  className="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent"></div>
                 <div className="absolute bottom-6 left-6">
-                  <h3 className="text-2xl font-bold text-white mb-2">Hemant</h3>
+                  <h3 className="text-2xl font-xl text-white mb-4">Hemant</h3>
                   <p className="text-white/80">Senior Instructor & Mentor</p>
                 </div>
               </div>
@@ -105,7 +105,7 @@ const AboutUs: React.FC = () => {
               {/* Card Content */}
               <div className="p-8">
                 {/* Journey */}
-                <div className="mb-6">
+                <div className="mb-8">
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     <span className="font-semibold text-foreground">
                       I started my journey:

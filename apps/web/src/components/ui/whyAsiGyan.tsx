@@ -14,18 +14,18 @@ const WhyASIGyan: React.FC = () => {
         {/* Header Section */}
         <div className="text-center mb-12">
           {/* AI for All Stages tag */}
-          <div className="inline-flex items-center px-4 py-2 rounded-full mb-6 bg-primary/10 border border-primary/20">
+          <div className="inline-flex items-center px-4 py-2 rounded-full mb-6 bg-primary/10 border border-primary green/20">
             <span className="text-sm font-medium text-primary">AI for All Stages</span>
           </div>
           
           {/* Main heading */}
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-            Why ASI Gyan?
+            <span className="text-primary"> Why </span> ASI Gyan?
           </h2>
           
           {/* Description */}
-          <p className="text-lg max-w-3xl mx-auto leading-relaxed text-muted-foreground">
-            Discover how our comprehensive AI education platform transforms learning at every stage of your journey.
+          <p className="text-sl max-w-3xl mx-auto leading-relaxed text-muted-foreground">
+            Discover how our comprehensive AI education platform transforms <br/> learning at every stage of your journey.
           </p>
         </div>
 

@@ -63,7 +63,7 @@ const Hero = () => {
 
         {/* Description */}
         <p
-          className="text-white text-base sm:text-lg md:text-xl max-w-3xl leading-relaxed"
+          className="text-white text-base sm:text-sl md:text-sl max-w-2xl leading-relaxed"
           style={{ animation: 'fadeInUp 1.9s ease-out forwards', animationDelay: '0.7s' }}
         >
           {heroContent.description}

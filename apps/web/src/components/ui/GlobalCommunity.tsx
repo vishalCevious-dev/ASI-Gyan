@@ -20,12 +20,12 @@ const GlobalCommunity: React.FC = () => {
           
           {/* Main heading */}
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground" style={{ lineHeight: '1.2' }}>
-            Join a Global Community Shaping <br />The Future of AI
+            Join a Global Community Shaping <br /> <span className="text-primary">The Future of AI </span>
           </h2>
           
           {/* Description */}
-          <p className="text-lg max-w-3xl mx-auto leading-relaxed text-muted-foreground">
-            Connect with learners, professionals, and AI enthusiasts from around the world in our thriving community.
+          <p className="text-sl max-w-3xl mx-auto leading-relaxed text-muted-foreground">
+            Connect with learners, professionals, and AI enthusiasts from around <br/> the world in our thriving community.
           </p>
         </div>
 
@@ -57,7 +57,7 @@ const GlobalCommunity: React.FC = () => {
               <div className="relative flex-1 min-w-[250px] rounded-xl border border-border bg-card p-6">
                 <div className="space-y-6">
                   <p className="text-foreground text-base leading-relaxed">
-                    <strong>55% of our Community</strong> consists of Founders, Working Professionals, Students and More.
+                    <strong> <span className="text-primary text-bold"> 55% of our Community </span> </strong> consists of Founders, Working Professionals, Students and More.
                   </p>
 
                   {/* Bars */}

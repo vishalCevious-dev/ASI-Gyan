@@ -168,8 +168,8 @@ const Testimonials: React.FC = () => {
           </h2>
           
           {/* Description */}
-          <p className="text-lg max-w-3xl mx-auto leading-relaxed text-muted-foreground">
-            Discover what our community members say about their transformative learning experiences with ASI Gyan.
+          <p className="text-sl max-w-3xl mx-auto leading-relaxed text-muted-foreground">
+            Discover what our community members say about their transformative<br/> learning experiences with ASI Gyan.
           </p>
         </div>
 
