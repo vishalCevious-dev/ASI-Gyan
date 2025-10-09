@@ -65,8 +65,8 @@ const About = () => {
   ];
 
   return (
-    <section id="about" className="py-20 bg-background">
-      <div className="max-w-6xl mx-auto px-5 py-16">
+    <section id="about" className="py-12 bg-background">
+      <div className="max-w-5xl mx-auto px-5 py-16">
         {/* Section Header */}
         <div className="text-center mb-16">
           <div className="text-4xl mb-4">🎓</div>
@@ -81,7 +81,7 @@ const About = () => {
         </div>
 
         {/* Values Grid */}
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {values.map((value, index) => (
             <Card
               key={index}

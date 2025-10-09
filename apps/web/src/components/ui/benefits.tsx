@@ -1,96 +1,110 @@
 import React from "react";
+import { motion } from "framer-motion";
+import { Sparkles, Brain, Bot, Layers, Rocket } from "lucide-react";
 
-const Benefits: React.FC = () => {
-  const benefits = [
+function cn(...classes: Array<string | false | null | undefined>) {
+  return classes.filter(Boolean).join(" ");
+}
+
+// Reusable UI components
+function Badge({ children }: { children: React.ReactNode }) {
+  return <span className="inline-block rounded-full bg-primary/10 text-primary border border-primary/20 text-xs px-3 py-1 font-medium">{children}</span>;
+}
+
+function Card({ title, desc, level, icon: Icon }: { title: string; desc: string; level: string; icon: React.ElementType; }) {
+  return (
+    <motion.div
+      whileHover={{ scale: 1.05, y: -4 }}
+      whileTap={{ scale: 0.98 }}
+      viewport={{ once: true, amount: 0.3 }}
+      className="group relative rounded-2xl backdrop-blur-md bg-white/20 dark:bg-black/30 border border-white/30 dark:border-white/10 shadow-lg p-6 transition-all duration-300 hover:shadow-2xl hover:border-primary/40 hover:bg-white/30"
+    >
+      <div className="flex items-center gap-4">
+        <div className="p-3 rounded-xl bg-primary/10 text-primary border border-primary/30">
+          <Icon className="h-6 w-6" />
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold text-foreground mb-1">{title}</h3>
+          <p className="text-sm text-muted-foreground">{desc}</p>
+        </div>
+      </div>
+      <div className="mt-4 flex gap-2 flex-wrap">
+        <Badge>{level}</Badge>
+      </div>
+      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-br from-primary/10 to-secondary/10 blur-xl" />
+    </motion.div>
+  );
+}
+
+export default function CoursesSection() {
+  const courses = [
     {
-      title: "Built by Professionals",
-      description: "Get the best Experience knowing that our Courses are built by Professionals.",
+      title: "AI Foundations",
+      desc: "Learn the core principles of AI, ML, and deep learning.",
+      level: "Beginner",
+      icon: Brain,
     },
     {
-      title: "Completion Certificate",
-      description: "Receive a Completion Award from our Team to enhance your motivation",
+      title: "Prompt Engineering Lab",
+      desc: "Master prompt crafting with practical hands-on tasks.",
+      level: "Prompt Engineering",
+      icon: Bot,
     },
     {
-      title: "Instant Chat Help",
-      description: "Have questions? Reach out for a quick chat—here for you 24/7",
+      title: "Project-Based Learning",
+      desc: "Build interactive AI tools and automation workflows.",
+      level: "Intermediate",
+      icon: Layers,
     },
     {
-      title: "Lifetime Membership",
-      description: "With Just One Payment, you'll get Permanent Access to the Course.",
-    },
-    {
-      title: "Access to Community",
-      description: "Join Our Private Community to Connect with Like-Minded Individuals and Grow Together.",
-    },
-    {
-      title: "Download for Offline Use",
-      description: "Our courses can be downloaded, so you can watch them anytime, anywhere.",
+      title: "Capstone Challenge",
+      desc: "Solve real-world problems and showcase your portfolio.",
+      level: "Advanced",
+      icon: Rocket,
     },
   ];
 
   return (
-    <section className="relative py-16 px-5 overflow-hidden bg-background">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/20 to-background"></div>
-      
-      {/* Decorative elements */}
-      <div className="absolute top-20 left-10 w-20 h-20 rounded-full opacity-30 blur-xl bg-primary/20"></div>
-      <div className="absolute bottom-20 right-10 w-32 h-32 rounded-full opacity-30 blur-xl bg-secondary/20"></div>
-      
-      <div className="relative max-w-6xl mx-auto">
-        {/* Header Section */}
-        <div className="text-center mb-12">
-          {/* Benefits tag */}
-          <div className="inline-flex items-center px-4 py-2 rounded-full mb-6 bg-primary/10 border border-primary/20">
-            <span className="text-sm font-medium text-primary">Benefits</span>
-          </div>
-          
-          {/* Main heading */}
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-            Key Benefits of <span className="text-primary">Courses</span>
-          </h2>
-          
-          {/* Description */}
-          <p className="text-sl max-w-3xl mx-auto leading-relaxed text-muted-foreground">
-            Explore the incredible advantages of enrolling in our courses and <br/>enhancing your skills for the ultimate career success.
-          </p>
-        </div>
+    <section className="relative py-20 px-5 overflow-hidden bg-background">
+      {/* Background visuals */}
+      <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/20 to-background" />
+      <div className="absolute top-10 left-20 w-40 h-40 rounded-full bg-primary/20 blur-3xl opacity-30 animate-pulse" />
+      <div className="absolute bottom-10 right-20 w-64 h-64 rounded-full bg-secondary/20 blur-3xl opacity-30 animate-pulse" />
 
-        {/* Benefits Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {benefits.map((benefit, index) => (
-            <div
-              key={index}
-              className="group relative border border-border rounded-2xl p-6 bg-card text-foreground hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
-            >
-              {/* Icon */}
-              <div className="w-12 h-12 rounded-lg mb-4 flex items-center justify-center bg-muted
-                            transition-all duration-300 ease-out
-                            group-hover:bg-primary/20 group-hover:scale-110">
-                <div className="w-6 h-6 rounded bg-primary/60 
-                              transition-all duration-300 ease-out
-                              group-hover:bg-primary group-hover:scale-110"></div>
-              </div>
-              
-              {/* Title */}
-              <h3 className="text-xl font-bold mb-3 text-foreground
-                            transition-colors duration-300 ease-out
-                            group-hover:text-primary">
-                {benefit.title}
-              </h3>
-              
-              {/* Description */}
-              <p className="text-sm  leading-relaxed text-muted-foreground
-                          transition-colors duration-300 ease-out
-                          group-hover:text-foreground/90">
-                {benefit.description}
-              </p>
-            </div>
-          ))}
+      <div className="relative max-w-6xl mx-auto text-center mb-14">
+        <div className="inline-flex items-center gap-2 mb-4 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm text-primary">
+          <Sparkles className="h-4 w-4" /> Structured Courses
         </div>
+        <h2 className="text-3xl md:text-4xl font-bold mb-3">Structured Courses for Real AI Skills</h2>
+        <p className="text-muted-foreground max-w-2xl mx-auto">
+          Learn AI step-by-step with interactive labs, guided projects, and skill-level badges.
+        </p>
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        viewport={{ once: true }}
+        className="relative grid gap-6 sm:grid-cols-2 lg:grid-cols-4 px-4"
+      >
+        {courses.map((course, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.15, duration: 0.6 }}
+          >
+            <Card {...course} />
+          </motion.div>
+        ))}
+      </motion.div>
+
+      <div className="relative mt-12 text-center">
+        <button className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:shadow-lg hover:scale-105 transition-transform">
+          Explore All Courses
+        </button>
       </div>
     </section>
   );
-};
-
-export default Benefits;
+}
