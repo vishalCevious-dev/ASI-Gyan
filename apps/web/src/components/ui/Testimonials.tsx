@@ -141,12 +141,12 @@ const Testimonials: React.FC = () => {
     {
       name: "Twinkle Soni",
       content:
-        "Thank you. The last two days have been incredible and today towards the end the things did become overwhelming. The sessions were great and valuable.",
+        "Thank you. The last two days have been incredible and today towards the end the things did become overwhelming.",
     },
   ];
 
   return (
-    <section className="relative py-16 px-5 overflow-hidden bg-background">
+    <section className="relative py-12 px-5 overflow-hidden bg-background">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/20 to-background"></div>
       

@@ -2,7 +2,7 @@ import React from "react";
 
 const GlobalCommunity: React.FC = () => {
   return (
-    <section className="relative py-16 px-5 overflow-hidden bg-background">
+    <section className="relative py-10 px-5 overflow-hidden bg-background">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/20 to-background"></div>
       
@@ -30,7 +30,7 @@ const GlobalCommunity: React.FC = () => {
         </div>
 
         {/* Main Content */}
-        <div className="flex flex-col lg:flex-row gap-8 justify-center w-full">
+        <div className="flex flex-col lg:flex-row gap-6 justify-center w-full">
           {/* Left Image */}
           <div className="relative flex-1 min-w-[300px] rounded-xl overflow-hidden border border-border aspect-[4/3]">
             <img
@@ -52,7 +52,7 @@ const GlobalCommunity: React.FC = () => {
             </div>
 
             {/* Experience Cards */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-6">
               {/* Main Experience Card */}
               <div className="relative flex-1 min-w-[250px] rounded-xl border border-border bg-card p-6">
                 <div className="space-y-6">

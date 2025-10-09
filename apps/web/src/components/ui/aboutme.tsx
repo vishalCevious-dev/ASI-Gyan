@@ -26,7 +26,7 @@ const AboutUs: React.FC = () => {
   ];
 
   return (
-    <section className="relative py-16 px-5 overflow-hidden bg-background">
+    <section className="relative py-12 px-5 overflow-hidden bg-background">
       {/* Enhanced Background with animated gradients */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/10 to-background"></div>
       <div className="absolute top-0 left-0 w-72 h-72 bg-primary/5 rounded-full blur-3xl animate-pulse"></div>
@@ -36,9 +36,9 @@ const AboutUs: React.FC = () => {
       <div className="absolute top-0 left-10 w-20 h-20 rounded-full opacity-40 blur-xl bg-primary/20 animate-bounce"></div>
       <div className="absolute bottom-20 right-10 w-32 h-32 rounded-full opacity-40 blur-xl bg-secondary/20 animate-bounce delay-1000"></div>
       
-      <div className="relative max-w-7xl mx-auto">
+      <div className="relative max-w-6xl mx-auto">
         {/* Enhanced Header Section */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           {/* About Me tag */}
           <div className="inline-flex items-center px-6 py-3 rounded-full mb-8 bg-primary/10 border border-primary/20 shadow-sm">
             <div className="w-2 h-2 rounded-full bg-primary mr-3 animate-ping"></div>
@@ -46,7 +46,7 @@ const AboutUs: React.FC = () => {
           </div>
           
           {/* Main heading */}
-          <h2 className="text-5xl md:text-6xl font-bold mb-8 text-foreground bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+          <h2 className="text-5xl md:text-5xl font-bold mb-8 text-foreground bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
              Why <span className="text-primary">ASI-Gyan?</span>
           </h2>
           
@@ -56,15 +56,15 @@ const AboutUs: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 items-start">
+        <div className="grid lg:grid-cols-2 gap-6 items-start">
           {/* Left Column (Benefits) */}
           <div className="space-y-8">
             {/* Enhanced Benefits Grid */}
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 gap-6">
               {benefits.map((benefit, i) => (
                 <div
                   key={i}
-                  className="group relative rounded-2xl p-8 bg-card border border-border/50 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
+                  className="group relative rounded-2xl p-6 bg-card border border-border/50 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
                 >
                   {/* Background glow effect */}
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -103,7 +103,7 @@ const AboutUs: React.FC = () => {
               </div>
 
               {/* Card Content */}
-              <div className="p-8">
+              <div className="p-6">
                 {/* Journey */}
                 <div className="mb-8">
                   <p className="text-sm text-muted-foreground leading-relaxed">
@@ -127,7 +127,7 @@ const AboutUs: React.FC = () => {
                 </div>
 
                 {/* Social Links */}
-                <div className="flex gap-3 mb-8">
+                <div className="flex gap-6 mb-8">
                   <a
                     href="#"
                     className="w-12 h-12 flex items-center justify-center rounded-xl bg-muted hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110 shadow-sm"

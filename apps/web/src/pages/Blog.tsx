@@ -100,7 +100,7 @@ function BlogListPage() {
       <Header />
       
       {/* Hero Section */}
-      <section className="py-20 bg-space-depth">
+      <section className="py-14 bg-space-depth">
         <div className="container mx-auto px-6 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-cyber-sheen bg-clip-text text-transparent">
             AI Learning Blog
