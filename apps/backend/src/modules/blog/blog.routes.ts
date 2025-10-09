@@ -12,6 +12,8 @@ import {
   deletePost,
   getPostBySlug,
   listPosts,
+  adminListPosts,
+  adminGetPost,
   updatePost,
 } from "./blog.controller";
 import { uploadBlogImage } from "../../middlewares/upload.middleware";
@@ -19,12 +21,23 @@ import { UserRole } from "../../constants";
 
 const router = Router();
 
+// Admin routes (must be defined BEFORE slug route to avoid collision)
+router.get(
+  "/admin",
+  authMiddleware,
+  rbac(UserRole.Admin),
+  asyncHandler(adminListPosts),
+);
+router.get(
+  "/admin/:id",
+  authMiddleware,
+  rbac(UserRole.Admin),
+  asyncHandler(adminGetPost),
+);
+
 // Public routes
 router.get("/", asyncHandler(listPosts));
 router.get("/:slug", asyncHandler(getPostBySlug));
-
-// Admin routes
-// Accept multipart/form-data with optional image field for cover image
 router.post(
   "/add",
   authMiddleware,

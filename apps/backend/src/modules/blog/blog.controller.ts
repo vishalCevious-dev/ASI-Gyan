@@ -83,6 +83,71 @@ export const listPosts = async (req: Request, res: Response) => {
   }
 };
 
+// Admin: list posts including drafts, optional status filter
+export const adminListPosts = async (req: Request, res: Response) => {
+  try {
+    const page = Math.max(parseInt(req.query.page as string) || 1, 1);
+    const limit = Math.min(
+      Math.max(parseInt(req.query.limit as string) || 10, 1),
+      50,
+    );
+    const offset = (page - 1) * limit;
+
+    const status = (req.query.status as "DRAFT" | "PUBLISHED" | undefined) || undefined;
+
+    const baseCond = and(eq(Blog.isDeleted, false));
+
+    const whereCond = status
+      ? and(baseCond, eq(Blog.status, status))
+      : baseCond;
+
+    const posts = await db
+      .select({
+        id: Blog.id,
+        title: Blog.title,
+        slug: Blog.slug,
+        excerpt: Blog.excerpt,
+        coverImageUrl: Blog.coverImageUrl,
+        videoUrl: Blog.videoUrl,
+        category: Blog.category,
+        tags: Blog.tags,
+        status: Blog.status,
+        createdAt: Blog.createdAt,
+        updatedAt: Blog.updatedAt,
+      })
+      .from(Blog)
+      .where(whereCond)
+      .orderBy(desc(Blog.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    const [{ count }] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(Blog)
+      .where(whereCond);
+
+    res.status(200).json(
+      ApiResponse(
+        200,
+        {
+          data: posts,
+          pagination: {
+            page,
+            limit,
+            total: count,
+            pages: Math.ceil(count / limit),
+          },
+        },
+        "Posts fetched",
+      ),
+    );
+    return;
+  } catch (err) {
+    res.status(500).json(ApiError(500, "Failed to fetch posts", req));
+    return;
+  }
+};
+
 export const getPostBySlug = async (req: Request, res: Response) => {
   try {
     const { slug } = req.params;
@@ -99,6 +164,34 @@ export const getPostBySlug = async (req: Request, res: Response) => {
     );
 
     const [post] = await db.select().from(Blog).where(condition).limit(1);
+
+    if (!post) {
+      res.status(404).json(ApiError(404, "Post not found", req));
+      return;
+    }
+
+    res.status(200).json(ApiResponse(200, post, "Post fetched"));
+    return;
+  } catch (err) {
+    res.status(500).json(ApiError(500, "Failed to fetch post", req));
+    return;
+  }
+};
+
+// Admin: get a single post (draft or published) by id
+export const adminGetPost = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      res.status(400).json(ApiError(400, "Id is required", req));
+      return;
+    }
+
+    const [post] = await db
+      .select()
+      .from(Blog)
+      .where(and(eq(Blog.id, id), eq(Blog.isDeleted, false)))
+      .limit(1);
 
     if (!post) {
       res.status(404).json(ApiError(404, "Post not found", req));
@@ -285,7 +378,14 @@ export const updatePost = async (req: Request, res: Response) => {
     }
 
     const [currentPost] = await db
-      .select({ coverImageUrl: Blog.coverImageUrl })
+      .select({
+        coverImageUrl: Blog.coverImageUrl,
+        slug: Blog.slug,
+        title: Blog.title,
+        excerpt: Blog.excerpt,
+        content: Blog.content,
+        status: Blog.status,
+      })
       .from(Blog)
       .where(eq(Blog.id, id))
       .limit(1);
@@ -306,6 +406,35 @@ export const updatePost = async (req: Request, res: Response) => {
       if (file) deleteFile(file.path); // cleanup new file
       res.status(404).json(ApiError(404, "Post not found", req));
       return;
+    }
+
+    // If transitioning from DRAFT -> PUBLISHED, send newsletter notification
+    if (
+      currentPost &&
+      currentPost.status !== "PUBLISHED" &&
+      updates.status === "PUBLISHED"
+    ) {
+      try {
+        const titleForEmail = updates.title ?? currentPost.title;
+        const excerptForEmail =
+          updates.excerpt ?? currentPost.excerpt ?? "";
+        const contentForEmail = updates.content ?? currentPost.content ?? "";
+        const preview =
+          excerptForEmail ||
+          (typeof contentForEmail === "string"
+            ? contentForEmail.substring(0, 200) + "..."
+            : "");
+        const blogUrl = `${EnvSecret.BASE_URL}/blog/${result.slug}`;
+        await sendNewsletterNotificationForNewContent(
+          "blog",
+          titleForEmail,
+          preview,
+          blogUrl,
+        );
+      } catch (error) {
+        console.error("Error sending newsletter notification:", error);
+        // Do not fail the request if email sending fails
+      }
     }
 
     res.status(200).json(ApiResponse(200, result, "Post updated"));
