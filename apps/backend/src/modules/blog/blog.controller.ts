@@ -321,19 +321,16 @@ export const deletePost = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    // Soft-delete: mark as deleted instead of removing
-    const [result] = await db
-      .update(Blog)
-      .set({ isDeleted: true, updatedAt: new Date() })
-      .where(eq(Blog.id, id))
-      .returning({ id: Blog.id, isDeleted: Blog.isDeleted });
+    // Hard-delete: use raw query
+    const result = await db
+      .execute(sql`DELETE FROM Blog WHERE id = ${id}`);
 
-    if (!result) {
+    if (result.rowCount === 0) {
       res.status(404).json(ApiError(404, "Post not found", req));
       return;
     }
 
-    res.status(200).json(ApiResponse(200, result, "Post deleted"));
+    res.status(200).json(ApiResponse(200, { id }, "Post deleted"));
     return;
   } catch (err) {
     res.status(500).json(ApiError(500, "Failed to delete post", req));
