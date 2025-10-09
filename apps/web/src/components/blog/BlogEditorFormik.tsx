@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Save, Send } from "lucide-react";
+import { ArrowLeft, Save, Send, X } from "lucide-react";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import QuillEditor from "@/components/editor/QuillEditor";
 import { slugify } from "@/lib/slug";
@@ -26,28 +26,43 @@ import { validateImageFile } from "@/validation/file";
 import { useToast } from "@/components/ui/use-toast";
 import { useBlogMutation } from "@/hooks/useBlogMutations";
 
-type PostPreview = {
-  id: number;
+type FullPost = {
+  id: string;
   title: string;
-  excerpt: string;
-  author: string;
-  status: string;
-  category: string;
+  slug: string;
+  excerpt?: string;
+  content?: string;
+  coverImageUrl?: string | null;
+  videoUrl?: string | null;
+  metaDescription?: string | null;
+  status: "DRAFT" | "PUBLISHED";
+  category?: string;
+  tags?: string[];
+  author?: string;
 } | null;
 
 export default function BlogEditorFormik({
   post,
   onClose,
 }: {
-  post: PostPreview;
+  post: FullPost;
   onClose: () => void;
 }) {
   const { toast } = useToast();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState("");
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
+  const [removeExistingImage, setRemoveExistingImage] = useState(false);
   const [tagsInput, setTagsInput] = useState("");
   const [metaEdited, setMetaEdited] = useState(false);
   const { mutate, isPending } = useBlogMutation(() => onClose());
+
+  // Set existing image when post is loaded
+  useEffect(() => {
+    if (post?.coverImageUrl) {
+      setExistingImageUrl(post.coverImageUrl);
+    }
+  }, [post?.coverImageUrl]);
 
   const {
     values,
@@ -62,14 +77,14 @@ export default function BlogEditorFormik({
   } = useFormik({
     initialValues: {
       title: post?.title || "",
-      slug: slugify(post?.title || ""),
+      slug: post?.slug || slugify(post?.title || ""),
       excerpt: post?.excerpt || "",
-      metaDescription: post?.excerpt || "",
-      videoUrl: "",
-      content: "",
-      status: "DRAFT" as "DRAFT" | "PUBLISHED",
+      metaDescription: post?.metaDescription || post?.excerpt || "",
+      videoUrl: post?.videoUrl || "",
+      content: post?.content || "",
+      status: post?.status || ("DRAFT" as "DRAFT" | "PUBLISHED"),
       category: post?.category || "",
-      tags: [] as string[],
+      tags: (post?.tags || []) as string[],
     },
     validateOnChange: true,
     validate: (v) => {
@@ -131,13 +146,27 @@ export default function BlogEditorFormik({
         console.error(parsed.error);
         const m = parsed.error.issues[0]?.message || "Invalid form input";
         toast({
-          title: "Validation failed 1",
+          title: "Validation failed",
           description: m,
           variant: "destructive",
         });
         return;
       }
-      mutate({ path: "create", ...parsed.data, image: imageFile || undefined });
+      
+      // Check if we're editing or creating
+      if (post?.id) {
+        // Update existing post
+        mutate({ 
+          path: "update", 
+          id: post.id,
+          ...parsed.data, 
+          image: imageFile || undefined,
+          removeImage: removeExistingImage
+        });
+      } else {
+        // Create new post
+        mutate({ path: "create", ...parsed.data, image: imageFile || undefined });
+      }
     },
   });
 
@@ -316,16 +345,71 @@ export default function BlogEditorFormik({
                     const f = e.target.files?.[0] || null;
                     setImageFile(f);
                     setImagePreview(f ? URL.createObjectURL(f) : "");
+                    if (f) {
+                      setRemoveExistingImage(false);
+                    }
                   }}
                   className="bg-input border-primary/20"
                 />
                 {imagePreview && (
-                  <div className="mt-4">
+                  <div className="mt-4 relative">
                     <ImageWithFallback
                       src={imagePreview}
                       alt="Featured image preview"
                       className="w-full h-48 object-cover rounded-lg border border-primary/20"
                     />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-2 right-2"
+                      onClick={() => {
+                        setImageFile(null);
+                        setImagePreview("");
+                      }}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+                {!imagePreview && existingImageUrl && !removeExistingImage && (
+                  <div className="mt-4 relative">
+                    <ImageWithFallback
+                      src={existingImageUrl}
+                      alt="Current featured image"
+                      className="w-full h-48 object-cover rounded-lg border border-primary/20"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-2 right-2"
+                      onClick={() => {
+                        setRemoveExistingImage(true);
+                        setExistingImageUrl(null);
+                      }}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                    <p className="text-sm text-muted-foreground mt-2">Current image (upload a new one to replace)</p>
+                  </div>
+                )}
+                {removeExistingImage && !imagePreview && (
+                  <div className="mt-2">
+                    <p className="text-sm text-muted-foreground">Image will be removed when you save</p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setRemoveExistingImage(false);
+                        if (post?.coverImageUrl) {
+                          setExistingImageUrl(post.coverImageUrl);
+                        }
+                      }}
+                    >
+                      Undo
+                    </Button>
                   </div>
                 )}
               </div>

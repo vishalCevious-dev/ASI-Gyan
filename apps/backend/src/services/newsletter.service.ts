@@ -1,7 +1,7 @@
-import { db } from "src/config/db";
-import { NewsletterSubscribers } from "src/model/newsletter.model";
+import { db } from "../config/db";
+import { NewsletterSubscribers } from "../model/newsletter.model";
 import { eq } from "drizzle-orm";
-import { sendBulkNewsletterNotification } from "src/utils/sendMail";
+import { sendBulkNewsletterNotification } from "../utils/sendMail";
 
 export const sendNewsletterNotificationForNewContent = async (
   contentType: "blog" | "gallery" | "course",

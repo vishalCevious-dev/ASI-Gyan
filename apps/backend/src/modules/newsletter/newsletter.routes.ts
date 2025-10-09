@@ -4,12 +4,12 @@ import {
   unsubscribeNewsletter,
   getAllSubscribers,
   getSubscriberCount,
-} from "src/modules/newsletter/newsletter.controller";
-import { validateBody } from "src/middlewares/validateBody.middleware";
-import { subscribeNewsletterSchema, unsubscribeNewsletterSchema } from "src/validation/newsletter.validation";
-import { authMiddleware } from "src/middlewares/auth.middleware";
-import { rbac } from "src/middlewares/rbac.middleware";
-import { UserRole } from "src/constants";
+} from "./newsletter.controller";
+import { validateBody } from "../../middlewares/validateBody.middleware";
+import { subscribeNewsletterSchema, unsubscribeNewsletterSchema } from "../../validation/newsletter.validation";
+import { authMiddleware } from "../../middlewares/auth.middleware";
+import { rbac } from "../../middlewares/rbac.middleware";
+import { UserRole } from "../../constants";
 
 const router = Router();
 

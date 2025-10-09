@@ -7,7 +7,7 @@ import {
   pgEnum,
   boolean,
 } from "drizzle-orm/pg-core";
-import { Users } from "src/model/user.model";
+import { Users } from "./user.model";
 
 export const blogStatusEnum = pgEnum("blog_status", ["DRAFT", "PUBLISHED"]);
 

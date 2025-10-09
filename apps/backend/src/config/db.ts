@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import EnvSecret, { EApplicationEnviroment } from "src/constants/envVariables";
+import EnvSecret, { EApplicationEnviroment } from "../constants/envVariables";
 
 // Initialize the connection pool with Neon DB connection string
 const pool = new Pool({

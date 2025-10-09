@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import EnvSecret from "src/constants/envVariables";
+import EnvSecret from "../constants/envVariables";
 
 // Create transporter only if email credentials are available
 const createTransporter = () => {

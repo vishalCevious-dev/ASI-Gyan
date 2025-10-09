@@ -1,19 +1,19 @@
 import { Request, Response } from "express";
 import { and, desc, eq, sql } from "drizzle-orm";
-import { db } from "src/config/db";
-import { Gallery } from "src/model/gallery.model";
-import { ApiError } from "src/utils/ApiError";
-import { ApiResponse } from "src/utils/ApiResponse";
+import { db } from "../../config/db";
+import { Gallery } from "../../model/gallery.model";
+import { ApiError } from "../../utils/ApiError";
+import { ApiResponse } from "../../utils/ApiResponse";
 import {
   deleteFile,
   makeMediaUploader,
   resolvePublicFilePath,
   type MultiMulterRequest,
-} from "src/middlewares/upload.middleware";
-import { buildFileUrl } from "src/utils/url";
-import { detectVideoInfo, isValidVideoUrl } from "src/utils/videoDetection";
-import { sendNewsletterNotificationForNewContent } from "src/services/newsletter.service";
-import EnvSecret from "src/constants/envVariables";
+} from "../../middlewares/upload.middleware";
+import { buildFileUrl } from "../../utils/url";
+import { detectVideoInfo, isValidVideoUrl } from "../../utils/videoDetection";
+import { sendNewsletterNotificationForNewContent } from "../../services/newsletter.service";
+import EnvSecret from "../../constants/envVariables";
 
 export const uploadGalleryMedia = makeMediaUploader({ folder: "gallery" });
 

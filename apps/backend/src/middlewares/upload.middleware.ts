@@ -1,7 +1,7 @@
 import path from "node:path";
 import fs from "node:fs";
 import multer from "multer";
-import EnvSecret from "src/constants/envVariables";
+import EnvSecret from "../constants/envVariables";
 
 type UploaderOptions = {
   folder?: string;

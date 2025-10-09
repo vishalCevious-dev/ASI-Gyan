@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import OpenAI from "openai";
-import EnvSecret from "src/constants/envVariables";
+import EnvSecret from "../../constants/envVariables";
 
 type ChatMessage = {
   role: "system" | "user" | "assistant";

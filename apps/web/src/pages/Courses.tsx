@@ -239,7 +239,19 @@ function CoursesListPage() {
                   const firstImage = course.images && course.images.length > 0 ? course.images[0] : null;
                   
                   return (
-                    <Card key={course.id} className="group hover:shadow-glow-green transition-all duration-300 cursor-pointer overflow-hidden border border-border/50 hover:border-primary/50">
+                    <Card
+                      key={course.id}
+                      className="group hover:shadow-glow-green transition-all duration-300 cursor-pointer overflow-hidden border border-border/50 hover:border-primary/50"
+                      onClick={() => navigate(`/courses/${slugify(course.title)}`)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          navigate(`/courses/${slugify(course.title)}`);
+                        }
+                      }}
+                    >
                       <div className="aspect-video bg-muted rounded-t-lg mb-4 overflow-hidden relative">
                         {firstImage ? (
                           <img 

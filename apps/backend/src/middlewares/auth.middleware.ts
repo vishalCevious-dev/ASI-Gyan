@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { Users } from "src/model/user.model";
-import { db } from "src/config/db";
+import { Users } from "../model/user.model";
+import { db } from "../config/db";
 import { eq } from "drizzle-orm";
-import EnvSecret from "src/constants/envVariables";
+import EnvSecret from "../constants/envVariables";
 
 export const authMiddleware = async (
   req: Request,

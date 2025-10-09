@@ -1,8 +1,8 @@
 import express, { Application } from "express";
 import cors, { CorsOptions } from "cors";
 import cookieParser from "cookie-parser";
-import { errorHandler } from "src/middlewares/error.middleware";
-import apiRoutes from "src/modules/index.routes";
+import { errorHandler } from "./middlewares/error.middleware";
+import apiRoutes from "./modules/index.routes";
 import helmet from "helmet";
 import path from "node:path";
 import EnvSecret from "./constants/envVariables";
