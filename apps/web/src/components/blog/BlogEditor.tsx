@@ -159,7 +159,10 @@ export function BlogEditor({ post, onClose }: BlogEditorProps) {
       }
       if (featuredImageFile) fd.append("image", featuredImageFile);
 
-      mutate({ path: "/blog/add", formData: fd });
+      const path = post ? `/blog/update/${post.id}` : "/blog/add";
+      const method = post ? "PUT" : "POST";
+
+      mutate({ path, method, formData: fd });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       console.error("[BlogEditor] Create failed", e);

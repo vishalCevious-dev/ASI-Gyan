@@ -253,7 +253,20 @@ function BlogListPage() {
               <div className="grid md:grid-cols-2 gap-8">
                 {filteredPosts.map(post => {
                   return (
-                    <Card key={post.id} className="group hover:shadow-glow-green transition-all duration-300 cursor-pointer overflow-hidden border border-border/50 hover:border-primary/50">
+                    <Card
+                      key={post.id}
+                      className="group hover:shadow-glow-green transition-all duration-300 cursor-pointer overflow-hidden border border-border/50 hover:border-primary/50"
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Open post ${post.title}`}
+                      onClick={() => navigate(`/blog/${post.slug || slugify(post.title)}`)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          navigate(`/blog/${post.slug || slugify(post.title)}`);
+                        }
+                      }}
+                    >
                       <div className="aspect-video bg-muted rounded-t-lg mb-4 overflow-hidden relative">
                         {post.coverImageUrl ? (
                           <img 
@@ -328,7 +341,10 @@ function BlogListPage() {
                         </div>
                         
                         <Button 
-                          onClick={() => navigate(`/blog/${slugify(post.title)}`)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/blog/${post.slug || slugify(post.title)}`);
+                          }}
                           className="group-hover:shadow-glow-green"
                         >
                           Read More

@@ -38,13 +38,24 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 import BlogEditorFormik from "./BlogEditorFormik";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { blogApi } from "@/lib/api";
+import { useBlogMutation } from "@/hooks/useBlogMutations";
+import { toast } from "sonner";
 
 type UIPost = {
   id: string;
   title: string;
+  slug?: string;
   excerpt?: string;
   author: string;
   authorAvatar: string;
@@ -53,6 +64,21 @@ type UIPost = {
   views: number;
   category: string;
   readTime?: string;
+};
+
+type FullPost = {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  content?: string;
+  coverImageUrl?: string | null;
+  videoUrl?: string | null;
+  metaDescription?: string | null;
+  status: "DRAFT" | "PUBLISHED";
+  category?: string;
+  tags?: string[];
+  author?: string;
 };
 
 const stats = [
@@ -74,18 +100,21 @@ const stats = [
 
 export function Blog() {
   const [showEditor, setShowEditor] = useState(false);
-  const [editingPost, setEditingPost] = useState<{
-    id: number;
-    title: string;
-    excerpt: string;
-    author: string;
-    status: string;
-    category: string;
-  } | null>(null);
+  const [editingPost, setEditingPost] = useState<FullPost | null>(null);
+  const [loadingPostSlug, setLoadingPostSlug] = useState<string | null>(null);
 
   // Pagination state
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+
+  // Delete confirmation state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<UIPost | null>(null);
+
+  // Blog mutations
+  const { mutate: deleteBlog, isPending: isDeleting } = useBlogMutation(() => {
+    toast.success("Blog post deleted successfully");
+  });
 
   // Load posts from API
   const { data, isLoading } = useQuery({
@@ -100,6 +129,7 @@ export function Blog() {
     return arr.map((p: any) => ({
       id: String(p.id),
       title: p.title,
+      slug: p.slug,
       excerpt: p.excerpt || "",
       author: p.author || "—",
       authorAvatar: (p.author || "—").slice(0, 2).toUpperCase(),
@@ -121,22 +151,71 @@ export function Blog() {
     setShowEditor(true);
   };
 
-  const handleEditPost = (post: UIPost) => {
-    // Map to editor preview shape expected by BlogEditorFormik
-    setEditingPost({
-      id: Number.isFinite(Number(post.id)) ? Number(post.id) : 0,
-      title: post.title,
-      excerpt: post.excerpt || "",
-      author: post.author || "—",
-      status: post.status,
-      category: post.category || "-",
-    });
-    setShowEditor(true);
+  const handleEditPost = async (post: UIPost) => {
+    if (!post.slug) {
+      toast.error("Cannot edit post without slug");
+      return;
+    }
+    
+    try {
+      setLoadingPostSlug(post.slug);
+      // Fetch full post data by slug
+      const response = await blogApi.getBySlug(post.slug);
+      const fullPost = response.data;
+      
+      setEditingPost({
+        id: String(fullPost.id),
+        title: fullPost.title,
+        slug: fullPost.slug,
+        excerpt: fullPost.excerpt || "",
+        content: fullPost.content || "",
+        coverImageUrl: fullPost.coverImageUrl,
+        videoUrl: fullPost.videoUrl || "",
+        metaDescription: fullPost.metaDescription || "",
+        status: fullPost.status,
+        category: (fullPost as any).category || "",
+        tags: (fullPost as any).tags || [],
+        author: (fullPost as any).author || "",
+      });
+      setShowEditor(true);
+    } catch (error) {
+      console.error("Failed to fetch post:", error);
+      toast.error("Failed to load post data");
+    } finally {
+      setLoadingPostSlug(null);
+    }
   };
 
   const handleCloseEditor = () => {
     setShowEditor(false);
     setEditingPost(null);
+  };
+
+  const handleDeletePost = (post: UIPost) => {
+    setPostToDelete(post);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (postToDelete) {
+      deleteBlog({
+        path: "delete",
+        id: postToDelete.id,
+      });
+      setDeleteDialogOpen(false);
+      setPostToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteDialogOpen(false);
+    setPostToDelete(null);
+  };
+
+  const handlePreviewPost = (post: UIPost) => {
+    // Open the blog post in a new tab using the slug
+    const blogUrl = post.slug ? `/blog/${post.slug}` : `/blog/${post.id}`;
+    window.open(blogUrl, '_blank');
   };
 
   if (showEditor) {
@@ -410,20 +489,28 @@ export function Blog() {
                           align="end"
                           className="glassmorphism border-primary/20"
                         >
-                          <DropdownMenuItem className="hover:bg-accent/20">
+                          <DropdownMenuItem 
+                            className="hover:bg-accent/20"
+                            onClick={() => handlePreviewPost(post)}
+                          >
                             <Eye className="w-4 h-4 mr-2" />
                             Preview
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="hover:bg-accent/20"
                             onClick={() => handleEditPost(post)}
+                            disabled={loadingPostSlug === post.slug}
                           >
                             <Edit className="w-4 h-4 mr-2" />
-                            Edit
+                            {loadingPostSlug === post.slug ? "Loading..." : "Edit"}
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="hover:bg-accent/20 text-chart-4">
+                          <DropdownMenuItem 
+                            className="hover:bg-accent/20 text-chart-4"
+                            onClick={() => handleDeletePost(post)}
+                            disabled={isDeleting}
+                          >
                             <Trash2 className="w-4 h-4 mr-2" />
-                            Delete
+                            {isDeleting ? "Deleting..." : "Delete"}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -471,6 +558,34 @@ export function Blog() {
           </div>
         </CardContent>
       </Card> */}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent className="glassmorphism border-primary/20">
+          <DialogHeader>
+            <DialogTitle className="text-destructive">Delete Blog Post</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{postToDelete?.title}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={cancelDelete}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
