@@ -29,6 +29,7 @@ import {
   Trash2,
   MoreHorizontal,
   Calendar,
+  Send,
   // TrendingUp,
   // Clock
 } from "lucide-react";
@@ -81,22 +82,7 @@ type FullPost = {
   author?: string;
 };
 
-const stats = [
-  { label: "Total Posts", value: "247", change: "+12", color: "text-mute-foreground" },
-  {
-    label: "Published",
-    value: "189",
-    change: "+8",
-    color: "text-mute-foreground",
-  },
-  { label: "Drafts", value: "42", change: "+3", color: "text-chart-4" },
-  {
-    label: "Total Views",
-    value: "156.2K",
-    change: "+24%",
-    color: "text-chart-5",
-  },
-];
+// Stats will be computed live using API pagination totals
 
 export function Blog() {
   const [showEditor, setShowEditor] = useState(false);
@@ -115,14 +101,57 @@ export function Blog() {
   const { mutate: deleteBlog, isPending: isDeleting } = useBlogMutation(() => {
     toast.success("Blog post deleted successfully");
   });
+  const { mutate: updateBlog, isPending: isUpdating } = useBlogMutation(() => {
+    toast.success("Post published successfully");
+  });
 
   // Load posts from API
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "DRAFT" | "PUBLISHED">("ALL");
+
   const { data, isLoading } = useQuery({
-    queryKey: ["blog", "list", page, limit],
-    queryFn: () => blogApi.list(page, limit),
+    queryKey: ["blog", "admin-list", page, limit, statusFilter],
+    queryFn: () =>
+      statusFilter === "ALL"
+        ? blogApi.adminList(page, limit)
+        : blogApi.adminList(page, limit, statusFilter),
     staleTime: 60_000,
     placeholderData: keepPreviousData,
   });
+
+  // Live counts for stats widgets (use limit=1 to read only totals)
+  const { data: allCountData } = useQuery({
+    queryKey: ["blog", "admin-count", "ALL"],
+    queryFn: () => blogApi.adminList(1, 1),
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
+  });
+  const { data: publishedCountData } = useQuery({
+    queryKey: ["blog", "admin-count", "PUBLISHED"],
+    queryFn: () => blogApi.adminList(1, 1, "PUBLISHED"),
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
+  });
+  const { data: draftCountData } = useQuery({
+    queryKey: ["blog", "admin-count", "DRAFT"],
+    queryFn: () => blogApi.adminList(1, 1, "DRAFT"),
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
+  });
+
+  const totalCount = allCountData?.data?.pagination?.total ?? 0;
+  const publishedCount = publishedCountData?.data?.pagination?.total ?? 0;
+  const draftCount = draftCountData?.data?.pagination?.total ?? 0;
+
+  const stats = useMemo(
+    () => [
+      { label: "Total Posts", value: String(totalCount), color: "text-mute-foreground" } as const,
+      { label: "Published", value: String(publishedCount), color: "text-mute-foreground" } as const,
+      { label: "Drafts", value: String(draftCount), color: "text-chart-4" } as const,
+      // Views not tracked in backend yet
+      { label: "Total Views", value: "-", color: "text-chart-5" } as const,
+    ],
+    [totalCount, publishedCount, draftCount],
+  );
 
   const blogPosts: UIPost[] = useMemo(() => {
     const arr = (data?.data?.data as any[]) || [];
@@ -196,6 +225,10 @@ export function Blog() {
     setDeleteDialogOpen(true);
   };
 
+  const handlePublish = (post: UIPost) => {
+    updateBlog({ path: "update", id: post.id, status: "PUBLISHED" as any });
+  };
+
   const confirmDelete = () => {
     if (postToDelete) {
       deleteBlog({
@@ -226,13 +259,26 @@ export function Blog() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <div>
+        <div className="flex items-center gap-4">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-foreground bg-clip-text text-transparent">
             Blog Management
           </h1>
           <p className="text-muted-foreground mt-2">
             Create and manage educational content for your platform.
           </p>
+          <div className="ml-auto flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Filter:</span>
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
+              <SelectTrigger className="w-36">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All</SelectItem>
+                <SelectItem value="PUBLISHED">Published</SelectItem>
+                <SelectItem value="DRAFT">Drafts</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <Button
           onClick={handleCreatePost}
@@ -258,12 +304,17 @@ export function Blog() {
                   </p>
                   <p className="text-sm text-muted-foreground">{stat.label}</p>
                 </div>
-                <Badge
-                  variant="secondary"
-                  className="bg-input text-accent-foreground border-accent-foreground/20"
-                >
-                  {stat.change}
-                </Badge>
+                {/* Only show change badge when provided */}
+                {/* @ts-expect-error - stat may not include change */}
+                {stat.change ? (
+                  <Badge
+                    variant="secondary"
+                    className="bg-input text-accent-foreground border-accent-foreground/20"
+                  >
+                    {/* @ts-expect-error - guarded above */}
+                    {stat.change}
+                  </Badge>
+                ) : null}
               </div>
             </CardContent>
           </Card>
@@ -283,15 +334,14 @@ export function Blog() {
                 />
               </div>
             </div>
-            <Select>
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
               <SelectTrigger className="w-48 bg-input border-primary/20">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent className="glassmorphism  border-primary/20">
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="published">Published</SelectItem>
-                <SelectItem value="draft">Draft</SelectItem>
-                <SelectItem value="scheduled">Scheduled</SelectItem>
+                <SelectItem value="ALL">All</SelectItem>
+                <SelectItem value="PUBLISHED">Published</SelectItem>
+                <SelectItem value="DRAFT">Draft</SelectItem>
               </SelectContent>
             </Select>
             <Select>
@@ -489,6 +539,16 @@ export function Blog() {
                           align="end"
                           className="glassmorphism border-primary/20"
                         >
+                          {post.status === "Draft" && (
+                            <DropdownMenuItem
+                              className="hover:bg-accent/20 text-primary"
+                              onClick={() => handlePublish(post)}
+                              disabled={isUpdating}
+                            >
+                              <Send className="w-4 h-4 mr-2" />
+                              {isUpdating ? "Publishing..." : "Publish"}
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem 
                             className="hover:bg-accent/20"
                             onClick={() => handlePreviewPost(post)}

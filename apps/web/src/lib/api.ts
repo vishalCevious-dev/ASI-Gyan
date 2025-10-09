@@ -133,6 +133,15 @@ export const blogApi = {
       }>
     >("/v1/blog", { method: "GET", params: { page, limit } });
   },
+  // Admin list including drafts
+  async adminList(page = 1, limit = 10, status?: "DRAFT" | "PUBLISHED") {
+    return apiFetch<
+      ApiResponse<{
+        data: BlogPost[];
+        pagination: { page: number; limit: number; total: number; pages: number };
+      }>
+    >("/v1/blog/admin", { method: "GET", params: { page, limit, status } });
+  },
   async getBySlug(slug: string) {
     return apiFetch<ApiResponse<BlogPost>>(
       `/v1/blog/${encodeURIComponent(slug)}`,

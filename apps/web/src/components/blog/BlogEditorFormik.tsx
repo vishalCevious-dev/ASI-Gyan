@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Save, Send, X } from "lucide-react";
+import { ArrowLeft, Save, Send, X, Eye } from "lucide-react";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import QuillEditor from "@/components/editor/QuillEditor";
 import { slugify } from "@/lib/slug";
@@ -25,6 +25,14 @@ import {
 import { validateImageFile } from "@/validation/file";
 import { useToast } from "@/components/ui/use-toast";
 import { useBlogMutation } from "@/hooks/useBlogMutations";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 type FullPost = {
   id: string;
@@ -56,6 +64,7 @@ export default function BlogEditorFormik({
   const [tagsInput, setTagsInput] = useState("");
   const [metaEdited, setMetaEdited] = useState(false);
   const { mutate, isPending } = useBlogMutation(() => onClose());
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   // Set existing image when post is loaded
   useEffect(() => {
@@ -73,6 +82,7 @@ export default function BlogEditorFormik({
     setFieldValue,
     setFieldTouched,
     handleSubmit,
+    submitForm,
     submitCount,
   } = useFormik({
     initialValues: {
@@ -209,7 +219,10 @@ export default function BlogEditorFormik({
           <Button
             type="button"
             variant="outline"
-            onClick={() => setFieldValue("status", "DRAFT")}
+            onClick={async () => {
+              await setFieldValue("status", "DRAFT");
+              submitForm();
+            }}
             className="border-accent-foreground/30 text-accent-foreground hover:bg-accent-foreground/10"
             disabled={isPending}
           >
@@ -218,7 +231,17 @@ export default function BlogEditorFormik({
           </Button>
           <Button
             type="button"
-            onClick={() => setFieldValue("status", "PUBLISHED")}
+            variant="outline"
+            onClick={() => setPreviewOpen(true)}
+            className="border-primary/30 hover:bg-primary/10"
+            disabled={isPending}
+          >
+            <Eye className="w-4 h-4 mr-2" />
+            Preview
+          </Button>
+          <Button
+            type="button"
+            onClick={() => setPreviewOpen(true)}
             className="gradient-primary text-black font-medium hover:scale-105 transition-transform"
             disabled={isPending}
           >
@@ -567,6 +590,80 @@ export default function BlogEditorFormik({
           </div>
         </div>
       </form>
+
+      {/* Preview Dialog */}
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Post preview</DialogTitle>
+            <DialogDescription>
+              Review how your post will look before publishing.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="max-h-[70vh] overflow-y-auto space-y-4">
+            {(imagePreview || existingImageUrl) && (
+              <ImageWithFallback
+                src={imagePreview || (existingImageUrl as string)}
+                alt="Featured image"
+                className="w-full h-56 object-cover rounded-md border border-border"
+              />
+            )}
+            <h2 className="text-2xl font-semibold">{values.title || "Untitled"}</h2>
+            {values.excerpt && (
+              <p className="text-muted-foreground">{values.excerpt}</p>
+            )}
+            {values.tags?.length ? (
+              <div className="flex flex-wrap gap-2">
+                {values.tags.map((t, i) => (
+                  <span
+                    key={i}
+                    className="px-2 py-1 text-xs rounded border border-primary/30 text-primary"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+            <div
+              className="prose prose-invert max-w-none"
+              dangerouslySetInnerHTML={{ __html: values.content || "" }}
+            />
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPreviewOpen(false)}
+            >
+              Close
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={async () => {
+                await setFieldValue("status", "DRAFT");
+                submitForm();
+                setPreviewOpen(false);
+              }}
+            >
+              Save Draft
+            </Button>
+            <Button
+              type="button"
+              onClick={async () => {
+                await setFieldValue("status", "PUBLISHED");
+                submitForm();
+                setPreviewOpen(false);
+              }}
+              className="gradient-primary text-black"
+            >
+              Publish Now
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

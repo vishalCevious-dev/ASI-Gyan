@@ -52,7 +52,8 @@ export function useBlogMutation(onSuccess?: () => void) {
       // delete
       return blogApi.remove((data as DeleteInput).id);
     },
-    [{ queryKey: ["blog", "list"] }],
+    // Invalidate all blog-related queries (admin list, counts, detail)
+    ["blog"],
     onSuccess,
   );
 
