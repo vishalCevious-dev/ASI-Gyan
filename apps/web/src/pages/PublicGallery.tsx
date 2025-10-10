@@ -8,6 +8,8 @@ import Footer from "@/components/ui/footer";
 import { Grid3X3, List, ChevronDown, Filter, Search } from "lucide-react";
 import { useState, useMemo } from "react";
 import { VideoCard } from "@/components/ui/VideoCard";
+import { useTheme } from "@/providers/theme-provider";
+import { cn } from "@/lib/utils";
 
 
 // Component for embedded video players
@@ -136,23 +138,33 @@ const VideoModal = ({
   isOpen, 
   onClose, 
   videoUrl, 
-  title 
+  title,
+  isDark 
 }: { 
   isOpen: boolean; 
   onClose: () => void; 
   videoUrl: string; 
-  title: string; 
+  title: string;
+  isDark: boolean;
 }) => {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
       <div className="relative w-full max-w-4xl mx-4">
-        <div className="bg-black rounded-lg overflow-hidden relative">
+        <div className={cn(
+          "rounded-lg overflow-hidden relative",
+          isDark ? "bg-card" : "bg-black"
+        )}>
           {/* Single close button - always visible */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-20 bg-black/70 rounded-full p-2 hover:bg-black/90"
+            className={cn(
+              "absolute top-4 right-4 transition-colors z-20 rounded-full p-2",
+              isDark 
+                ? "text-foreground hover:text-primary bg-card/70 hover:bg-card/90" 
+                : "text-white hover:text-gray-300 bg-black/70 hover:bg-black/90"
+            )}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -165,7 +177,10 @@ const VideoModal = ({
               className="w-full h-full" 
             />
           </div>
-          <div className="p-4 text-white">
+          <div className={cn(
+            "p-4",
+            isDark ? "text-foreground" : "text-white"
+          )}>
             <h3 className="text-lg font-medium">{title}</h3>
           </div>
         </div>
@@ -177,6 +192,7 @@ const VideoModal = ({
 export default function PublicGallery() {
   const { data, isLoading, isError } = usePublicGalleryList(1, 12);
   const items = data?.data?.data || [];
+  const { isDark } = useTheme();
   
   // State for video modal
   const [selectedVideo, setSelectedVideo] = useState<{
@@ -281,14 +297,20 @@ export default function PublicGallery() {
                 {/* All button - highlighted */}
                 <button
                   onClick={() => setSelectedCategory("All")}
-                  className={`flex items-center rounded-[10px] px-3 py-2 transition-all duration-200 ${
+                  className={cn(
+                    "flex items-center rounded-[10px] px-3 py-2 transition-all duration-200",
                     selectedCategory === "All"
-                      ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
-                      : "bg-card text-foreground hover:bg-accent"
-                  }`}
+                      ? "bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-md"
+                      : "bg-card text-foreground hover:bg-accent border border-border"
+                  )}
                 >
                   <span className="text-sm font-bold mr-2">All</span>
-                  <span className="text-xs font-bold bg-white/10 rounded-full px-3 py-1">
+                  <span className={cn(
+                    "text-xs font-bold rounded-full px-3 py-1",
+                    selectedCategory === "All" 
+                      ? "bg-white/20 dark:bg-black/20" 
+                      : "bg-secondary/40"
+                  )}>
                     {categoryCounts.total}
                   </span>
                 </button>
@@ -304,14 +326,20 @@ export default function PublicGallery() {
                   <button
                     key={category.name}
                     onClick={() => setSelectedCategory(category.name)}
-                    className={`flex items-center rounded-[10px] px-3 py-2 transition-all duration-200 ${
+                    className={cn(
+                      "flex items-center rounded-[10px] px-3 py-2 transition-all duration-200",
                       selectedCategory === category.name
-                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                        ? "bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-md"
                         : "bg-card text-foreground hover:bg-accent border border-border"
-                    }`}
+                    )}
                   >
                     <span className="text-sm font-bold mr-2">{category.name}</span>
-                    <span className="text-xs font-bold bg-secondary/40 rounded-full px-3 py-1">
+                    <span className={cn(
+                      "text-xs font-bold rounded-full px-3 py-1",
+                      selectedCategory === category.name 
+                        ? "bg-white/20 dark:bg-black/20" 
+                        : "bg-secondary/40"
+                    )}>
                       {category.count}
                     </span>
                   </button>
@@ -365,22 +393,24 @@ export default function PublicGallery() {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => setViewMode("grid")}
-                      className={`p-2 rounded-[10px] transition-all duration-200 ${
+                      className={cn(
+                        "p-2 rounded-[10px] transition-all duration-200",
                         viewMode === "grid"
-                          ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                          ? "bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-md"
                           : "bg-card text-foreground hover:bg-accent border border-border"
-                      }`}
+                      )}
                       aria-label="Grid view"
                     >
                       <Grid3X3 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setViewMode("list")}
-                      className={`p-2 rounded-[10px] transition-all duration-200 ${
+                      className={cn(
+                        "p-2 rounded-[10px] transition-all duration-200",
                         viewMode === "list"
-                          ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                          ? "bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-md"
                           : "bg-card text-foreground hover:bg-accent border border-border"
-                      }`}
+                      )}
                       aria-label="List view"
                     >
                       <List className="w-4 h-4" />
@@ -397,23 +427,31 @@ export default function PublicGallery() {
             </div>
           </div>
           <div className="text-center mb-8 sm:mb-12">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-4">Gallery</h1>
-            <p className="text-muted-foreground text-sm sm:text-base">
+            <h1 className={`text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-4 ${
+              isDark ? "text-white" : "text-gray-900"
+            }`}>Gallery</h1>
+            <p className={`text-sm sm:text-base ${
+              isDark ? "text-gray-300" : "text-gray-700"
+            }`}>
               Explore our collection of photos and videos
             </p>
           </div>
           
           {isLoading ? (
             <div className="text-center py-12">
-              <div className="text-muted-foreground">Loading gallery…</div>
+              <div className={isDark ? "text-gray-300" : "text-gray-700"}>
+                Loading gallery…
+              </div>
             </div>
           ) : isError ? (
             <div className="text-center py-12">
-              <div className="text-destructive">Failed to load gallery.</div>
+              <div className={isDark ? "text-red-400" : "text-red-600"}>
+                Failed to load gallery.
+              </div>
             </div>
           ) : sortedItems.length === 0 ? (
             <div className="text-center py-12">
-              <div className="text-muted-foreground">
+              <div className={isDark ? "text-gray-400" : "text-gray-600"}>
                 {searchQuery.trim() ? "No items found matching your search." : "No items found."}
               </div>
             </div>
@@ -505,6 +543,7 @@ export default function PublicGallery() {
         onClose={() => setSelectedVideo(null)}
         videoUrl={selectedVideo?.url || ''}
         title={selectedVideo?.title || ''}
+        isDark={isDark}
       />
     </div>
   );

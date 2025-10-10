@@ -36,11 +36,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
 // Simple themed Gallery page matching dashboard look-and-feel
 export default function Gallery() {
-  const [input1, onChangeInput1] = useState("");
-  const [input2, onChangeInput2] = useState("");
-  const [input3, onChangeInput3] = useState("");
-  const [input4, onChangeInput4] = useState("");
-  const [input5, onChangeInput5] = useState("");
   const { toast } = useToast();
   const qc = useQueryClient();
   const { data, isLoading, isError, refetch } = useQuery({
@@ -54,6 +49,7 @@ export default function Gallery() {
   const [filterType, setFilterType] = useState<"ALL" | "PHOTO" | "VIDEO">(
     "ALL",
   );
+  const [filterCategory, setFilterCategory] = useState<string>("ALL");
   const [filterStatus, setFilterStatus] = useState<
     "ALL" | "PUBLISHED" | "DRAFT"
   >("ALL");
@@ -72,19 +68,26 @@ export default function Gallery() {
         filterType === "ALL"
           ? true
           : (it.type || "").toUpperCase() === filterType;
+      const matchesCategory =
+        filterCategory === "ALL"
+          ? true
+          : (it.category || "").toLowerCase() === filterCategory.toLowerCase();
       const matchesStatus =
         filterStatus === "ALL"
           ? true
           : (it.status || "").toUpperCase() === filterStatus;
-      return matchesQ && matchesType && matchesStatus;
+      return matchesQ && matchesType && matchesCategory && matchesStatus;
     });
-  }, [items, searchQuery, filterType, filterStatus]);
+  }, [items, searchQuery, filterType, filterCategory, filterStatus]);
 
-  // Quick stats
+  // Quick stats - Live counts from actual data
   const total = items.length;
   const photos = items.filter((i: any) => i.type === "PHOTO").length;
   const videos = items.filter((i: any) => i.type === "VIDEO").length;
   const published = items.filter((i: any) => i.status === "PUBLISHED").length;
+  const events = items.filter((i: any) => (i.category || "").toLowerCase() === "events").length;
+  const community = items.filter((i: any) => (i.category || "").toLowerCase() === "community").length;
+  const featured = items.filter((i: any) => (i.category || "").toLowerCase() === "featured").length;
 
   // Description removed per request
   const [title, setTitle] = useState<string>("");
@@ -168,37 +171,75 @@ export default function Gallery() {
       {/* Filter bar */}
       <div className="flex flex-col lg:flex-row items-center justify-between gap-4 bg-card/50 border border-border rounded-xl py-4 sm:py-6 px-4 sm:px-6">
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <div className="flex items-center rounded-[10px] px-3 py-2 gradient-primary">
-            <span className="text-white text-sm font-bold mr-2">All</span>
-            <span className="text-white text-xs font-bold bg-white/10 rounded-full px-3 py-1">
-              1342
+          <button
+            onClick={() => {
+              setFilterType("ALL");
+              setFilterCategory("ALL");
+            }}
+            className={`flex items-center rounded-[10px] px-3 py-2 transition-all ${
+              filterType === "ALL" && filterCategory === "ALL"
+                ? "gradient-primary"
+                : "bg-card border border-border hover:border-primary/50"
+            }`}
+          >
+            <span className={`text-sm font-bold mr-2 ${
+              filterType === "ALL" && filterCategory === "ALL" ? "text-white" : "text-foreground"
+            }`}>
+              All
             </span>
-          </div>
+            <span className={`text-xs font-bold rounded-full px-3 py-1 ${
+              filterType === "ALL" && filterCategory === "ALL"
+                ? "text-white bg-white/10"
+                : "text-foreground bg-secondary/40"
+            }`}>
+              {total}
+            </span>
+          </button>
 
           {[
-            ["Photos", input1, onChangeInput1, "982"],
-            ["Videos", input2, onChangeInput2, "234"],
-            ["Events", input3, onChangeInput3, "78"],
-            ["Community", input4, onChangeInput4, "156"],
-            ["Featured", input5, onChangeInput5, "42"],
-          ].map(([ph, val, setVal, count], i) => (
-            <div
-              key={i}
-              className="flex items-center bg-card py-2 px-3 rounded-[10px] border border-border"
-            >
-              <input
-                placeholder={String(ph)}
-                value={String(val)}
-                onChange={(e) =>
-                  (setVal as (v: string) => void)(e.target.value)
-                }
-                className="text-foreground bg-transparent text-sm font-bold w-[92px] py-[1px] border-0 outline-none"
-              />
-              <span className="text-foreground text-xs font-bold bg-secondary/40 rounded-full px-3 py-1 ml-2">
-                {String(count)}
-              </span>
-            </div>
-          ))}
+            { label: "Photos", type: "PHOTO", count: photos },
+            { label: "Videos", type: "VIDEO", count: videos },
+            { label: "Events", category: "Events", count: events },
+            { label: "Community", category: "Community", count: community },
+            { label: "Featured", category: "Featured", count: featured },
+          ].map((filter, i) => {
+            const isActive = filter.type
+              ? filterType === filter.type && filterCategory === "ALL"
+              : filterCategory === filter.category;
+            
+            return (
+              <button
+                key={i}
+                onClick={() => {
+                  if (filter.type) {
+                    setFilterType(filter.type as "PHOTO" | "VIDEO");
+                    setFilterCategory("ALL");
+                  } else if (filter.category) {
+                    setFilterCategory(filter.category);
+                    setFilterType("ALL");
+                  }
+                }}
+                className={`flex items-center py-2 px-3 rounded-[10px] transition-all ${
+                  isActive
+                    ? "gradient-primary"
+                    : "bg-card border border-border hover:border-primary/50"
+                }`}
+              >
+                <span className={`text-sm font-bold mr-2 ${
+                  isActive ? "text-white" : "text-foreground"
+                }`}>
+                  {filter.label}
+                </span>
+                <span className={`text-xs font-bold rounded-full px-3 py-1 ${
+                  isActive
+                    ? "text-white bg-white/10"
+                    : "text-foreground bg-secondary/40"
+                }`}>
+                  {filter.count}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Star, Loader2, Play, Pause } from "lucide-react";
+import { useTheme } from "@/providers/theme-provider";
 
 interface FeaturedItem {
   id: number;
@@ -42,6 +43,7 @@ export default function FeaturedContent() {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [progress, setProgress] = useState(0);
+  const { isDark } = useTheme();
 
   // Preload images
   useEffect(() => {
@@ -169,17 +171,29 @@ export default function FeaturedContent() {
         {/* Header Section */}
         <div className="text-center mb-12">
           {/* Featured Content tag */}
-          <div className="inline-flex items-center px-4 py-2 rounded-full mb-6 bg-primary/10 border border-primary/20">
-            <span className="text-sm font-medium text-primary">Featured Content</span>
+          <div className={`inline-flex items-center px-4 py-2 rounded-full mb-6 border ${
+            isDark 
+              ? "bg-green-500/20 border-green-400/30" 
+              : "bg-green-100 border-green-300"
+          }`}>
+            <span className={`text-sm font-medium ${
+              isDark ? "text-green-300" : "text-green-700"
+            }`}>Featured Content</span>
           </div>
           
           {/* Main heading */}
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-            <span className="text-primary">★</span> Featured Content <span className="text-primary">★</span>
+          <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${
+            isDark ? "text-white" : "text-gray-900"
+          }`}>
+            <span className={isDark ? "text-green-400" : "text-green-600"}>★</span> 
+            {" "}Featured Content{" "}
+            <span className={isDark ? "text-green-400" : "text-green-600"}>★</span>
           </h2>
           
           {/* Description */}
-          <p className="text-lg max-w-3xl mx-auto leading-relaxed text-muted-foreground">
+          <p className={`text-lg max-w-3xl mx-auto leading-relaxed ${
+            isDark ? "text-gray-300" : "text-gray-700"
+          }`}>
             Discover our handpicked selection of exceptional educational content and community moments
           </p>
         </div>
@@ -200,25 +214,41 @@ export default function FeaturedContent() {
             >
               {/* Loading Overlay */}
               {isLoading && (
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
+                <div className={`absolute inset-0 flex items-center justify-center z-10 ${
+                  isDark ? 'bg-black/70' : 'bg-white/70'
+                }`}>
                   <div className="text-center">
-                    <Loader2 className="w-8 h-8 text-white animate-spin mx-auto mb-4" />
-                    <p className="text-white text-lg">Loading featured content...</p>
+                    <Loader2 className={`w-8 h-8 animate-spin mx-auto mb-4 ${
+                      isDark ? 'text-white' : 'text-black'
+                    }`} />
+                    <p className={`text-lg ${isDark ? 'text-white' : 'text-black'}`}>
+                      Loading featured content...
+                    </p>
                   </div>
                 </div>
               )}
 
               {/* Image Loading Indicator */}
               {!loadedImages.has(currentIndex) && !isLoading && (
-                <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
+                <div className={`absolute inset-0 flex items-center justify-center ${
+                  isDark ? 'bg-gray-800' : 'bg-gray-200'
+                }`}>
                   <div className="text-center">
-                    <Loader2 className="w-6 h-6 text-white animate-spin mx-auto mb-2" />
-                    <p className="text-white text-sm">Loading image...</p>
+                    <Loader2 className={`w-6 h-6 animate-spin mx-auto mb-2 ${
+                      isDark ? 'text-white' : 'text-black'
+                    }`} />
+                    <p className={`text-sm ${isDark ? 'text-white' : 'text-black'}`}>
+                      Loading image...
+                    </p>
                   </div>
                 </div>
               )}
               {/* Gradient overlay for better text readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              <div className={`absolute inset-0 bg-gradient-to-t ${
+                isDark 
+                  ? 'from-black/80 via-black/20 to-transparent' 
+                  : 'from-black/60 via-black/10 to-transparent'
+              }`} />
               
               {/* Featured Badge */}
               <div className="absolute top-6 left-6">
@@ -232,9 +262,13 @@ export default function FeaturedContent() {
               <div className="absolute top-6 right-6 flex items-center gap-3">
                 {/* Progress Bar */}
                 {isAutoPlaying && (
-                  <div className="w-16 h-1 bg-white/20 rounded-full overflow-hidden">
+                  <div className={`w-16 h-1 rounded-full overflow-hidden ${
+                    isDark ? 'bg-white/20' : 'bg-black/20'
+                  }`}>
                     <div 
-                      className="h-full bg-white transition-all duration-100 ease-linear"
+                      className={`h-full transition-all duration-100 ease-linear ${
+                        isDark ? 'bg-white' : 'bg-black'
+                      }`}
                       style={{ width: `${progress}%` }}
                     />
                   </div>
@@ -275,10 +309,14 @@ export default function FeaturedContent() {
               {/* Content Overlay */}
               <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 lg:p-8">
                 <div className="max-w-3xl">
-                  <h3 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground mb-3 sm:mb-4 lg:mb-6 leading-tight">
+                  <h3 className={`text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3 sm:mb-4 lg:mb-6 leading-tight ${
+                    isDark ? "text-white drop-shadow-lg" : "text-white drop-shadow-xl"
+                  }`}>
                     {currentItem.title}
                   </h3>
-                  <p className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-4 sm:mb-6 lg:mb-8 leading-relaxed max-w-2xl">
+                  <p className={`text-base sm:text-lg lg:text-xl mb-4 sm:mb-6 lg:mb-8 leading-relaxed max-w-2xl ${
+                    isDark ? "text-gray-200 drop-shadow-md" : "text-white drop-shadow-lg"
+                  }`}>
                     {currentItem.description}
                   </p>
                   
@@ -287,13 +325,13 @@ export default function FeaturedContent() {
                     <Button 
                       variant="outline" 
                       size="lg"
-                      className="border-primary/50 text-foreground hover:bg-primary/10 rounded-lg px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium backdrop-blur-sm"
+                      className="rounded-xl px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold backdrop-blur-sm border-white/50 text-white hover:bg-white/20"
                     >
                       View Details
                     </Button>
                     <Button 
                       size="lg"
-                      className="gradient-primary text-black font-medium hover:scale-105 transition-transform rounded-lg px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg shadow-lg"
+                      className="bg-green-500 hover:bg-green-600 text-white font-semibold hover:scale-105 transition-transform rounded-xl shadow-lg px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg"
                     >
                       Learn More
                     </Button>

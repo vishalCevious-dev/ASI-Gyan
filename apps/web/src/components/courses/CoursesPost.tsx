@@ -83,17 +83,7 @@ import {
   Legend,
 } from "recharts";
 
-// Mock data
-const courseStats = {
-  total: 156,
-  active: 134,
-  draft: 15,
-  archived: 7,
-  totalStudents: 2847,
-  completionRate: 73,
-  revenue: 125420,
-};
-
+// Mock data for enrollment trends (can be replaced with real API data later)
 const enrollmentData = [
   { month: "Jan", enrollments: 245, completions: 178 },
   { month: "Feb", enrollments: 312, completions: 201 },
@@ -102,18 +92,6 @@ const enrollmentData = [
   { month: "May", enrollments: 521, completions: 389 },
   { month: "Jun", enrollments: 478, completions: 356 },
 ];
-
-const categoryData = [
-  {
-    name: "AI & Machine Learning",
-    value: 35,
-    color: "#00FFFF",
-  },
-  { name: "Web Development", value: 28, color: "#00FF9D" },
-  { name: "Data Science", value: 22, color: "#8A2BE2" },
-  { name: "Mobile Development", value: 15, color: "#FF6B9D" },
-];
-
 
 const categories = [
   "All",
@@ -168,6 +146,35 @@ export function Courses() {
     duration: "",
     price: "",
   });
+
+  // Calculate real stats from courses data
+  const courseStats = {
+    total: courses.length,
+    active: courses.filter(c => c.status === 'PUBLISHED').length,
+    draft: courses.filter(c => c.status === 'DRAFT').length,
+    archived: courses.filter(c => c.status === 'ARCHIVED').length,
+    totalStudents: courses.reduce((sum, c) => sum + (c.enrolledStudents || 0), 0),
+    completionRate: courses.length > 0 
+      ? Math.round(courses.reduce((sum, c) => sum + (c.completionRate || 0), 0) / courses.length)
+      : 0,
+    revenue: courses.reduce((sum, c) => sum + ((c.price || 0) * (c.enrolledStudents || 0)), 0),
+  };
+
+  // Calculate category distribution from real data
+  const categoryData = (() => {
+    const categoryCounts: Record<string, number> = {};
+    courses.forEach(course => {
+      const cat = course.category || 'Other';
+      categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+    });
+    
+    const colors = ['#00FFFF', '#00FF9D', '#8A2BE2', '#FF6B9D', '#FFD700', '#FF4500'];
+    return Object.entries(categoryCounts).map(([name, value], index) => ({
+      name,
+      value,
+      color: colors[index % colors.length]
+    }));
+  })();
 
   // Load courses on component mount
   useEffect(() => {
@@ -1127,7 +1134,7 @@ export function Courses() {
                   {courseStats.completionRate}%
                 </p>
               </div>
-              <Target className="w-8 h-8 text-secondary-foreground" />
+              <Target className="w-8 h-8 text-accent-foreground" />
             </div>
           </CardContent>
         </Card>
@@ -1239,34 +1246,44 @@ export function Courses() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={categoryData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={120}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {categoryData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={entry.color}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "rgba(16, 24, 40, 0.9)",
-                    border: "1px solid rgba(0, 255, 255, 0.2)",
-                    borderRadius: "8px",
-                  }}
-                />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+            {categoryData.length === 0 ? (
+              <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                <div className="text-center">
+                  <BookOpen className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                  <p>No courses yet</p>
+                  <p className="text-sm">Create your first course to see categories</p>
+                </div>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={categoryData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={120}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {categoryData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.color}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "rgba(58, 88, 148, 0.9)",
+                      border: "1px solid rgba(16, 234, 234, 0.2)",
+                      borderRadius: "8px",
+                    }}
+                  />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
       </div>
