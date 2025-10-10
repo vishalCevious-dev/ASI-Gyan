@@ -131,7 +131,7 @@ const Footer = () => {
         <div className="border-t border-border pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-muted-foreground text-sm">
-              © 2024 ASI Gyan - AI School of Entrepreneur. All rights reserved.
+              © 2025 ASI Gyan - AI School of Entrepreneur. All rights reserved.
             </div>
             <div className="flex gap-6 text-sm">
               <a
