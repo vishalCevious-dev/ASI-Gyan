@@ -49,7 +49,7 @@ const Header = () => {
 
   const ThemeIcon = isDark ? Sun : Moon;
   const MenuIcon = mobileMenuOpen ? X : Menu;
-  const accentColor = "#00b56a"; // primary green
+  const accentColor = "#16a34a"; // primary green
   const navLinks = [
     { label: "Courses", to: "/courses" },
     { label: "About", to: "/#about" },
@@ -151,8 +151,8 @@ const Header = () => {
               className={cn(
                 "transition-all duration-300 hover:scale-105",
                 isDark
-                  ? "text-white/80 hover:text-[#00b56a] hover:bg-[#00b56a]/10"
-                  : "text-gray-800 hover:text-[#00b56a] hover:bg-[#00b56a]/10"
+                  ? "text-white/80 hover:text-[#16a34a] hover:bg-[#16a34a]/10"
+                  : "text-gray-800 hover:text-[#16a34a] hover:bg-[#16a34a]/10"
               )}
             >
               <ThemeIcon className="h-5 w-5" />
@@ -162,8 +162,8 @@ const Header = () => {
             <Button
               asChild
               variant="outline"
-              className="border border-[#00b56a]/50 text-[#00b56a] 
-                         bg-white/70 dark:bg-black/40 hover:bg-[#00b56a]/10 
+              className="border border-[#16a34a]/50 text-[#16a34a] 
+                         bg-white/70 dark:bg-black/40 hover:bg-[#16a34a]/10 
                          transition-all duration-300 font-medium"
             >
               <Link to="/login">Login</Link>
@@ -172,8 +172,8 @@ const Header = () => {
             {/* Explore Courses */}
             <Button
               asChild
-              className="bg-[#00b56a]/90 text-white hover:bg-[#00b56a]/70 
-                         shadow-md hover:shadow-[0_0_20px_#00b56a/40] 
+              className="bg-[#16a34a]/90 text-white hover:bg-[#16a34a]/70 
+                         shadow-md hover:shadow-[0_0_20px_#16a34a/40] 
                          backdrop-blur-lg transition-all duration-500 border border-white/20"
             >
               <Link to="/courses">Explore Courses</Link>
@@ -192,8 +192,8 @@ const Header = () => {
               className={cn(
                 "transition-all duration-300 hover:scale-105",
                 isDark
-                  ? "text-white/80 hover:text-[#00b56a] hover:bg-[#00b56a]/10"
-                  : "text-gray-800 hover:text-[#00b56a] hover:bg-[#00b56a]/10"
+                  ? "text-white/80 hover:text-[#16a34a] hover:bg-[#16a34a]/10"
+                  : "text-gray-800 hover:text-[#16a34a] hover:bg-[#16a34a]/10"
               )}
             >
               <ThemeIcon className="h-5 w-5" />
@@ -208,8 +208,8 @@ const Header = () => {
               className={cn(
                 "transition-all duration-300",
                 isDark
-                  ? "text-white/80 hover:text-[#00b56a] hover:bg-[#00b56a]/10"
-                  : "text-gray-800 hover:text-[#00b56a] hover:bg-[#00b56a]/10"
+                  ? "text-white/80 hover:text-[#16a34a] hover:bg-[#16a34a]/10"
+                  : "text-gray-800 hover:text-[#16a34a] hover:bg-[#16a34a]/10"
               )}
             >
               <MenuIcon className="h-6 w-6" />
@@ -251,7 +251,7 @@ const Header = () => {
                     isDark
                       ? "text-white/80 hover:text-white hover:bg-white/10"
                       : "text-gray-800/80 hover:text-gray-900 hover:bg-black/5",
-                    active && "font-semibold bg-[#00b56a]/10"
+                    active && "font-semibold bg-[#16a34a]/10"
                   )}
                   onClick={() => setMobileMenuOpen(false)}
                 >
@@ -276,8 +276,8 @@ const Header = () => {
             <Button
               asChild
               variant="outline"
-              className="w-full border border-[#00b56a]/50 text-[#00b56a] 
-                         bg-white/70 dark:bg-black/40 hover:bg-[#00b56a]/10 
+              className="w-full border border-[#16a34a]/50 text-[#16a34a] 
+                         bg-white/70 dark:bg-black/40 hover:bg-[#16a34a]/10 
                          transition-all duration-300 font-medium h-12"
             >
               <Link to="/login">Login</Link>
@@ -285,8 +285,8 @@ const Header = () => {
 
             <Button
               asChild
-              className="w-full bg-[#00b56a]/90 text-white hover:bg-[#00b56a]/70 
-                         shadow-md hover:shadow-[0_0_20px_#00b56a/40] 
+              className="w-full bg-[#16a34a]/90 text-white hover:bg-[#16a34a]/70 
+                         shadow-md hover:shadow-[0_0_20px_#16a34a/40] 
                          backdrop-blur-lg transition-all duration-500 border border-white/20 h-12"
             >
               <Link to="/courses">Explore Courses</Link>

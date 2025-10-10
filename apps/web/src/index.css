@@ -10,7 +10,7 @@
     /* Brand & Semantic Colors */
     --space-blue: 218 60% 8%;
     --electric-cyan: 180 100% 50%;
-    --ai-green: 153 100% 50%;
+    --ai-green: 142 76% 36%;
     --digital-purple: 271 76% 53%;
 
     /* Chrome Default Light Theme */
@@ -20,7 +20,7 @@
     --card-foreground: 0 0% 20%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 20%;
-    --primary: 153 100% 50%;
+    --primary: var(--ai-green);
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 96%;
     --secondary-foreground: 0 0% 20%;
