@@ -66,9 +66,9 @@ const About = () => {
 
   return (
     <section id="about" className="py-12 bg-background">
-      <div className="max-w-5xl mx-auto px-5 py-16">
+      <div className="max-w-5xl mx-auto px-5">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <div className="text-4xl mb-4">🎓</div>
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             <span className="text-primary">ASI Gyan </span> AI School of Entrepreneur

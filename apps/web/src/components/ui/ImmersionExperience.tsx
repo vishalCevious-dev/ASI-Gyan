@@ -193,7 +193,7 @@ export default function LearningJourneyRoadmap() {
   const progressPct = Math.min(100, (completed / steps.length) * 100);
 
   return (
-    <section className="relative py-14 sm:py-16 lg:py-20">
+    <section className="relative py-12 sm:py-12 lg:py-12">
       {/* Background accents that look good in light & dark */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute left-10 top-16 h-24 w-24 rounded-full blur-2xl bg-primary/15" />
@@ -201,12 +201,12 @@ export default function LearningJourneyRoadmap() {
       </div>
 
       {/* Header */}
-      <div className="mx-auto mb-10 max-w-6xl px-4 text-center">
+      <div className="mx-auto mb-10 max-w-5xl px-4 text-center">
         <div className="mx-auto mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
           <Sparkles className="h-4 w-4" />
           AI Learning Journey
         </div>
-        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl">
+        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-3xl">
           Step‑by‑Step Roadmap
         </h2>
         <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">

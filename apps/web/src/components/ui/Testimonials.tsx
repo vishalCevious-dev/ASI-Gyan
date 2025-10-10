@@ -1,249 +1,252 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, Play, Pause } from "lucide-react";
 
-interface TestimonialProps {
+interface Testimonial {
+  type: "text" | "video";
   name: string;
-  content: string;
-  hasIcon?: boolean;
+  title?: string;
+  content?: string;
+  videoSrc?: string;
   iconSrc?: string;
 }
 
-interface VideoTestimonialProps {
-  name: string;
-  title?: string;
-  videoSrc: string;
-}
+const testimonials: Testimonial[] = [
+  {
+    type: "video",
+    name: "Nathalie Ramanathansoa-frat",
+    title: "Entrepreneur & Executive Advisor",
+    videoSrc: "/videos/Video-502.mp4",
+  },
+  {
+    type: "text",
+    name: "Chetan Sharma",
+    content:
+      "Team Outskill for the Generative AI Mastermind. It helped me open up to AI as a tool for everyday life. Also thanks for all the resources...",
+  },
+  {
+    type: "text",
+    name: "Jyoti Sunit Shukla",
+    content:
+      "Thank you for sharing this knowledge. You guys are doing a fantastic job. Being non-techie, I still learned how to prepare PPTs, create blogs, and posts!",
+  },
+  {
+    type: "video",
+    name: "Neha Bapna",
+    title: "Marketing Operations Expert",
+    videoSrc: "/videos/Video-604.mp4",
+  },
+  {
+    type: "text",
+    name: "Parin Patel",
+    content:
+      "A huge thank you to the entire Outskill Team and my fellow attendees for an incredible 2-Day AI Mastermind!",
+  },
+];
 
-const TestimonialCard: React.FC<TestimonialProps> = ({
-  name,
-  content,
-  hasIcon,
-  iconSrc,
-}) => (
-  <div className="group relative border border-border rounded-2xl p-6 bg-card text-foreground hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
-    <h4 className="text-base font-semibold group-hover:text-primary transition-colors duration-300">{name}</h4>
-    <p className="text-sm text-muted-foreground mt-3 leading-relaxed">{content}</p>
-
-    {hasIcon && iconSrc && (
-      <div className="absolute top-3 right-3 w-6 h-6">
-        <img
-          src={iconSrc}
-          alt="icon"
-          className="w-full h-full object-contain"
-        />
-      </div>
-    )}
-  </div>
-);
-
-const VideoTestimonialCard: React.FC<VideoTestimonialProps> = ({
-  name,
-  title,
-  videoSrc,
-}) => {
-  const [isPlaying, setIsPlaying] = useState(false);
+// ---------------------------------------------------------------
+// VideoCard Component
+const VideoCard: React.FC<{ t: Testimonial }> = ({ t }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  const handleVideoClick = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-        setIsPlaying(false);
-      } else {
-        videoRef.current.play();
-        setIsPlaying(true);
-      }
-    }
+  const togglePlay = () => {
+    if (!videoRef.current) return;
+    if (isPlaying) videoRef.current.pause();
+    else videoRef.current.play();
+    setIsPlaying(!isPlaying);
   };
 
   return (
-    <div className="group relative border border-border rounded-2xl overflow-hidden bg-card hover:shadow-2xl transition-transform duration-500 hover:scale-105">
-      <div className="relative">
-        {/* Video element */}
-        <video
-          ref={videoRef}
-          className="w-full aspect-[16/9] md:aspect-[4/3] object-cover rounded-t-2xl cursor-pointer"
-          muted
-          preload="metadata"
-          poster=""
-          onClick={handleVideoClick}
-        >
-          <source src={videoSrc} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-        
-        {/* Play button overlay - only show when video is not playing */}
-        {!isPlaying && (
-          <div 
-            className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors cursor-pointer"
-            onClick={handleVideoClick}
-          >
-            <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center group-hover:bg-white transition-colors">
-              <svg 
-                className="w-8 h-8 text-gray-800 ml-1" 
-                fill="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path d="M8 5v14l11-7z"/>
-              </svg>
-            </div>
-          </div>
-        )}
+    <motion.div
+      className="relative w-[320px] md:w-[420px] rounded-3xl overflow-hidden border 
+      bg-white/40 dark:bg-white/10 backdrop-blur-xl border-white/30 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.1)]"
+      whileHover={{ scale: 1.05 }}
+    >
+      <video
+        ref={videoRef}
+        className="w-full aspect-[16/9] object-cover cursor-pointer"
+        onClick={togglePlay}
+        muted
+        preload="metadata"
+      >
+        <source src={t.videoSrc} type="video/mp4" />
+      </video>
 
-        {/* Pause indicator - show when video is playing */}
-        {isPlaying && (
-          <div className="absolute top-3 right-3">
-            <div className="bg-black/70 rounded-full p-2">
-              <svg 
-                className="w-4 h-4 text-white" 
-                fill="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path d="M6 4h4v16H6zm8 0h4v16h-4z"/>
-              </svg>
-            </div>
-          </div>
+      <div
+        className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/40 transition cursor-pointer"
+        onClick={togglePlay}
+      >
+        <div className="w-16 h-16 rounded-full bg-white/80 dark:bg-white/40 flex items-center justify-center backdrop-blur-md shadow-xl">
+          {isPlaying ? (
+            <Pause className="w-7 h-7 text-gray-900 dark:text-white" />
+          ) : (
+            <Play className="w-7 h-7 text-gray-900 dark:text-white ml-1" />
+          )}
+        </div>
+      </div>
+
+      <div className="p-5 text-center">
+        <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+          {t.name}
+        </h4>
+        {t.title && (
+          <p className="text-sm text-gray-600 dark:text-gray-300">{t.title}</p>
         )}
       </div>
-      
-      <div className="p-6">
-        <h4 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors duration-300">{name}</h4>
-        {title && (
-          <p className="text-sm text-muted-foreground mt-1">{title}</p>
-        )}
-      </div>
-    </div>
+    </motion.div>
   );
 };
 
+// ---------------------------------------------------------------
+// TextCard Component
+const TextCard: React.FC<{ t: Testimonial }> = ({ t }) => (
+  <motion.div
+    className="w-[320px] md:w-[420px] p-6 rounded-3xl border 
+    bg-white/40 dark:bg-white/10 backdrop-blur-xl border-white/30 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.1)]"
+    whileHover={{ scale: 1.05 }}
+  >
+    <p className="text-base leading-relaxed text-gray-800 dark:text-gray-200">
+      {t.content}
+    </p>
+    <div className="mt-4">
+      <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+        {t.name}
+      </h4>
+      {t.title && (
+        <p className="text-sm text-gray-600 dark:text-gray-400">{t.title}</p>
+      )}
+    </div>
+  </motion.div>
+);
+
+// ---------------------------------------------------------------
+// Main Component
 const Testimonials: React.FC = () => {
-  const testimonials = [
-    {
-      name: "Chetan Sharma",
-      content:
-        "Team Outskill for the Generative AI Mastermind. It helped me open up to AI as tool for everyday life. Also thanks for all the resources...",
-      hasIcon: true,
-      iconSrc:
-        "https://api.builder.io/api/v1/image/assets/TEMP/1fd16a8353d4937f3c22d02935da9ca4f248bef7?placeholderIfAbsent=true",
-    },
-    {
-      name: "Kamal Kanagat",
-      content:
-        "This has been a phenomenal session. Thank you so much for sharing all the information and knowledge. It was indeed an eye opener.",
-    },
-    {
-      name: "Jyoti Sunit Shukla",
-      content:
-        "Thank you for sharing this knowledge. You guys are doing fantastic job. Being non techie I still got to learn how to prepare PPT, create blog & posts :)",
-      hasIcon: true,
-      iconSrc:
-        "https://api.builder.io/api/v1/image/assets/TEMP/d6f84fd6aa29343e089905aedce69d13fd49ed1c?placeholderIfAbsent=true",
-    },
-    {
-      name: "Twinkle Soni",
-      content:
-        "Thank you. The last two days have been incredible and today towards the end the things did become overwhelming.",
-    },
-  ];
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  const next = () => setActive((p) => (p + 1) % testimonials.length);
+  const prev = () =>
+    setActive((p) => (p === 0 ? testimonials.length - 1 : p - 1));
+
+  // 🌀 Auto-scroll logic
+  useEffect(() => {
+    if (paused) return;
+    const interval = setInterval(() => {
+      next();
+    }, 4500); // 4.5s per scroll
+    return () => clearInterval(interval);
+  }, [paused, active]);
 
   return (
-    <section className="relative py-12 px-5 overflow-hidden bg-background">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/20 to-background"></div>
-      
-      {/* Decorative elements */}
-      <div className="absolute top-20 left-10 w-20 h-20 rounded-full opacity-30 blur-xl bg-primary/20"></div>
-      <div className="absolute bottom-20 right-10 w-32 h-32 rounded-full opacity-30 blur-xl bg-secondary/20"></div>
-      
-      <div className="relative max-w-6xl mx-auto">
-        {/* Header Section */}
-        <div className="text-center mb-12">
-          {/* Testimonials tag */}
-          <div className="inline-flex items-center px-4 py-2 rounded-full mb-6 bg-primary/10 border border-primary/20">
-            <span className="text-sm font-medium text-primary">Hear it From Them</span>
+    <section
+      className="relative py-24 bg-gray-100 dark:bg-neutral-900 overflow-hidden transition-colors duration-700"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      {/* Background gradient and glass blobs */}
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-100 via-gray-50 to-gray-200 dark:from-neutral-900 dark:via-neutral-950 dark:to-neutral-900"></div>
+      <div className="absolute -top-20 -left-20 w-72 h-72 bg-primary/30 dark:bg-primary/20 rounded-full blur-3xl opacity-30"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-secondary/30 dark:bg-secondary/20 rounded-full blur-3xl opacity-30"></div>
+
+      <div className="relative max-w-6xl mx-auto text-center">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="mb-16"
+        >
+          <div className="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-5">
+            <span className="text-primary text-sm font-medium">
+              Hear it From Them
+            </span>
           </div>
-          
-          {/* Main heading */}
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-            Ambitious People Love <span className="text-primary">ASI Gyan</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">
+            What Our Learners Say
           </h2>
-          
-          {/* Description */}
-          <p className="text-sl max-w-3xl mx-auto leading-relaxed text-muted-foreground">
-            Discover what our community members say about their transformative<br/> learning experiences with ASI Gyan.
+          <p className="mt-4 text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto">
+            Experience the transformation through voices of our learners —
+            inspiring journeys made possible with{" "}
+            <span className="text-primary font-semibold">ASI Gyan</span>.
           </p>
+        </motion.div>
+
+        {/* Carousel */}
+        <div className="relative h-[420px] flex items-center justify-center perspective-[1000px]">
+          <AnimatePresence>
+            {testimonials.map((t, i) => {
+              const offset =
+                (i - active + testimonials.length) % testimonials.length;
+              const distance = Math.min(
+                Math.abs(offset),
+                testimonials.length - Math.abs(offset)
+              );
+              const zIndex = testimonials.length - distance;
+              const rotateY =
+                offset === 0
+                  ? 0
+                  : offset > testimonials.length / 2
+                  ? -60
+                  : 60;
+              const translateX =
+                offset * 250 -
+                (offset > testimonials.length / 2
+                  ? testimonials.length * 250
+                  : 0);
+
+              return (
+                <motion.div
+                  key={i}
+                  className="absolute"
+                  style={{ zIndex }}
+                  initial={{ opacity: 0 }}
+                  animate={{
+                    opacity: distance <= 2 ? 1 : 0,
+                    x: translateX,
+                    scale: offset === 0 ? 1 : 0.85,
+                    rotateY,
+                    z: offset === 0 ? 0 : -200,
+                  }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                >
+                  {t.type === "video" ? <VideoCard t={t} /> : <TextCard t={t} />}
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
         </div>
 
-        {/* Grid Layout with equal spacing */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Column 1 - Using space-y-6 for consistent gaps */}
-          <div className="space-y-6">
-            <VideoTestimonialCard
-              name="Nathalie Ramanathansoa-frat"
-              title="Entrepreneur & executive advisor"
-              videoSrc="/videos/Video-502.mp4"
-            />
-            {testimonials.map((t, i) => (
-              <TestimonialCard key={i} {...t} />
-            ))}
-          </div>
+        {/* Navigation */}
+        <div className="flex justify-center gap-6 mt-12">
+          <button
+            onClick={prev}
+            className="p-4 rounded-full bg-white/70 dark:bg-white/10 text-gray-800 dark:text-gray-200 hover:bg-primary hover:text-white transition-all shadow-md"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            onClick={next}
+            className="p-4 rounded-full bg-white/70 dark:bg-white/10 text-gray-800 dark:text-gray-200 hover:bg-primary hover:text-white transition-all shadow-md"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
 
-          {/* Column 2 - Using space-y-6 for consistent gaps */}
-          <div className="space-y-6">
-            <TestimonialCard
-              name="Ashwath BM"
-              content="Immense gratitude to the Outskill team, phenomenal mentors, and the powerhouse community..."
+        {/* Dots */}
+        <div className="flex justify-center gap-2 mt-8">
+          {testimonials.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setActive(i)}
+              className={`w-3 h-3 rounded-full transition-all ${
+                i === active
+                  ? "bg-primary scale-110 shadow-md"
+                  : "bg-gray-400 dark:bg-gray-500 hover:bg-primary/60"
+              }`}
             />
-            <TestimonialCard
-              name="Yasmin Niazi"
-              content="I had a fantastic experience at the two-day AI Mastermind event. It was an incredible opportunity..."
-              hasIcon
-              iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/ea4ec06768c3163b6b5e3346d658c81a3bd9e61b?placeholderIfAbsent=true"
-            />
-            <TestimonialCard
-              name="Priya Sharma"
-              content="The AI Mastermind session was absolutely transformative! The practical insights and hands-on approach made complex concepts so much clearer."
-            />
-            <VideoTestimonialCard
-              name="Neha Bapna"
-              title="Marketing Operation expert"
-              videoSrc="/videos/Video-604.mp4"
-            />
-            <TestimonialCard
-              name="Shashank Aeligala"
-              content="Thank you Outskill team. I've learnt a lot in these 2 days and looking forward to learn more about AI this year!"
-            />
-          </div>
-
-          {/* Column 3 - Using space-y-6 for consistent gaps */}
-          <div className="space-y-6">
-            <TestimonialCard
-              name="Parin Patel"
-              content="A huge thank you to the entire Outskill Team and my fellow attendees for an incredible 2 Day AI Mastermind!"
-              hasIcon
-              iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/fe2137467fae4db3828da8fd9c3ce0986e1930b1?placeholderIfAbsent=true"
-            />
-            <TestimonialCard
-              name="Bhawna Mehra"
-              content="First of all, I thank the entire Outskill and Outshine team and then to myself for keeping patience for this long..."
-              hasIcon
-              iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/80446e8cb44773744235d0bb8bc19b49fc8a1427?placeholderIfAbsent=true"
-            />
-            <TestimonialCard
-              name="Jay"
-              content="Hello Outskill team Thank you guys for a fantastic 1+2 days. This was a weekend very well spent with great learning..."
-            />
-            <TestimonialCard
-              name="Subhashini Nachimuthu"
-              content="Thank you, divij. It was really very insightful. Especially for a beginner like me, helped me understand basics of AI & prompting techniques!"
-              hasIcon
-              iconSrc="https://api.builder.io/api/v1/image/assets/TEMP/f8643c0824cb50a555c34a717f1e9956891f438c?placeholderIfAbsent=true"
-            />
-            <VideoTestimonialCard
-              name="Subhashini Nachimuthu"
-              title="AI Enthusiast"
-              videoSrc="/videos/Video-746.mp4"
-            />
-          </div>
+          ))}
         </div>
       </div>
     </section>
