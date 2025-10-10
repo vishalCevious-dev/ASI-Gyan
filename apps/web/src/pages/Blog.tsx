@@ -438,7 +438,7 @@ function BlogPostPage() {
       <Header />
       
       {/* Blog Post Hero */}
-      <section className="py-20 bg-space-depth">
+      <section className="py-12 bg-space-depth">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center gap-4 mb-6">
